@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>其他 on Hata的小屋</title>
+        <link>http://localhost:1313/categories/%E5%85%B6%E4%BB%96/</link>
+        <description>Recent content in 其他 on Hata的小屋</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>hata</copyright>
+        <lastBuildDate>Sun, 09 Nov 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/%E5%85%B6%E4%BB%96/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>orange</title>
+        <link>http://localhost:1313/p/orange/</link>
+        <pubDate>Sun, 09 Nov 2025 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/p/orange/</guid>
+        <description>&lt;img src="http://localhost:1313/p/orange/111.png" alt="Featured image of post orange" /&gt;&lt;p&gt;公元2025年11月9日不知何许时分，此站初建成，具备基础功能，日后逐渐完善&amp;hellip;&lt;/p&gt;
+&lt;p&gt;由于仅有的有两篇WP在此之前就写好了，这里保留了其原始的日期&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

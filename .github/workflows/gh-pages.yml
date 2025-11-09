@@ -5,16 +5,16 @@ on:
     branches: [ main ]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
       with:
-        submodules: true  # 获取主题（如果是子模块）
-        fetch-depth: 0    # 获取所有历史
+        submodules: true
+        fetch-depth: 0
 
     - name: Setup Hugo
-      uses: peaceiris/actions-hugo@v3
+      uses: peaceiris/actions-hugo@v2
       with:
         hugo-version: 'latest'
         extended: true
@@ -23,11 +23,10 @@ jobs:
       run: hugo --minify
 
     - name: Deploy
-      uses: peaceiris/actions-gh-pages@v4
+      uses: peaceiris/actions-gh-pages@v3
       with:
         personal_token: ${{ secrets.PERSONAL_TOKEN }}
         external_repository: hataovo/hataovo.github.io
         publish_dir: ./public
         publish_branch: main
         force_orphan: true
-        keep_files: false

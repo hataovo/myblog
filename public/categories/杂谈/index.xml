@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>杂谈 on Hata的小屋</title>
+        <link>http://localhost:1313/categories/%E6%9D%82%E8%B0%88/</link>
+        <description>Recent content in 杂谈 on Hata的小屋</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>hata</copyright>
+        <lastBuildDate>Wed, 01 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/%E6%9D%82%E8%B0%88/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>nothing1</title>
+        <link>http://localhost:1313/p/nothing1/</link>
+        <pubDate>Wed, 01 Jan 2025 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/p/nothing1/</guid>
+        <description>&lt;img src="http://localhost:1313/p/nothing1/222.png" alt="Featured image of post nothing1" /&gt;</description>
+        </item>
+        
+    </channel>
+</rss>
