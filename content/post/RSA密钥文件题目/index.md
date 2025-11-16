@@ -405,7 +405,7 @@ coefficient:
 
 好了，到这里清楚的看出来就是一个dp，dq泄露的问题，e已知，n未知
 
-<a href='https://hataovo.github.io/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/#rsa5%29'> 参考</a>，恢复出p和q
+<a href='https://hataovo.github.io/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/#rsa5%29'> 参考</a>->Day2->rsa5，恢复出p和q
 
 exp
 
