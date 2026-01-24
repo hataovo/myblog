@@ -17,17 +17,17 @@
 &lt;/h2&gt;&lt;p&gt;本文记录了一些泄露高位/低位的题目&lt;/p&gt;
 &lt;p&gt;核心方法是coppersmith&lt;/p&gt;
 &lt;h2 id=&#34;原理简述&#34;&gt;原理简述
-&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.&lt;strong&gt;coppersmith方法small_roots()参数的设置，摘自&lt;/strong&gt;[参考1]&lt;/strong&gt;&lt;/p&gt;
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;1.&lt;/strong&gt; coppersmith方法small_roots()参数的设置，摘自 &lt;strong&gt;[参考1]&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;X:所求根的上界&lt;/p&gt;
 &lt;p&gt;beta(β): 限定因子，满足$b &gt;= N^{\beta}$ ，默认值为1 (所以此情况下b = N)&lt;/p&gt;
 &lt;p&gt;(找到 f(x)=0 的一个解，使它在模n的某个因子时成立，此时这里说的某个因子即为b，在rsa中n = p * q，只有两个因子，故此时的b即p或q。一般我们遇到的题中p,q位数都是相等的，故beta可取0.5，但更多情况下我们并不知道p,q哪个大，所以保险起见beta通常取0.4)&lt;/p&gt;
 &lt;p&gt;epsilon(ϵ): 限定因子，默认值为$ \beta / 8$，epsilon越小，耗时越长&lt;/p&gt;
-&lt;p&gt;**2.**最简单的类型例如&lt;a class=&#34;link&#34; href=&#34;https://hataovo.github.io/p/%e5%af%86%e7%a0%81%e6%8a%80%e6%9c%af%e8%83%bd%e5%8a%9b%e6%8f%90%e5%8d%87%e9%a2%98%e7%9b%ae%e7%bb%83%e4%b9%a0/#rsa8&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+&lt;p&gt;&lt;strong&gt;2.&lt;/strong&gt; 最简单的类型例如&lt;a class=&#34;link&#34; href=&#34;https://hataovo.github.io/p/%e5%af%86%e7%a0%81%e6%8a%80%e6%9c%af%e8%83%bd%e5%8a%9b%e6%8f%90%e5%8d%87%e9%a2%98%e7%9b%ae%e7%bb%83%e4%b9%a0/#rsa8&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;rsa8&lt;/a&gt;，直接泄露p或q的高位/低位，可以直接构造coppersmith&lt;/p&gt;
-&lt;p&gt;**3.**模板化的d高位泄露打法&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3.&lt;/strong&gt; 模板化的d高位泄露打法&lt;/p&gt;
 &lt;p&gt;$d = d_{high}\cdot 2^{lowbits} + d_{low}$，$d_{high}已知，lowbits是d_{low}的比特位数$，则由$ed = 1+k\cdot phi$，可得$e(d_{high}\cdot 2^{lowbits} + d_{low})-1 = k(n-(p+q)+1)$，变形可得$kn =e(d_{high}\cdot 2^{lowbits} + d_{low})-1+k(p+q-1) $，同时除n，$k = \frac {e\cdot d_{high}\cdot 2^{lowbits}}{n} + \frac{d_{low}}{n}-\frac {1}{n}+ \frac {k(p+q-1)}{n} $，观察比特位数，发现右边除了第一项，除以n后都非常小，即$k \approx e\cdot d_{high}\cdot 2^{lowbits}//n $，具体做法是给右边+i，遍历[0,+1]即可可以求出k的值&lt;/p&gt;
-&lt;p&gt;求出k之后下一步，忽略掉$d_{low}$，由$ed = 1+kn-kp-kq+k$，得$edp = p+knp-kp^2-kn+kp$，代入数据可以求出p的高位(此时求出的p也大概低$lowbits$位是不准确的)，最后回到**[2]**，copper恢复p&lt;/p&gt;
-&lt;p&gt;**4.**自然的想法，d的低位泄露怎么打？&lt;/p&gt;
+&lt;p&gt;求出k之后下一步，忽略掉$d_{low}$，由$ed = 1+kn-kp-kq+k$，得$edp = p+knp-kp^2-kn+kp$，代入数据可以求出p的高位(此时求出的p也大概低$lowbits$位是不准确的)，最后回到 &lt;strong&gt;[2]&lt;/strong&gt; ，copper恢复p&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;4.&lt;/strong&gt; 自然的想法，d的低位泄露怎么打？&lt;/p&gt;
 &lt;p&gt;显然和上面一模一样行不通了，因为同样的方法已经求不出k了，结合了一个例子放在[T3]叙述了&lt;/p&gt;
 &lt;h2 id=&#34;t1&#34;&gt;T1
 &lt;/h2&gt;&lt;p&gt;&lt;strong&gt;[CISCN 2024] ez_rsa&lt;/strong&gt;&lt;/p&gt;
@@ -1086,8 +1086,8 @@
 &lt;/h2&gt;&lt;p&gt;之后遇到题目再往里面补充&lt;/p&gt;
 &lt;p&gt;后续找个二元copper的题目做一做&lt;/p&gt;
 &lt;h2 id=&#34;参考&#34;&gt;参考
-&lt;/h2&gt;&lt;p&gt;1.[ciscn2024 crypto-CSDN博客-Emmaaaaaaaaaa](&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/XiongSiqi_blog/article/details/139064568?ops_request_misc=%7B%22request%5Fid%22%3A%22bd984c7b39f8a800fd827c59c999740e%22%2C%22scm%22%3A%2220140713.130102334..%22%7D&amp;amp;request_id=bd984c7b39f8a800fd827c59c999740e&amp;amp;biz_id=0&amp;amp;utm_medium=distribute.pc_search_result.none-task-blog-2~blog~sobaiduend~default-1-139064568-null-null.nonecase&amp;amp;utm_term=2024ciscn&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://blog.csdn.net/XiongSiqi_blog/article/details/139064568?ops_request_misc=%7B%22request%5Fid%22%3A%22bd984c7b39f8a800fd827c59c999740e%22%2C%22scm%22%3A%2220140713.130102334..%22%7D&amp;request_id=bd984c7b39f8a800fd827c59c999740e&amp;biz_id=0&amp;utm_medium=distribute.pc_search_result.none-task-blog-2~blog~sobaiduend~default-1-139064568-null-null.nonecase&amp;utm_term=2024ciscn&lt;/a&gt; crypto&amp;amp;spm=1018.2226.3001.4450)&lt;/p&gt;
+&lt;/h2&gt;&lt;p&gt;1.&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/XiongSiqi_blog/article/details/139064568?ops_request_misc=%7B%22request%5Fid%22%3A%22bd984c7b39f8a800fd827c59c999740e%22%2C%22scm%22%3A%2220140713.130102334..%22%7D&amp;amp;request_id=bd984c7b39f8a800fd827c59c999740e&amp;amp;biz_id=0&amp;amp;utm_medium=distribute.pc_search_result.none-task-blog-2~blog~sobaiduend~default-1-139064568-null-null.nonecase&amp;amp;utm_term=2024ciscncrypto&amp;amp;spm=1018.2226.3001.4450&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ciscn2024 crypto-CSDN博客-Emmaaaaaaaaaa&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;2.&lt;a class=&#34;link&#34; href=&#34;https://tangcuxiaojikuai.xyz/post/9e021283.html#more&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;2024-CISCN-wp-crypto | 糖醋小鸡块的blog&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;3.&lt;a class=&#34;link&#34; href=&#34;https://dexterjie.github.io/2024/05/18/%e8%b5%9b%e9%a2%98%e5%a4%8d%e7%8e%b0/2024CISCN/#ezrsa%e2%80%94%e2%80%94%e5%a4%8d%e7%8e%b0&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
