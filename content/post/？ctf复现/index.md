@@ -1,5 +1,5 @@
 +++
-title = "?CTF 2025 题目复现"
+title = "？CTF 2025 题目复现"
 date = "2026-01-24"
 description = "做题✍"
 categories = ["WP"]
