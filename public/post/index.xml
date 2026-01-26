@@ -7,13 +7,72 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>hata</copyright>
-        <lastBuildDate>Sat, 24 Jan 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>?CTF 2025 题目复现</title>
+        <lastBuildDate>Mon, 26 Jan 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>小记0x01</title>
+        <link>http://localhost:1313/p/%E5%B0%8F%E8%AE%B00x01/</link>
+        <pubDate>Mon, 26 Jan 2026 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/p/%E5%B0%8F%E8%AE%B00x01/</guid>
+        <description>&lt;p&gt;2026.1.26 下午&lt;/p&gt;
+&lt;p&gt;感觉最近学习做题状态都有点低迷，学知识的时候学不进去容易走神，做题的时候碰到不会做的题就想着靠ai，ai要是也不会就想摆烂&lt;/p&gt;
+&lt;p&gt;第一场lilacCTF 0/5，难&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;题目&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;解出数量&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;是否解决&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;myRSA&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;18&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;❌&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;nestDLP&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;18&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;❌&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;Noisy Forest&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;14&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;❌&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;myBlock&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;6&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;❌&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;BootsTrapping&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;2&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;❌&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;难，没有一道上20解的题目，我也一道都做不出来，陷入了一种没思路、不会分析、做不出的状态，确实是自身水平远远不够，做不出来就不想做，不想做就更做不出来，不得不承认如果没有一些正反馈的话，于我而言积极性确实会下降，并且从中没学到什么东西，体验感很差&lt;/p&gt;
+&lt;p&gt;水群看到群友一句话&lt;code&gt;简单题便宜ai做，复杂题付费ai做&lt;/code&gt;，令人哭笑不得。学了半年多，也算是踏入了ctf的大门，走上了一个台阶，但谁又知走上去需要多少级台阶，几十，几百，或是更多？&amp;hellip;&amp;hellip;站在我的视角来看现如今ctf现状，基本50(甚至30多)以上解的题就是ai/agent能梭，而ai能做出来的我未必能独立做出来，ai要是做不出来就更希望渺茫了。起初，我的想法：一方面若ai梭出来，那么对题目的探索兴趣直接大减，就不再想自己分析了，另一方面，ai梭题除了能拿分之外再无益处了，若是竞争性的比赛，要拿奖或是争名次，那确实不用ai就仿佛输在起跑线上，而若是以赛代练，或是自己练习，用ai就是自欺欺人了。显然我现在的状况是后者，我希望通过比赛来提高自己的技术，锻炼分析问题的能力。但事实不然，诱惑难抗，在N1CTF中看到有两题解数越来多，但我自己做不来，于是也去用ai去一把梭了，满足自己的虚荣心&amp;hellip;反观，ai是梭出来了，但是我连看ai的思路都费劲，并且打心底也不想去看了&amp;hellip;&lt;/p&gt;
+&lt;p&gt;回到文首谈的，我想通过记录的形式清醒清醒，寒假已过一周，我在想是否有些太盲目了，是否应当审视自身的情况来制定一些合理的学习计划，循序渐进。最初我想的是以赛为主，以学为辅，在比赛做题中学习，现在看来收效甚微，也不感到舒服，因为很多赛题的质量和难度都很高，目前水平尚且对付不来。或许应转变观念，应以学为主，以赛为辅，慢慢进步。毕竟最初的意志说到底还是想提升水平，本不为名次，也不应看到题目解数上去但做不出就完全依靠ai，我应找一些适合自己的题目，从中学习，思考，也慢慢补充基础知识，脚踏实地的来吧。&lt;/p&gt;
+&lt;p&gt;另外一点想谈的，以CTF形式学习密码学(当然其只是密码学的一簇)，我感到一个很大的困境就是知识点太零散，今天做个coppersmith题，明天做个背包格，后天打个ecc&amp;hellip;没有形成一个合理且完整的知识体系，一方面是缺少总结，另一方面则是基础不牢。每次遇到一个新的难题仿佛都是崭新出厂，和过去的知识搭建不起关联。希望在以后的日子里能想清楚这件事情。&lt;/p&gt;
+&lt;p&gt;看动漫的时候发现，主角修为提升后，再遇到的人的修为也提升了&amp;hellip;这倒是有点映照现实，学了挺长时间，感觉自己应该变强了一点点，结果再碰到的题目也更难了 ╮(╯▽╰)╭ 总之，在后面的这段时间里，重心转移，潜心沉淀吧&lt;/p&gt;
+&lt;p&gt;在这里给自己列几点要求，尽力做到：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;平静下来，想清楚为了什么&lt;/li&gt;
+&lt;li&gt;完全思考充分后，仍不得解，再去尝试借助ai&lt;/li&gt;
+&lt;li&gt;制定比较清晰的每日计划(不限于学习)&lt;/li&gt;
+&lt;li&gt;慢慢调整到一个合理作息&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>？CTF 2025 题目复现</title>
         <link>http://localhost:1313/p/ctf-2025-%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%8E%B0/</link>
         <pubDate>Sat, 24 Jan 2026 00:00:00 +0000</pubDate>
         
         <guid>http://localhost:1313/p/ctf-2025-%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%8E%B0/</guid>
-        <description>&lt;img src="http://localhost:1313/p/ctf-2025-%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%8E%B0/111.png" alt="Featured image of post ?CTF 2025 题目复现" /&gt;&lt;h1 id=&#34;ctf-2025-复现&#34;&gt;?CTF 2025 复现
+        <description>&lt;img src="http://localhost:1313/p/ctf-2025-%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%8E%B0/111.png" alt="Featured image of post ？CTF 2025 题目复现" /&gt;&lt;h1 id=&#34;ctf-2025-复现&#34;&gt;?CTF 2025 复现
 &lt;/h1&gt;&lt;p&gt;&lt;strong&gt;前言&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;赛时只做了两三个题，当时感觉题目挺好的，一直想复现一下&lt;/p&gt;
 &lt;p&gt;?CTF整体难度比其他新生赛高很多，总体难度递进，越往后越难&lt;/p&gt;
