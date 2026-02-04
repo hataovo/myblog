@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="西电终端密码技术能力提升栏目题目练习">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="密码技术能力提升题目练习\r前言\n题目练习简单记录一下\nDay2：组会任务，9道rsa，前8道都挺公式化的，最后一道有点牢，详细记录了一下\n之后有时间的话把5个Day都做一做\nDay2\rrsa1\rp和q相差过小，开根枚举\nexp\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 import gmpy2 from Crypto.Util.number import * from sympy import nextprime c = 24694587387650920645996270549211207170638993154632740677659084672997106533269276167283114218006415216641778758173753050155613881125870891753812944825531433039125347447982352594932373137761585259271639546067263493692092183112083130016947631246281337375914696856286638623891178019397226234217383695239175194718 N = 47962015206855458418156612725688458795417626954963597347756764792325394700898782582998766219844198304624745810354449960976267092231860696089438097898628350928536758251238231355081269322175805806583435953523659093358712086737791909740621824243858233262611396937190733869654279420922758507262756820538256710701 p1, _ = gmpy2.iroot(N, 2) while 1: if N % p1 == 0: break p1 = nextprime(p1) p = p1 q = N // p phi = (p - 1) * (q - 1) d = pow(65537, -1, phi) m = pow(c, d, N) print(long_to_bytes(m)) # b&#39;hello&#39; rsa2\re=3小加密指数一般情况，直接开三次根\nexp\n1 2 3 4 5 6 7 8 import gmpy2 from Crypto.Util.number import * c = 90143305010218464651239068244550223 e = 3 n = 23033888059215652914547372571639832513795208553023368309294724398833696153243240439540505594523127438687598867850463867115334519418669023090322343378415503624073754318569038171789384345983857238854755806950088416689190107162861217850425292065837477205856204633063820787468124190181429310472692074161706160393611060419616313295013372404855581583756301983942208908189883172993963465850312578716718513001692084948798489419907453255919259237500207921922678923274075451935962157001214124804211340585033630247456567290613345126133871450507594280438724958688392815919099272303738741921577077656382506193257888572604276774991 m, _ = gmpy2.iroot(c, 3) print(long_to_bytes(int(m))) # b&#39;hello&#39; rsa3\r共模攻击，扩展欧几里得\n">
 <title>密码技术能力提升题目练习</title>
 
 <link rel='canonical' href='http://localhost:1313/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/'>
 
 <link rel="stylesheet" href="/scss/style.min.4d36f8dc1fd48129e1635deb4b8eb2870fa09474f7280c4cb606d40b2526994b.css"><meta property='og:title' content="密码技术能力提升题目练习">
-<meta property='og:description' content="西电终端密码技术能力提升栏目题目练习">
+<meta property='og:description' content="密码技术能力提升题目练习\r前言\n题目练习简单记录一下\nDay2：组会任务，9道rsa，前8道都挺公式化的，最后一道有点牢，详细记录了一下\n之后有时间的话把5个Day都做一做\nDay2\rrsa1\rp和q相差过小，开根枚举\nexp\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 import gmpy2 from Crypto.Util.number import * from sympy import nextprime c = 24694587387650920645996270549211207170638993154632740677659084672997106533269276167283114218006415216641778758173753050155613881125870891753812944825531433039125347447982352594932373137761585259271639546067263493692092183112083130016947631246281337375914696856286638623891178019397226234217383695239175194718 N = 47962015206855458418156612725688458795417626954963597347756764792325394700898782582998766219844198304624745810354449960976267092231860696089438097898628350928536758251238231355081269322175805806583435953523659093358712086737791909740621824243858233262611396937190733869654279420922758507262756820538256710701 p1, _ = gmpy2.iroot(N, 2) while 1: if N % p1 == 0: break p1 = nextprime(p1) p = p1 q = N // p phi = (p - 1) * (q - 1) d = pow(65537, -1, phi) m = pow(c, d, N) print(long_to_bytes(m)) # b&#39;hello&#39; rsa2\re=3小加密指数一般情况，直接开三次根\nexp\n1 2 3 4 5 6 7 8 import gmpy2 from Crypto.Util.number import * c = 90143305010218464651239068244550223 e = 3 n = 23033888059215652914547372571639832513795208553023368309294724398833696153243240439540505594523127438687598867850463867115334519418669023090322343378415503624073754318569038171789384345983857238854755806950088416689190107162861217850425292065837477205856204633063820787468124190181429310472692074161706160393611060419616313295013372404855581583756301983942208908189883172993963465850312578716718513001692084948798489419907453255919259237500207921922678923274075451935962157001214124804211340585033630247456567290613345126133871450507594280438724958688392815919099272303738741921577077656382506193257888572604276774991 m, _ = gmpy2.iroot(c, 3) print(long_to_bytes(int(m))) # b&#39;hello&#39; rsa3\r共模攻击，扩展欧几里得\n">
 <meta property='og:url' content='http://localhost:1313/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/'>
 <meta property='og:site_name' content='Hata的小屋'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='练习' /><meta property='article:published_time' content='2025-11-16T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-11-16T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:1313/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/222.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-11-16T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-11-16T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:1313/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/222.jpg' />
 <meta name="twitter:title" content="密码技术能力提升题目练习">
-<meta name="twitter:description" content="西电终端密码技术能力提升栏目题目练习"><meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:description" content="密码技术能力提升题目练习\r前言\n题目练习简单记录一下\nDay2：组会任务，9道rsa，前8道都挺公式化的，最后一道有点牢，详细记录了一下\n之后有时间的话把5个Day都做一做\nDay2\rrsa1\rp和q相差过小，开根枚举\nexp\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 import gmpy2 from Crypto.Util.number import * from sympy import nextprime c = 24694587387650920645996270549211207170638993154632740677659084672997106533269276167283114218006415216641778758173753050155613881125870891753812944825531433039125347447982352594932373137761585259271639546067263493692092183112083130016947631246281337375914696856286638623891178019397226234217383695239175194718 N = 47962015206855458418156612725688458795417626954963597347756764792325394700898782582998766219844198304624745810354449960976267092231860696089438097898628350928536758251238231355081269322175805806583435953523659093358712086737791909740621824243858233262611396937190733869654279420922758507262756820538256710701 p1, _ = gmpy2.iroot(N, 2) while 1: if N % p1 == 0: break p1 = nextprime(p1) p = p1 q = N // p phi = (p - 1) * (q - 1) d = pow(65537, -1, phi) m = pow(c, d, N) print(long_to_bytes(m)) # b&#39;hello&#39; rsa2\re=3小加密指数一般情况，直接开三次根\nexp\n1 2 3 4 5 6 7 8 import gmpy2 from Crypto.Util.number import * c = 90143305010218464651239068244550223 e = 3 n = 23033888059215652914547372571639832513795208553023368309294724398833696153243240439540505594523127438687598867850463867115334519418669023090322343378415503624073754318569038171789384345983857238854755806950088416689190107162861217850425292065837477205856204633063820787468124190181429310472692074161706160393611060419616313295013372404855581583756301983942208908189883172993963465850312578716718513001692084948798489419907453255919259237500207921922678923274075451935962157001214124804211340585033630247456567290613345126133871450507594280438724958688392815919099272303738741921577077656382506193257888572604276774991 m, _ = gmpy2.iroot(c, 3) print(long_to_bytes(int(m))) # b&#39;hello&#39; rsa3\r共模攻击，扩展欧几里得\n"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='http://localhost:1313/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/222.jpg' />
     </head>
     <body class="
@@ -151,7 +151,7 @@
         
         
         <li>
-            <a href="/tags/">
+            <a href="/categories/">
                 
                 
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -162,7 +162,7 @@
 
 
 
-                <span>标签</span>
+                <span>分类</span>
             </a>
             </li>
             
@@ -201,6 +201,25 @@
 
 
                 <span>链接</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/about/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                <span>关于</span>
             </a>
             </li>
             
@@ -301,8 +320,8 @@
     
     <header class="article-category">
         
-            <a href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" style="background-color: #2a9d8f; color: #fff;">
-                学习记录
+            <a href="/categories/%E5%AF%86%E7%A0%81%E5%AD%A6%E4%B9%A0/" style="background-color: #2a9d8f; color: #fff;">
+                密码学习
             </a>
         
     </header>
@@ -313,10 +332,6 @@
             <a href="/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/">密码技术能力提升题目练习</a>
         </h2>
     
-        
-        <h3 class="article-subtitle">
-            西电终端密码技术能力提升栏目题目练习
-        </h3>
         
     </div>
 
@@ -903,12 +918,6 @@ $$<p>
 
     <footer class="article-footer">
     
-    <section class="article-tags">
-        
-            <a href="/tags/%E7%BB%83%E4%B9%A0/">练习</a>
-        
-    </section>
-
 
     
     <section class="article-copyright">
@@ -971,15 +980,15 @@ $$<p>
             
                 
 <article class="has-image">
-    <a href="/p/%E9%AB%98%E4%BD%8E%E4%BD%8D%E6%B3%84%E9%9C%B2%E9%A2%98%E7%9B%AE/">
+    <a href="/p/rsa-copper/">
         
         
             <div class="article-image">
-                <img src="/p/%E9%AB%98%E4%BD%8E%E4%BD%8D%E6%B3%84%E9%9C%B2%E9%A2%98%E7%9B%AE/111.82dd1bc5058d1f60cc46b9194d19b4d8_hu_5bf6c48af516b25d.png" 
+                <img src="/p/rsa-copper/111.82dd1bc5058d1f60cc46b9194d19b4d8_hu_5bf6c48af516b25d.png" 
                         width="250" 
                         height="150" 
                         loading="lazy"
-                        alt="Featured image of post 高低位泄露题目"
+                        alt="Featured image of post RSA-copper"
                         
                         data-hash="md5-gt0bxQWNH2DMRrkZTRm02A==">
                 
@@ -987,7 +996,7 @@ $$<p>
         
 
         <div class="article-details">
-            <h2 class="article-title">高低位泄露题目</h2>
+            <h2 class="article-title">RSA-copper</h2>
         </div>
     </a>
 </article>
@@ -995,15 +1004,15 @@ $$<p>
             
                 
 <article class="has-image">
-    <a href="/p/rsa%E5%89%AA%E6%9E%9D%E7%B1%BB%E5%9E%8B%E9%A2%98%E7%9B%AE/">
+    <a href="/p/rsa-%E5%89%AA%E6%9E%9D/">
         
         
             <div class="article-image">
-                <img src="/p/rsa%E5%89%AA%E6%9E%9D%E7%B1%BB%E5%9E%8B%E9%A2%98%E7%9B%AE/111.9735f259acdd2343d92fc362ae716f3d_hu_e00e9fc4340e1ac2.png" 
+                <img src="/p/rsa-%E5%89%AA%E6%9E%9D/111.9735f259acdd2343d92fc362ae716f3d_hu_e00e9fc4340e1ac2.png" 
                         width="250" 
                         height="150" 
                         loading="lazy"
-                        alt="Featured image of post RSA剪枝类型题目"
+                        alt="Featured image of post RSA-剪枝"
                         
                         data-hash="md5-lzXyWazdI0PZL8NirnFvPQ==">
                 
@@ -1011,7 +1020,7 @@ $$<p>
         
 
         <div class="article-details">
-            <h2 class="article-title">RSA剪枝类型题目</h2>
+            <h2 class="article-title">RSA-剪枝</h2>
         </div>
     </a>
 </article>
@@ -1019,15 +1028,15 @@ $$<p>
             
                 
 <article class="has-image">
-    <a href="/p/rsa%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6%E9%A2%98%E7%9B%AE/">
+    <a href="/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/">
         
         
             <div class="article-image">
-                <img src="/p/rsa%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6%E9%A2%98%E7%9B%AE/123.95a3d75ac58a906e1f4881e3baba7afe_hu_478b74b8f412d6e5.png" 
+                <img src="/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/123.95a3d75ac58a906e1f4881e3baba7afe_hu_478b74b8f412d6e5.png" 
                         width="250" 
                         height="150" 
                         loading="lazy"
-                        alt="Featured image of post RSA密钥文件题目"
+                        alt="Featured image of post RSA-密钥文件"
                         
                         data-hash="md5-laPXWsWKkG4fSIHjurp6/g==">
                 
@@ -1035,7 +1044,7 @@ $$<p>
         
 
         <div class="article-details">
-            <h2 class="article-title">RSA密钥文件题目</h2>
+            <h2 class="article-title">RSA-密钥文件</h2>
         </div>
     </a>
 </article>

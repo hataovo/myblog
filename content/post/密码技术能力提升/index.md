@@ -1,9 +1,7 @@
 +++
 title = "密码技术能力提升题目练习"
 date = "2025-11-16"
-description = "西电终端密码技术能力提升栏目题目练习"
-categories = ["学习记录"]
-tags = ["练习"]
+categories = ["密码学习"]
 image="222.jpg"
 +++
 

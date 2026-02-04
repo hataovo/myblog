@@ -1,9 +1,7 @@
 +++
-title = "MoeCTF 2025 Crypto WP"
+title = "MoeCTF 2025"
 date = "2025-10-12"
-description = "MoeCTF 2025 Crypto 方向题目解析"
 categories = ["WP"]
-tags = ["Crypto"]
 image="fengmian.png"
 +++
 

@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="RSA密钥文件有关题目\r前言\n做RSA的时候有时候会遇到这种题目：给了一个.key文件或者.pem文件，但由于不清楚其格式是什么样的，一头雾水，所以这里结合一个例子仔细分析了一下密钥文件，主要是私钥文件的内容格式，最后附了几道题加深理解\n省流\n这种题本质上还是基础题型的RSA，只是多了两步，首先需要从文件中提取数据，最后需要考虑加密格式来解密\n解密时优先考虑用cyberchef\n常用命令\n1 2 openssl rsa -in private.key -text -noout # 查看 openssl pkeyutl -decrypt -in flag.txt -inkey private.key -out out.txt # 解密 密钥(私钥，公钥)证书格式\r私钥证书内容格式\n1 2 3 4 5 6 7 8 9 10 11 12 RSAPrivateKey ::= SEQUENCE { version Version, 0表示两个素数的RSA 1表示多素数的RSA modulus INTEGER, -- n publicExponent INTEGER, -- e privateExponent INTEGER, -- d prime1 INTEGER, -- p prime2 INTEGER, -- q exponent1 INTEGER, -- d mod (p-1) exponent2 INTEGER, -- d mod (q-1) coefficient INTEGER, -- (inverse of q) mod p otherPrimeInfos OtherPrimeInfos OPTIONAL } 一个私钥证书示例(private.key)\n">
+<title>RSA-密钥文件</title>
+
+<link rel='canonical' href='http://localhost:1313/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/'>
+
+<link rel="stylesheet" href="/scss/style.min.4d36f8dc1fd48129e1635deb4b8eb2870fa09474f7280c4cb606d40b2526994b.css"><meta property='og:title' content="RSA-密钥文件">
+<meta property='og:description' content="RSA密钥文件有关题目\r前言\n做RSA的时候有时候会遇到这种题目：给了一个.key文件或者.pem文件，但由于不清楚其格式是什么样的，一头雾水，所以这里结合一个例子仔细分析了一下密钥文件，主要是私钥文件的内容格式，最后附了几道题加深理解\n省流\n这种题本质上还是基础题型的RSA，只是多了两步，首先需要从文件中提取数据，最后需要考虑加密格式来解密\n解密时优先考虑用cyberchef\n常用命令\n1 2 openssl rsa -in private.key -text -noout # 查看 openssl pkeyutl -decrypt -in flag.txt -inkey private.key -out out.txt # 解密 密钥(私钥，公钥)证书格式\r私钥证书内容格式\n1 2 3 4 5 6 7 8 9 10 11 12 RSAPrivateKey ::= SEQUENCE { version Version, 0表示两个素数的RSA 1表示多素数的RSA modulus INTEGER, -- n publicExponent INTEGER, -- e privateExponent INTEGER, -- d prime1 INTEGER, -- p prime2 INTEGER, -- q exponent1 INTEGER, -- d mod (p-1) exponent2 INTEGER, -- d mod (q-1) coefficient INTEGER, -- (inverse of q) mod p otherPrimeInfos OtherPrimeInfos OPTIONAL } 一个私钥证书示例(private.key)\n">
+<meta property='og:url' content='http://localhost:1313/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/'>
+<meta property='og:site_name' content='Hata的小屋'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-11-16T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-11-16T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:1313/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/123.png' />
+<meta name="twitter:title" content="RSA-密钥文件">
+<meta name="twitter:description" content="RSA密钥文件有关题目\r前言\n做RSA的时候有时候会遇到这种题目：给了一个.key文件或者.pem文件，但由于不清楚其格式是什么样的，一头雾水，所以这里结合一个例子仔细分析了一下密钥文件，主要是私钥文件的内容格式，最后附了几道题加深理解\n省流\n这种题本质上还是基础题型的RSA，只是多了两步，首先需要从文件中提取数据，最后需要考虑加密格式来解密\n解密时优先考虑用cyberchef\n常用命令\n1 2 openssl rsa -in private.key -text -noout # 查看 openssl pkeyutl -decrypt -in flag.txt -inkey private.key -out out.txt # 解密 密钥(私钥，公钥)证书格式\r私钥证书内容格式\n1 2 3 4 5 6 7 8 9 10 11 12 RSAPrivateKey ::= SEQUENCE { version Version, 0表示两个素数的RSA 1表示多素数的RSA modulus INTEGER, -- n publicExponent INTEGER, -- e privateExponent INTEGER, -- d prime1 INTEGER, -- p prime2 INTEGER, -- q exponent1 INTEGER, -- d mod (p-1) exponent2 INTEGER, -- d mod (q-1) coefficient INTEGER, -- (inverse of q) mod p otherPrimeInfos OtherPrimeInfos OPTIONAL } 一个私钥证书示例(private.key)\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='http://localhost:1313/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/123.png' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <figure class="site-avatar">
+            <a href="/">
+                
+                
+                
+                
+                <img src="/img/avatar_hu_1f41586fb0ce9a39.png" width="300"
+                    height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                
+            </a>
+            
+            <span class="emoji">🤔</span>
+            
+        </figure>
+        
+        
+
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Hata的小屋</a></h1>
+            <h2 class="site-description">欲买桂花同载酒，终不似，......</h2>
+        </div>
+    </header>
+
+    
+    <ol class="menu-social">
+        
+        <li>
+            <a href="https://github.com/hataovo" target="_blank" title="GitHub" rel="me">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+            </a>
+        </li>
+        
+    </ol>
+    
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+        <li>
+            <a href="/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                <span>主页</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/archives/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                <span>归档</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/categories/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+                <span>分类</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/search/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                <span>搜索</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/links/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                <span>链接</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/about/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                <span>关于</span>
+            </a>
+            </li>
+            
+            
+
+            <li class="menu-bottom-section">
+                <ol class="menu">
+                    
+                    
+
+                    
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                    
+                </ol>
+            </li>
+    </ol>
+</aside>
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#密钥私钥公钥证书格式">密钥(私钥，公钥)证书格式</a></li>
+    <li><a href="#t1">T1</a>
+      <ol>
+        <li><a href="#方法一">方法一</a></li>
+        <li><a href="#方法二">方法二</a></li>
+      </ol>
+    </li>
+    <li><a href="#t2">T2</a></li>
+    <li><a href="#t1-续">T1-续</a></li>
+    <li><a href="#t3">T3</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/">
+                <img src="/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/123_hu_91825452e821d35c.png"
+                        srcset="/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/123_hu_91825452e821d35c.png 800w, /p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/123_hu_1530b85ca78372be.png 1600w"
+                        width="800" 
+                        height="449" 
+                        loading="lazy"
+                        alt="Featured image of post RSA-密钥文件" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AF%86%E7%A0%81%E5%AD%A6%E4%B9%A0/" style="background-color: #2a9d8f; color: #fff;">
+                密码学习
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/">RSA-密钥文件</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-16T00:00:00Z'>Nov 16, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 5 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="rsa密钥文件有关题目">RSA密钥文件有关题目
+</h1><p><strong>前言</strong></p>
+<p>做RSA的时候有时候会遇到这种题目：给了一个.key文件或者.pem文件，但由于不清楚其格式是什么样的，一头雾水，所以这里结合一个例子仔细分析了一下密钥文件，主要是私钥文件的内容格式，最后附了几道题加深理解</p>
+<p><strong>省流</strong></p>
+<p>这种题本质上还是基础题型的RSA，只是多了两步，首先需要从文件中提取数据，最后需要考虑加密格式来解密</p>
+<p>解密时优先考虑用cyberchef</p>
+<p>常用命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">openssl rsa -in private.key -text -noout # 查看
+</span></span><span class="line"><span class="cl">openssl pkeyutl -decrypt -in flag.txt -inkey private.key -out out.txt # 解密
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="密钥私钥公钥证书格式">密钥(私钥，公钥)证书格式
+</h2><p>私钥证书内容格式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">RSAPrivateKey ::= SEQUENCE {
+</span></span><span class="line"><span class="cl">    version           Version,     0表示两个素数的RSA  1表示多素数的RSA
+</span></span><span class="line"><span class="cl">    modulus           INTEGER,  -- n
+</span></span><span class="line"><span class="cl">    publicExponent    INTEGER,  -- e
+</span></span><span class="line"><span class="cl">    privateExponent   INTEGER,  -- d
+</span></span><span class="line"><span class="cl">    prime1            INTEGER,  -- p
+</span></span><span class="line"><span class="cl">    prime2            INTEGER,  -- q
+</span></span><span class="line"><span class="cl">    exponent1         INTEGER,  -- d mod (p-1)
+</span></span><span class="line"><span class="cl">    exponent2         INTEGER,  -- d mod (q-1)
+</span></span><span class="line"><span class="cl">    coefficient       INTEGER,  -- (inverse of q) mod p
+</span></span><span class="line"><span class="cl">    otherPrimeInfos   OtherPrimeInfos OPTIONAL
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>一个私钥证书示例(private.key)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">-----BEGIN RSA PRIVATE KEY-----
+</span></span><span class="line"><span class="cl">MIICXAIBAAKBgQCsWryPAQj9cp1O9UDVRQEWg3k7dsQfalNs8Xa4/ZOsTVvWwfu6
+</span></span><span class="line"><span class="cl">EPWbr3av5ewn/SCWqJbltLaJd122sBH1lcPygyxTtkQvPCamnVdtN+3qzZ0VxZkT
+</span></span><span class="line"><span class="cl">i7jaoR+SPgsPEiCZYN0JsJ104A0SZ0bXtAslmpIc4sE/+kqHSd5dfZmHVQIDAQAB
+</span></span><span class="line"><span class="cl">AoGBAKXl6N2VV3vtmLFprHAcLYHoJwcvuHOsuoSAn5BMtJoDFEVRDuX4cRDcAdgp
+</span></span><span class="line"><span class="cl">7fhH09hwil6sZY9IEDJKo97Ju4LcjrT3UtOGXWJOeEZCJHfP5s/62/2lZCAHjK3G
+</span></span><span class="line"><span class="cl">V1udujf1K0g0M0RcZLE41Rep8zKj/ASr4cmXkQgEgZ4gsII5AkEA1BP03n7liHYj
+</span></span><span class="line"><span class="cl">9SMoUVGceGtBhvyfVjzU74q1TFpmhWzQ3/hMqIfI498I5+voPBnFJj1Op1aE2wHH
+</span></span><span class="line"><span class="cl">RVKtnlqW3wJBANAMs3TXKCTP/cJm0LRXttzXgpID/jkY4e0KHZhpuJdkbBFs+Z1Z
+</span></span><span class="line"><span class="cl">BxfgfHwXVO17O1VOwZZNf2uh//oeFqH/LEsCQEJ70xrhCxHhf1o84EnF3Nh/PzaT
+</span></span><span class="line"><span class="cl">AVxmi5ZglH9QI62WNFDSJS38C0UsST1zXgVhSsW3GG4rGFET2KVpytXGrl8CQHS1
+</span></span><span class="line"><span class="cl">a0Y0HFTqSJPxUUqZmf8w9hIrI0Wsa7CpaAjD5cUnlGgCFdTqyEvgpnSGMiI2awZj
+</span></span><span class="line"><span class="cl">87z5JG2gpxQMJO4jUxkCQBiGHY58w0/yuRRr6HnAbF1LiS7JzedbXK3f3vO/IhMs
+</span></span><span class="line"><span class="cl">jZPBfOdeQyWnih3FT83o+L/u+PfUIEy9iaz0+KriuHQ=
+</span></span><span class="line"><span class="cl">-----END RSA PRIVATE KEY-----
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>是base64编码后的内容，base64解码，下面是测试代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">base64</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">s</span> <span class="o">=</span> <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">MIICXAIBAAKBgQCsWryPAQj9cp1O9UDVRQEWg3k7dsQfalNs8Xa4/ZOsTVvWwfu6
+</span></span></span><span class="line"><span class="cl"><span class="s2">EPWbr3av5ewn/SCWqJbltLaJd122sBH1lcPygyxTtkQvPCamnVdtN+3qzZ0VxZkT
+</span></span></span><span class="line"><span class="cl"><span class="s2">i7jaoR+SPgsPEiCZYN0JsJ104A0SZ0bXtAslmpIc4sE/+kqHSd5dfZmHVQIDAQAB
+</span></span></span><span class="line"><span class="cl"><span class="s2">AoGBAKXl6N2VV3vtmLFprHAcLYHoJwcvuHOsuoSAn5BMtJoDFEVRDuX4cRDcAdgp
+</span></span></span><span class="line"><span class="cl"><span class="s2">7fhH09hwil6sZY9IEDJKo97Ju4LcjrT3UtOGXWJOeEZCJHfP5s/62/2lZCAHjK3G
+</span></span></span><span class="line"><span class="cl"><span class="s2">V1udujf1K0g0M0RcZLE41Rep8zKj/ASr4cmXkQgEgZ4gsII5AkEA1BP03n7liHYj
+</span></span></span><span class="line"><span class="cl"><span class="s2">9SMoUVGceGtBhvyfVjzU74q1TFpmhWzQ3/hMqIfI498I5+voPBnFJj1Op1aE2wHH
+</span></span></span><span class="line"><span class="cl"><span class="s2">RVKtnlqW3wJBANAMs3TXKCTP/cJm0LRXttzXgpID/jkY4e0KHZhpuJdkbBFs+Z1Z
+</span></span></span><span class="line"><span class="cl"><span class="s2">BxfgfHwXVO17O1VOwZZNf2uh//oeFqH/LEsCQEJ70xrhCxHhf1o84EnF3Nh/PzaT
+</span></span></span><span class="line"><span class="cl"><span class="s2">AVxmi5ZglH9QI62WNFDSJS38C0UsST1zXgVhSsW3GG4rGFET2KVpytXGrl8CQHS1
+</span></span></span><span class="line"><span class="cl"><span class="s2">a0Y0HFTqSJPxUUqZmf8w9hIrI0Wsa7CpaAjD5cUnlGgCFdTqyEvgpnSGMiI2awZj
+</span></span></span><span class="line"><span class="cl"><span class="s2">87z5JG2gpxQMJO4jUxkCQBiGHY58w0/yuRRr6HnAbF1LiS7JzedbXK3f3vO/IhMs
+</span></span></span><span class="line"><span class="cl"><span class="s2">jZPBfOdeQyWnih3FT83o+L/u+PfUIEy9iaz0+KriuHQ=
+</span></span></span><span class="line"><span class="cl"><span class="s2">&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">s1</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">hex</span><span class="p">())</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>私钥证书在十六进制下的一些格式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">3082xxxx  #30是开始的标志  82表示接下来两个字节代表长度 
+</span></span><span class="line"><span class="cl">020100    #02是整数的标志  01表示这个整数占1个字节  00表示值为0x00=0  即两个素数的RSA
+</span></span><span class="line"><span class="cl">028181    #02是整数的标志  中间的81代表后面一个跟着一个单字节长度  最后的81代表长度为0x81字节
+</span></span><span class="line"><span class="cl">0203      #02是整数的标志  03表示长度为3个字节
+</span></span><span class="line"><span class="cl">0241      #02是整数的标志  41表示长度为0x41个字节
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里涉及到一个ASN.1 结构中的长度编码规则，具体地<br ></p>
+<ul>
+<li>短格式：长度 ≤ 127(即7F)，直接用1字节表示长度<br ></li>
+<li>长格式：长度 &gt; 127(即7F)，用(0x80 + 后续字节数)，然后是实际长度<br ></li>
+</ul>
+<p>结合上面<br >
+短格式的例子：0241，表示有0x41个字节<br >
+长格式的例子：028181，表示有0x81个字节；3082025c，表示有0x025c个字节<br ></p>
+<p>在打印出s1.hex后，结合上面的格式将其分割，&rsquo;||&lsquo;是我添加的，原来没有</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&#39;3082025c&#39; # 开始的标志，此后一共有0x025c个字节(不包括这4个字节)
+</span></span><span class="line"><span class="cl">&#39;020100&#39;   # 02是整数的标志  01表示这个整数占1个字节  00表示值为0x00=0  即两个素数的RSA
+</span></span><span class="line"><span class="cl">&#39;028181||00ac5abc8f0108fd729d4ef540d545011683793b76c41f6a536cf176b8fd93ac4d5bd6c1fbba10f59baf76afe5ec27fd2096a896e5b4b689775db6b011f595c3f2832c53b6442f3c26a69d576d37edeacd9d15c599138bb8daa11f923e0b0f12209960dd09b09d74e00d126746d7b40b259a921ce2c13ffa4a8749de5d7d998755&#39; # 028181表示0x81字节的整数 即n
+</span></span><span class="line"><span class="cl">&#39;0203||010001&#39; # 表示3字节整数 即e
+</span></span><span class="line"><span class="cl">&#39;028181||00a5e5e8dd95577bed98b169ac701c2d81e827072fb873acba84809f904cb49a031445510ee5f87110dc01d829edf847d3d8708a5eac658f4810324aa3dec9bb82dc8eb4f752d3865d624e7846422477cfe6cffadbfda56420078cadc6575b9dba37f52b483433445c64b138d517a9f332a3fc04abe1c997910804819e20b08239&#39; # 表示0x81字节整数 即d
+</span></span><span class="line"><span class="cl">&#39;0241||00d413f4de7ee5887623f5232851519c786b4186fc9f563cd4ef8ab54c5a66856cd0dff84ca887c8e3df08e7ebe83c19c5263d4ea75684db01c74552ad9e5a96df&#39; # 表示0x41字节整数 即p
+</span></span><span class="line"><span class="cl">&#39;0241||00d00cb374d72824cffdc266d0b457b6dcd7829203fe3918e1ed0a1d9869b897646c116cf99d590717e07c7c1754ed7b3b554ec1964d7f6ba1fffa1e16a1ff2c4b&#39; # 表示0x41字节整数 即q
+</span></span><span class="line"><span class="cl">&#39;0240||427bd31ae10b11e17f5a3ce049c5dcd87f3f3693015c668b9660947f5023ad963450d2252dfc0b452c493d735e05614ac5b7186e2b185113d8a569cad5c6ae5f&#39; # 表示0x40字节整数 即dp
+</span></span><span class="line"><span class="cl">&#39;0240||74b56b46341c54ea4893f1514a9999ff30f6122b2345ac6bb0a96808c3e5c52794680215d4eac84be0a674863222366b0663f3bcf9246da0a7140c24ee235319&#39; # 表示0x40字节整数 即dq
+</span></span><span class="line"><span class="cl">&#39;0240||18861d8e7cc34ff2b9146be879c06c5d4b892ec9cde75b5caddfdef3bf22132c8d93c17ce75e4325a78a1dc54fcde8f8bfeef8f7d4204cbd89acf4f8aae2b874&#39; # 表示0x40字节整数 即 q^(-1) mod p
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们可以用openssl验证<br ></p>
+<p>用命令<code>openssl rsa -in private.key -text -noout</code>，得到输出，和上面的结果是一样的</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Private-Key: (1024 bit, 2 primes)
+</span></span><span class="line"><span class="cl">modulus:
+</span></span><span class="line"><span class="cl">    00:ac:5a:bc:8f:01:08:fd:72:9d:4e:f5:40:d5:45:
+</span></span><span class="line"><span class="cl">    01:16:83:79:3b:76:c4:1f:6a:53:6c:f1:76:b8:fd:
+</span></span><span class="line"><span class="cl">    93:ac:4d:5b:d6:c1:fb:ba:10:f5:9b:af:76:af:e5:
+</span></span><span class="line"><span class="cl">    ec:27:fd:20:96:a8:96:e5:b4:b6:89:77:5d:b6:b0:
+</span></span><span class="line"><span class="cl">    11:f5:95:c3:f2:83:2c:53:b6:44:2f:3c:26:a6:9d:
+</span></span><span class="line"><span class="cl">    57:6d:37:ed:ea:cd:9d:15:c5:99:13:8b:b8:da:a1:
+</span></span><span class="line"><span class="cl">    1f:92:3e:0b:0f:12:20:99:60:dd:09:b0:9d:74:e0:
+</span></span><span class="line"><span class="cl">    0d:12:67:46:d7:b4:0b:25:9a:92:1c:e2:c1:3f:fa:
+</span></span><span class="line"><span class="cl">    4a:87:49:de:5d:7d:99:87:55
+</span></span><span class="line"><span class="cl">publicExponent: 65537 (0x10001)
+</span></span><span class="line"><span class="cl">privateExponent:
+</span></span><span class="line"><span class="cl">    00:a5:e5:e8:dd:95:57:7b:ed:98:b1:69:ac:70:1c:
+</span></span><span class="line"><span class="cl">    2d:81:e8:27:07:2f:b8:73:ac:ba:84:80:9f:90:4c:
+</span></span><span class="line"><span class="cl">    b4:9a:03:14:45:51:0e:e5:f8:71:10:dc:01:d8:29:
+</span></span><span class="line"><span class="cl">    ed:f8:47:d3:d8:70:8a:5e:ac:65:8f:48:10:32:4a:
+</span></span><span class="line"><span class="cl">    a3:de:c9:bb:82:dc:8e:b4:f7:52:d3:86:5d:62:4e:
+</span></span><span class="line"><span class="cl">    78:46:42:24:77:cf:e6:cf:fa:db:fd:a5:64:20:07:
+</span></span><span class="line"><span class="cl">    8c:ad:c6:57:5b:9d:ba:37:f5:2b:48:34:33:44:5c:
+</span></span><span class="line"><span class="cl">    64:b1:38:d5:17:a9:f3:32:a3:fc:04:ab:e1:c9:97:
+</span></span><span class="line"><span class="cl">    91:08:04:81:9e:20:b0:82:39
+</span></span><span class="line"><span class="cl">prime1:
+</span></span><span class="line"><span class="cl">    00:d4:13:f4:de:7e:e5:88:76:23:f5:23:28:51:51:
+</span></span><span class="line"><span class="cl">    9c:78:6b:41:86:fc:9f:56:3c:d4:ef:8a:b5:4c:5a:
+</span></span><span class="line"><span class="cl">    66:85:6c:d0:df:f8:4c:a8:87:c8:e3:df:08:e7:eb:
+</span></span><span class="line"><span class="cl">    e8:3c:19:c5:26:3d:4e:a7:56:84:db:01:c7:45:52:
+</span></span><span class="line"><span class="cl">    ad:9e:5a:96:df
+</span></span><span class="line"><span class="cl">prime2:
+</span></span><span class="line"><span class="cl">    00:d0:0c:b3:74:d7:28:24:cf:fd:c2:66:d0:b4:57:
+</span></span><span class="line"><span class="cl">    b6:dc:d7:82:92:03:fe:39:18:e1:ed:0a:1d:98:69:
+</span></span><span class="line"><span class="cl">    b8:97:64:6c:11:6c:f9:9d:59:07:17:e0:7c:7c:17:
+</span></span><span class="line"><span class="cl">    54:ed:7b:3b:55:4e:c1:96:4d:7f:6b:a1:ff:fa:1e:
+</span></span><span class="line"><span class="cl">    16:a1:ff:2c:4b
+</span></span><span class="line"><span class="cl">exponent1:
+</span></span><span class="line"><span class="cl">    42:7b:d3:1a:e1:0b:11:e1:7f:5a:3c:e0:49:c5:dc:
+</span></span><span class="line"><span class="cl">    d8:7f:3f:36:93:01:5c:66:8b:96:60:94:7f:50:23:
+</span></span><span class="line"><span class="cl">    ad:96:34:50:d2:25:2d:fc:0b:45:2c:49:3d:73:5e:
+</span></span><span class="line"><span class="cl">    05:61:4a:c5:b7:18:6e:2b:18:51:13:d8:a5:69:ca:
+</span></span><span class="line"><span class="cl">    d5:c6:ae:5f
+</span></span><span class="line"><span class="cl">exponent2:
+</span></span><span class="line"><span class="cl">    74:b5:6b:46:34:1c:54:ea:48:93:f1:51:4a:99:99:
+</span></span><span class="line"><span class="cl">    ff:30:f6:12:2b:23:45:ac:6b:b0:a9:68:08:c3:e5:
+</span></span><span class="line"><span class="cl">    c5:27:94:68:02:15:d4:ea:c8:4b:e0:a6:74:86:32:
+</span></span><span class="line"><span class="cl">    22:36:6b:06:63:f3:bc:f9:24:6d:a0:a7:14:0c:24:
+</span></span><span class="line"><span class="cl">    ee:23:53:19
+</span></span><span class="line"><span class="cl">coefficient:
+</span></span><span class="line"><span class="cl">    18:86:1d:8e:7c:c3:4f:f2:b9:14:6b:e8:79:c0:6c:
+</span></span><span class="line"><span class="cl">    5d:4b:89:2e:c9:cd:e7:5b:5c:ad:df:de:f3:bf:22:
+</span></span><span class="line"><span class="cl">    13:2c:8d:93:c1:7c:e7:5e:43:25:a7:8a:1d:c5:4f:
+</span></span><span class="line"><span class="cl">    cd:e8:f8:bf:ee:f8:f7:d4:20:4c:bd:89:ac:f4:f8:
+</span></span><span class="line"><span class="cl">    aa:e2:b8:74
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>一个由私钥恢复公钥的网站<a class="link" href="https://rtcd.io/zh-cn/rsa-pubkey-recovery/"  target="_blank" rel="noopener"
+    >在线RSA公钥恢复工具</a><br ></p>
+</blockquote>
+<p>类似地，读取公钥文件的命令<code>openssl rsa -in public.key -pubin -text -noout</code>，略有不同<br ></p>
+<p>输出结果内容比私钥文件少很多，只有n和e<br ></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Public-Key: (1024 bit)
+</span></span><span class="line"><span class="cl">Modulus:
+</span></span><span class="line"><span class="cl">    00:ac:5a:bc:8f:01:08:fd:72:9d:4e:f5:40:d5:45:
+</span></span><span class="line"><span class="cl">    01:16:83:79:3b:76:c4:1f:6a:53:6c:f1:76:b8:fd:
+</span></span><span class="line"><span class="cl">    93:ac:4d:5b:d6:c1:fb:ba:10:f5:9b:af:76:af:e5:
+</span></span><span class="line"><span class="cl">    ec:27:fd:20:96:a8:96:e5:b4:b6:89:77:5d:b6:b0:
+</span></span><span class="line"><span class="cl">    11:f5:95:c3:f2:83:2c:53:b6:44:2f:3c:26:a6:9d:
+</span></span><span class="line"><span class="cl">    57:6d:37:ed:ea:cd:9d:15:c5:99:13:8b:b8:da:a1:
+</span></span><span class="line"><span class="cl">    1f:92:3e:0b:0f:12:20:99:60:dd:09:b0:9d:74:e0:
+</span></span><span class="line"><span class="cl">    0d:12:67:46:d7:b4:0b:25:9a:92:1c:e2:c1:3f:fa:
+</span></span><span class="line"><span class="cl">    4a:87:49:de:5d:7d:99:87:55
+</span></span><span class="line"><span class="cl">Exponent: 65537 (0x10001)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们看看base64解码后的内容，没有问题</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&#39;30819f&#39; # 开始的标志，此后一共有0x9f个字节(不包括这3个字节)
+</span></span><span class="line"><span class="cl">&#39;300d06092a864886f70d010101050003818d00308189&#39; # 一些配置和参数，不是很重要
+</span></span><span class="line"><span class="cl">&#39;028181||00ac5abc8f0108fd729d4ef540d545011683793b76c41f6a536cf176b8fd93ac4d5bd6c1fbba10f59baf76afe5ec27fd2096a896e5b4b689775db6b011f595c3f2832c53b6442f3c26a69d576d37edeacd9d15c599138bb8daa11f923e0b0f12209960dd09b09d74e00d126746d7b40b259a921ce2c13ffa4a8749de5d7d998755&#39; # 表示0x81字节整数 即n
+</span></span><span class="line"><span class="cl">&#39;0203||010001&#39; # 3字节整数，即e
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>至此，RSA密钥证书的格式已经基本摸清楚了，下面看看例题吧</p>
+<h2 id="t1">T1
+</h2><p>应当是最基础的一种类型，给了一个private.key文件和一个存密文的flag.txt<br >
+我上面分析的例子就是这个private.key文件的内容，可见其是完整的，各种参数都有<br >
+flag.txt直接打开不出意外是乱码，因为明文加密后得到一个大整数，转为字节序列(方法和bytes_to_long一样)存在txt中，不过不影响，用代码二进制模式读取即可<br >
+有两种方法解决，第一种是把d拿过来自己写一个脚本，第二种则是用openssl直接解密</p>
+<h3 id="方法一">方法一
+</h3><p>exp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">long_to_bytes</span><span class="p">,</span> <span class="n">bytes_to_long</span>
+</span></span><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;flag.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">c</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">c</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;00a5e5e8dd95577bed98b169ac701c2d81e827072fb873acba84809f904cb49a031445510ee5f87110dc01d829edf847d3d8708a5eac658f4810324aa3dec9bb82dc8eb4f752d3865d624e7846422477cfe6cffadbfda56420078cadc6575b9dba37f52b483433445c64b138d517a9f332a3fc04abe1c997910804819e20b08239&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="s1">&#39;00ac5abc8f0108fd729d4ef540d545011683793b76c41f6a536cf176b8fd93ac4d5bd6c1fbba10f59baf76afe5ec27fd2096a896e5b4b689775db6b011f595c3f2832c53b6442f3c26a69d576d37edeacd9d15c599138bb8daa11f923e0b0f12209960dd09b09d74e00d126746d7b40b259a921ce2c13ffa4a8749de5d7d998755&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">d</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">m</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>输出结果</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">b&#34;\x02\r\x83\xb1\xd4\x08\xfd!\x13\x8e\xd9\x98\xd8A\x88\x1a\xae\x02&#39;\xf1_\xd0Z(m\x01s\xa4\xe9\x06`\xaf\xe0\xe7\xb6\x9bF\xc1\x12?\x7f\x08\x95.\xc9\x8f.\x8e\xf1\xefx-W\xf9\t\x1d8|\x85R\x03M\xf47\xcd\xb3\xff\xd5\x9ag-\x19\xb9\x92Y\x06\xc5\xe3\xc1[\xe1\xa8%\xf1\x86V\xee\x9a\x00flag{57c2f8cf484134e31167e294cc8441c3}&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>得到<code>flag{57c2f8cf484134e31167e294cc8441c3}</code>，不过前面有一些奇怪的填充</p>
+<h3 id="方法二">方法二
+</h3><p>密钥证书完整，直接用命令，也可以得到flag，没有奇怪的填充🤔</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ openssl pkeyutl -decrypt -in flag.txt -inkey private.key -out out.txt
+</span></span><span class="line"><span class="cl">$ cat out.txt
+</span></span><span class="line"><span class="cl">flag<span class="o">{</span>57c2f8cf484134e31167e294cc8441c3<span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="t2">T2
+</h2><p>T1的方法一解密结果的填充我一开始并没有太在意，只关注了flag，好巧不巧又遇到了一道题</p>
+<p>同样是给了一个完整的私钥pem文件和一个enc文件存密文，那岂不是和上面一毛一样？</p>
+<p>结果是用方法一自己写脚本没问题，但是方法二直接openssl出来的结果相去甚远，遂询问ai</p>
+<p>得知OpenSSL默认使用PKCS#1 v1.5填充，其格式大概是这样子的</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">00 02 [随机填充] 00 [实际数据]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">00：起始字节
+</span></span><span class="line"><span class="cl">02：表示这是加密块
+</span></span><span class="line"><span class="cl">随机填充：至少8个非零字节
+</span></span><span class="line"><span class="cl">00：分隔符
+</span></span><span class="line"><span class="cl">实际数据：真正的明文
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>00 02 [随机填充] 00 [实际数据] # 我查到的大部分都是这样的<br >
+00 02 [随机填充] FF [实际数据] # 也有资料是这样的</p>
+</blockquote>
+<p>大概流程是这样的，依然是把密文文件的字节串转大整数(这一步都一样)，然后计算c的d次方模n，得到大整数m1，然后转字节串，去找上面的标志位(\x00 \x02这些)，最后拿出真正的明文</p>
+<p>而这个题其密文文件在由明文加密而来时是没有使用PKCS#1 v1.5填充的，就是纯粹的直接计算，因此解密后的结果中找不到对应的标志位，openssl默认解密结果就不对</p>
+<p>解决办法有三种，其一就是自己写脚本，其本质上就是不考虑填充</p>
+<p>第二稍微修改命令加一个参数<code>openssl pkeyutl -decrypt -in enc -inkey key.pem -out out.txt -pkeyopt rsa_padding_mode:none</code></p>
+<p>第三用cyberchef选择模式也可以正常解密(自然而然地，T1也可以用cyberchef)</p>
+<h2 id="t1-续">T1-续
+</h2><p>知道了PKCS#1 v1.5这一事实后，T1的问题就可以解决了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">b&#34;\x02\r\x83\xb1\xd4\x08\xfd!\x13\x8e\xd9\x98\xd8A\x88\x1a\xae\x02&#39;\xf1_\xd0Z(m\x01s\xa4\xe9\x06`\xaf\xe0\xe7\xb6\x9bF\xc1\x12?\x7f\x08\x95.\xc9\x8f.\x8e\xf1\xefx-W\xf9\t\x1d8|\x85R\x03M\xf47\xcd\xb3\xff\xd5\x9ag-\x19\xb9\x92Y\x06\xc5\xe3\xc1[\xe1\xa8%\xf1\x86V\xee\x9a\x00flag{57c2f8cf484134e31167e294cc8441c3}&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>正是<code>00 02 [随机填充] 00 [实际数据]</code>的格式，用openssl默认提取最后\x00后的flag</p>
+<p>什么？你说开头怎么不是\x00，那是因为m = pow(c, d, n)计算出的m最高位的0被省略了，因此long_to_bytes(m)的时候，最高位的\x00也被省略了，上面的输出结果是127字节，少的那1个字节正是省略的\x00</p>
+<h2 id="t3">T3
+</h2><p>这个题给了一个broken_sk.pem文件和一个secret.enc文件<br >
+broken_sk.pem内容如下，是不完整的</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">-----BEGIN RSA PRIVATE KEY-----
+</span></span><span class="line"><span class="cl">MIIEpAIBAAKCAQEAyQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQIDAQABAoIBABMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG8CgYEA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJeb90PpxojA50U2EDfCfDcCgYEA9AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIcCgYEArRm/+wIkn36m4NO4ydBcX338mdBciA2Jr6bFLFnNELVprOnugAlz7Z3Dj6wt7Zut/9KPq82Ah7tb+H5qVxMcym7FVa0RSoMi8ud91Z8y+h1hEwE8jka9O3FyXijkQldf7W/BwfjbomfIxmsZLrnn9pKrhXvXoN7MuxITkIH1iz0CgYEA1ppidZzdVeIsDdnoHjqemwiRB6o5pgdgFbPpIseZAy7wTOqLIQBS8LWglPcPu8/rBRZazGnWJ8tBAw9MPQNKEucRhCSYHe01A4nsgwrWk+YMGw5+imUZvvahgfW+kq+LAETI0LhCcOM0xZATjD6d+aKeya9F2wXwxEOx4JYjnTUCgYAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADvyaZUzJ3fr3oVuWx3LDMbY/aQlg==
+</span></span><span class="line"><span class="cl">-----END RSA PRIVATE KEY-----
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这时候我们尝试用openssl命令<code>openssl rsa -in broken_sk.pem -text -noout</code>读取，内容如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Private-Key: (2048 bit, 2 primes)
+</span></span><span class="line"><span class="cl">modulus:
+</span></span><span class="line"><span class="cl">    00:c9:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:01
+</span></span><span class="line"><span class="cl">publicExponent: 65537 (0x10001)
+</span></span><span class="line"><span class="cl">privateExponent:
+</span></span><span class="line"><span class="cl">    13:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    6f
+</span></span><span class="line"><span class="cl">prime1:
+</span></span><span class="line"><span class="cl">    00:d0:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:97:9b:f7:43:e9:c6:88:
+</span></span><span class="line"><span class="cl">    c0:e7:45:36:10:37:c2:7c:37
+</span></span><span class="line"><span class="cl">prime2:
+</span></span><span class="line"><span class="cl">    00:f4:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:87
+</span></span><span class="line"><span class="cl">exponent1:
+</span></span><span class="line"><span class="cl">    00:ad:19:bf:fb:02:24:9f:7e:a6:e0:d3:b8:c9:d0:
+</span></span><span class="line"><span class="cl">    5c:5f:7d:fc:99:d0:5c:88:0d:89:af:a6:c5:2c:59:
+</span></span><span class="line"><span class="cl">    cd:10:b5:69:ac:e9:ee:80:09:73:ed:9d:c3:8f:ac:
+</span></span><span class="line"><span class="cl">    2d:ed:9b:ad:ff:d2:8f:ab:cd:80:87:bb:5b:f8:7e:
+</span></span><span class="line"><span class="cl">    6a:57:13:1c:ca:6e:c5:55:ad:11:4a:83:22:f2:e7:
+</span></span><span class="line"><span class="cl">    7d:d5:9f:32:fa:1d:61:13:01:3c:8e:46:bd:3b:71:
+</span></span><span class="line"><span class="cl">    72:5e:28:e4:42:57:5f:ed:6f:c1:c1:f8:db:a2:67:
+</span></span><span class="line"><span class="cl">    c8:c6:6b:19:2e:b9:e7:f6:92:ab:85:7b:d7:a0:de:
+</span></span><span class="line"><span class="cl">    cc:bb:12:13:90:81:f5:8b:3d
+</span></span><span class="line"><span class="cl">exponent2:
+</span></span><span class="line"><span class="cl">    00:d6:9a:62:75:9c:dd:55:e2:2c:0d:d9:e8:1e:3a:
+</span></span><span class="line"><span class="cl">    9e:9b:08:91:07:aa:39:a6:07:60:15:b3:e9:22:c7:
+</span></span><span class="line"><span class="cl">    99:03:2e:f0:4c:ea:8b:21:00:52:f0:b5:a0:94:f7:
+</span></span><span class="line"><span class="cl">    0f:bb:cf:eb:05:16:5a:cc:69:d6:27:cb:41:03:0f:
+</span></span><span class="line"><span class="cl">    4c:3d:03:4a:12:e7:11:84:24:98:1d:ed:35:03:89:
+</span></span><span class="line"><span class="cl">    ec:83:0a:d6:93:e6:0c:1b:0e:7e:8a:65:19:be:f6:
+</span></span><span class="line"><span class="cl">    a1:81:f5:be:92:af:8b:00:44:c8:d0:b8:42:70:e3:
+</span></span><span class="line"><span class="cl">    34:c5:90:13:8c:3e:9d:f9:a2:9e:c9:af:45:db:05:
+</span></span><span class="line"><span class="cl">    f0:c4:43:b1:e0:96:23:9d:35
+</span></span><span class="line"><span class="cl">coefficient:
+</span></span><span class="line"><span class="cl">    20:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:
+</span></span><span class="line"><span class="cl">    00:00:00:ef:c9:a6:54:cc:9d:df:af:7a:15:b9:6c:
+</span></span><span class="line"><span class="cl">    77:2c:33:1b:63:f6:90:96
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>好了，到这里清楚的看出来就是一个dp，dq泄露的问题，e已知，n未知</p>
+<p><a class="link" href="https://hataovo.github.io/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/#rsa5"  target="_blank" rel="noopener"
+    >看这里</a>，恢复出p和q</p>
+<p>exp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">isPrime</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">tmp11</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">00:ad:19:bf:fb:02:24:9f:7e:a6:e0:d3:b8:c9:d0:
+</span></span></span><span class="line"><span class="cl"><span class="s1">5c:5f:7d:fc:99:d0:5c:88:0d:89:af:a6:c5:2c:59:
+</span></span></span><span class="line"><span class="cl"><span class="s1">cd:10:b5:69:ac:e9:ee:80:09:73:ed:9d:c3:8f:ac:
+</span></span></span><span class="line"><span class="cl"><span class="s1">2d:ed:9b:ad:ff:d2:8f:ab:cd:80:87:bb:5b:f8:7e:
+</span></span></span><span class="line"><span class="cl"><span class="s1">6a:57:13:1c:ca:6e:c5:55:ad:11:4a:83:22:f2:e7:
+</span></span></span><span class="line"><span class="cl"><span class="s1">7d:d5:9f:32:fa:1d:61:13:01:3c:8e:46:bd:3b:71:
+</span></span></span><span class="line"><span class="cl"><span class="s1">72:5e:28:e4:42:57:5f:ed:6f:c1:c1:f8:db:a2:67:
+</span></span></span><span class="line"><span class="cl"><span class="s1">c8:c6:6b:19:2e:b9:e7:f6:92:ab:85:7b:d7:a0:de:
+</span></span></span><span class="line"><span class="cl"><span class="s1">cc:bb:12:13:90:81:f5:8b:3d
+</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">tmp22</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">00:d6:9a:62:75:9c:dd:55:e2:2c:0d:d9:e8:1e:3a:
+</span></span></span><span class="line"><span class="cl"><span class="s1">9e:9b:08:91:07:aa:39:a6:07:60:15:b3:e9:22:c7:
+</span></span></span><span class="line"><span class="cl"><span class="s1">99:03:2e:f0:4c:ea:8b:21:00:52:f0:b5:a0:94:f7:
+</span></span></span><span class="line"><span class="cl"><span class="s1">0f:bb:cf:eb:05:16:5a:cc:69:d6:27:cb:41:03:0f:
+</span></span></span><span class="line"><span class="cl"><span class="s1">4c:3d:03:4a:12:e7:11:84:24:98:1d:ed:35:03:89:
+</span></span></span><span class="line"><span class="cl"><span class="s1">ec:83:0a:d6:93:e6:0c:1b:0e:7e:8a:65:19:be:f6:
+</span></span></span><span class="line"><span class="cl"><span class="s1">a1:81:f5:be:92:af:8b:00:44:c8:d0:b8:42:70:e3:
+</span></span></span><span class="line"><span class="cl"><span class="s1">34:c5:90:13:8c:3e:9d:f9:a2:9e:c9:af:45:db:05:
+</span></span></span><span class="line"><span class="cl"><span class="s1">f0:c4:43:b1:e0:96:23:9d:35
+</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">dp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tmp11</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">dq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tmp22</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">e</span> <span class="o">=</span> <span class="mi">65537</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tmp1</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="o">*</span> <span class="n">dp</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">i</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tmp2</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="o">*</span> <span class="n">dp</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">tmp2</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tmp1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">p</span> <span class="o">=</span> <span class="n">tmp2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tmp1</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="o">*</span> <span class="n">dq</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">i</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tmp2</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="o">*</span> <span class="n">dq</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">tmp2</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tmp1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">q</span> <span class="o">=</span> <span class="n">tmp2</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># p = 147673116768123046501026066807038926715915264969442823763204208720475579535213477786210371187742193605880627754665653951186744519004661448520641122167660320120916066617377213467621875332444790635885712675701692302167245584599460230318670678706064901636515350423028037212575403191070279218091882059694812068919</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># q = 171948646963038974435691793127831642257172420943060283745665555608701434414995570207450463094959389391741516208924038087804230983903133933532912182896192626915878363234805008629862688524283683392186453931930481499933370069645646443294030138569978008539334897839068026907252820219214009652777264505794114374279</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>算出p和q后，我们可以计算出密钥文件中缺失的其他部分，可以验证除了私钥d和给的那两个字节对应不上，其他都完全一样，我们合理怀疑是d的那两个字节出错了(最后确实可以得到结果)</p>
+<p>接下来重构密钥文件，创建一个key.asn1文件，记事本编辑写入如下内容</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">asn1=SEQUENCE:rsa_key
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">[rsa_key]
+</span></span><span class="line"><span class="cl">version=INTEGER:0
+</span></span><span class="line"><span class="cl">modulus=INTEGER:0x...
+</span></span><span class="line"><span class="cl">pubExp=INTEGER:65537
+</span></span><span class="line"><span class="cl">privExp=INTEGER:0x...
+</span></span><span class="line"><span class="cl">p=INTEGER:0x...
+</span></span><span class="line"><span class="cl">q=INTEGER:0x...
+</span></span><span class="line"><span class="cl">e1=INTEGER:0x...
+</span></span><span class="line"><span class="cl">e2=INTEGER:0x...
+</span></span><span class="line"><span class="cl">coeff=INTEGER:0x...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后用命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">openssl asn1parse -genconf key.asn1 -out key.der # 生成DER格式的密钥
+</span></span><span class="line"><span class="cl">openssl rsa -in key.der -inform DER -out key.pem # 转换为PEM格式
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后解密，当时在这里坐牢好久，怎么都弄不出来，后来知道RSA除了PKCS#1 v1.5填充以外，还有一种方式叫做OAEP，正是这一道题用的</p>
+<p>而cyberchef中的rsa解密恰好有三种模式PKCS#1 v1.5, OAEP, RAW无填充，可以直接梭，当然也可以写脚本，<code>from Crypto.Cipher import PKCS1_OAEP</code>也能实现一样的效果，具体脚本就不放了，可以让ai写，实际上也不如直接用cyberchef
+(T2可以用cyberchef解其实也是在此之后发现的)</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/rsa-copper/">
+        
+        
+            <div class="article-image">
+                <img src="/p/rsa-copper/111.82dd1bc5058d1f60cc46b9194d19b4d8_hu_5bf6c48af516b25d.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post RSA-copper"
+                        
+                        data-hash="md5-gt0bxQWNH2DMRrkZTRm02A==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">RSA-copper</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/rsa-%E5%89%AA%E6%9E%9D/">
+        
+        
+            <div class="article-image">
+                <img src="/p/rsa-%E5%89%AA%E6%9E%9D/111.9735f259acdd2343d92fc362ae716f3d_hu_e00e9fc4340e1ac2.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post RSA-剪枝"
+                        
+                        data-hash="md5-lzXyWazdI0PZL8NirnFvPQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">RSA-剪枝</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/222.e52d617d6040038a5292e7e1bec4f1f6_hu_ccaf7b8354d2954f.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 密码技术能力提升题目练习"
+                        
+                        data-hash="md5-5S1hfWBAA4pSkufhvsTx9g==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">密码技术能力提升题目练习</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2025 - 
+        
+        2026 hata
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.884460734613d5e85247b63e1915405c54071b98eccd53eda431ec100faee589.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

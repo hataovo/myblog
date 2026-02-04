@@ -163,9 +163,7 @@ params:
             - type: categories
               params:
                   limit: 10
-            - type: tag-cloud
-              params:
-                  limit: 10
+
         page:
             - type: toc
 
@@ -215,8 +213,8 @@ menu:
 
 
     - identifier: tags
-      name: 标签
-      url: /tags/
+      name: 分类
+      url: /categories/
       weight: 3
       params:
         icon: tag
@@ -243,6 +241,13 @@ menu:
       weight: 5
       params:
         icon: link
+
+    - identifier: about
+      name: 关于
+      url: /about/
+      weight: 6
+      params:
+        icon: user
 
   social:
     - identifier: github

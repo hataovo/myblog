@@ -1,9 +1,7 @@
 +++
-title = "RSA剪枝类型题目"
+title = "RSA-剪枝"
 date = "2025-12-06"
-description = "初探RSA剪枝类型题"
-categories = ["学习记录"]
-tags = ["总结"]
+categories = ["密码学习"]
 image="111.png"
 
 +++

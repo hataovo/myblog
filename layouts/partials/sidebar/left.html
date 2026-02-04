@@ -54,7 +54,7 @@
         {{ range .Site.Menus.main }}
         {{ $active := or (eq $currentPage.RelPermalink .URL) (or ($currentPage.HasMenuCurrent "main" .)
         ($currentPage.IsMenuCurrent "main" .)) }}
-        {{ if in (slice "home" "tags" "archives" "search" "Links") .Identifier }}
+        {{ if in (slice "home" "tags" "archives" "search" "Links" "about") .Identifier }}
         <li{{ if $active }} class="current" {{ end }}>
             <a href="{{ .URL }}">
                 {{ $icon := default .Pre .Params.Icon }}

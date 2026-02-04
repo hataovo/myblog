@@ -1,9 +1,7 @@
 +++
-title = "RSA密钥文件题目"
+title = "RSA-密钥文件"
 date = "2025-11-16"
-description = "RSA之.key文件或.pem文件简单总结"
-categories = ["学习记录"]
-tags = ["总结"]
+categories = ["密码学习"]
 image="123.png"
 +++
 

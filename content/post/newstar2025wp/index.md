@@ -1,9 +1,7 @@
 +++
-title = "NewStar CTF 2025 Crypto WP"
+title = "NewStar CTF 2025"
 date = "2025-11-04"
-description = "NewStar CTF 2025 Crypto 方向题目解析"
 categories = ["WP"]
-tags = ["Crypto"]
 image="fengmian.jpg"
 +++
 

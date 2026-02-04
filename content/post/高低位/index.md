@@ -1,9 +1,7 @@
 +++
-title = "高低位泄露题目"
+title = "RSA-copper"
 date = "2025-12-21"
-description = "杂题选做"
-categories = ["学习记录"]
-tags = ["Crypto","总结"]
+categories = ["密码学习"]
 image="111.png"
 +++
 

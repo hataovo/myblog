@@ -1,10 +1,7 @@
 +++
-title = "ISCTF 2025 WP&总结"
+title = "ISCTF 2025"
 date = "2025-12-14"
-description = "部分WP，复现，以及一些总结"
 categories = ["WP"]
-tags = ["复现","总结"]
-image="111.png"
 
 +++
 
