@@ -22,7 +22,7 @@ languages:
         weight: 1
         params:
             sidebar:
-                subtitle: 欲买桂花同载酒，终不似，......            
+                subtitle: 刻舟求剑          
 
 
 services:
