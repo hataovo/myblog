@@ -7,7 +7,186 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>hata</copyright>
-        <lastBuildDate>Thu, 05 Feb 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Fri, 20 Feb 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>ECC-(一)</title>
+        <link>http://localhost:1313/p/ecc-%E4%B8%80/</link>
+        <pubDate>Fri, 20 Feb 2026 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/p/ecc-%E4%B8%80/</guid>
+        <description>&lt;h1 id=&#34;ecc学习-一&#34;&gt;ECC学习-(一)
+&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;前言&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;之前零零散散做过几道ecc的基础题目，但是没有系统性的学习，许多知识点和攻击手法也只是停于表面，没有理解其原理，故有此文。主要借助Cryptohack上的ECC专栏进行学习，共计23个题目，希望最后都能理解掌握&lt;/p&gt;
+&lt;p&gt;下面的介绍内容摘自Cryptohack&lt;/p&gt;
+&lt;p&gt;The use of elliptic curves for public-key cryptography was first suggested in 1985. After resisting decades of attacks, they started to see widespread use from around 2005, providing several benefits over previous public-key cryptosystems such as RSA.&lt;/p&gt;
+&lt;p&gt;Smaller EC keys offer greater strength, with a 256-bit EC key having the same security level as a 3072-bit RSA key. Furthermore, several operations using those keys (including signing) can be more efficient both time- and memory-wise. Finally, since ECC is more complex than RSA, it has the welcome effect of encouraging developers to make use of trusted libraries rather than rolling their own.&lt;/p&gt;
+&lt;p&gt;These challenges aim to give you an intuition for the trapdoor function behind ECC; dip your toes into the mathematical structure underlying it; and have you breaking popular schemes like ECDSA.&lt;/p&gt;
+&lt;p&gt;可见，ecc是一种比较新的，高效的公钥密码体系，相应地，其也更为复杂&lt;/p&gt;
+&lt;p&gt;不过，Cryptohack官网不让在其他平台发布题解，原因是防止初学者不劳而获，而Cryptohack的题解似乎一搜一大把，而且也应该没人会看我的博客，若真有不妥，后面就删掉了&lt;/p&gt;
+&lt;h2 id=&#34;background&#34;&gt;Background
+&lt;/h2&gt;&lt;p&gt;Elliptic Curve Cryptography (ECC) 椭圆曲线密码学&lt;/p&gt;
+&lt;p&gt;考虑 Weierstrass equations 最典型的形式，形如$E:Y^2=X^3+aX+b$&lt;/p&gt;
+&lt;p&gt;一条椭圆曲线上的点(以及无穷远点)和点加运算构成了一个&lt;strong&gt;交换群&lt;/strong&gt;，无穷远点在群中充当单位元的作用，一个点的逆元即为其关于x轴对称的点&lt;/p&gt;
+&lt;p&gt;加法规则：一线三点相加为0(无穷远点)，下面的图是直观的点加的几何形式&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;要计算P+Q，做出过PQ的直线交于第三点R，则P+Q = -R&lt;/li&gt;
+&lt;li&gt;要计算P+Q，但是直线PQ与椭圆曲线没有第三个交点，而是在Q点与曲线相切，则P+Q+Q = 0，即P+Q = -Q，更容易理解的是，要计算Q+Q，故做过Q点的切线交于第三点P，此时Q+Q = -P&lt;/li&gt;
+&lt;li&gt;P和Q横坐标相同，此时互为逆元，相加为0&lt;/li&gt;
+&lt;li&gt;特殊情况，过P的切线斜率不存在，此时P+P = 0&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/p/ecc-%E4%B8%80/1.png&#34;
+	width=&#34;1014&#34;
+	height=&#34;306&#34;
+	srcset=&#34;http://localhost:1313/p/ecc-%E4%B8%80/1_hu_8e20b2ca73b0f7f8.png 480w, http://localhost:1313/p/ecc-%E4%B8%80/1_hu_51d98ee9b4b989a8.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;331&#34;
+		data-flex-basis=&#34;795px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Weierstrass 方程的参数a和b需满足$4a^3+27b^3 \neq 0$，为了保证曲线上没有奇点，奇点是曲线尖点或自相交的点，导致曲线在该点不光滑，这样的曲线在椭圆曲线理论中不被认为是有效的，它不具备良好的群结构&lt;/p&gt;
+&lt;p&gt;在 ECC 中，我们研究有限域 Fp 上的椭圆曲线。这意味着我们对曲线进行取模，椭圆曲线不再是曲线，而是一组坐 x,y 标为整数的离散的点&lt;/p&gt;
+&lt;h2 id=&#34;starter&#34;&gt;Starter
+&lt;/h2&gt;&lt;p&gt;在这个系列中，使用固定的椭圆曲线$E:Y^2=X^3+497X+1768\pmod {9739}$&lt;/p&gt;
+&lt;h3 id=&#34;point-negation&#34;&gt;Point Negation
+&lt;/h3&gt;&lt;p&gt;找到点P(8045,6936)的逆元Q，即P+Q=0&lt;/p&gt;
+&lt;p&gt;题目说注意处理负数(negative number)，那么就是(8045,-6936) -&amp;gt; (8045,2803)&lt;/p&gt;
+&lt;h3 id=&#34;point-addition&#34;&gt;Point Addition
+&lt;/h3&gt;&lt;p&gt;之前从几何角度直观展示了点加，下面是具体的坐标运算公式
+&lt;/p&gt;
+$$
+\begin{aligned}
+&amp;\text{(a) If } P = \mathcal{O}, \text{ then } P + Q = Q. \\
+&amp;\text{(b) Otherwise, if } Q = \mathcal{O}, \text{ then } P + Q = P. \\
+&amp;\text{(c) Otherwise, write } P = (x_1, y_1) \text{ and } Q = (x_2, y_2). \\
+&amp;\text{(d) If } x_1 = x_2 \text{ and } y_1 = -y_2, \text{ then } P + Q = \mathcal{O}. \\
+&amp;\text{(e) Otherwise:} \\
+&amp;\quad \text{(e1) if } P \neq Q: \lambda = \dfrac{y_2 - y_1}{x_2 - x_1}. \\
+&amp;\quad \text{(e2) if } P = Q: \lambda = \dfrac{3x_1^2 + a}{2y_1}. \\
+&amp;\text{(f) } x_3 = \lambda^2 - x_1 - x_2. \\
+&amp;\text{(h) } y_3 = \lambda(x_1 - x_3) - y_1. \\
+&amp;\text{(i) } P + Q = (x_3, y_3).
+\end{aligned}
+$$&lt;p&gt;
+这道题的任务是让我们计算(P+P+Q+R)的和，应当是自己设计算法去算，不过我这里就直接用现成的了&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;9739&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;A&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;497&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;B&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1768&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;E&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;EllipticCurve&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GF&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;A&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;B&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;])&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;P&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;E&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;493&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;5564&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Q&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;E&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1539&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;4742&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;R&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;E&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;4403&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;5202&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;assert&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;P&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;E&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;and&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Q&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;E&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;and&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;R&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;E&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# 可用 in 判断点是否在线上&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;ans&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;P&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;P&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Q&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;R&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ans&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;scalar-multiplication&#34;&gt;Scalar Multiplication
+&lt;/h3&gt;&lt;p&gt;标量乘，即数乘，Q=kP，一个常见的优化就是利用k的二进制展开加速计算，之前在 &lt;a class=&#34;link&#34; href=&#34;https://hataovo.github.io/p/isctf-2025/#%e6%b2%89%e8%bf%b7%e6%95%b0%e5%ad%a6%e7%9a%84%e5%b0%8f%e8%93%9d%e9%b2%a8&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link&lt;/a&gt; 有提及过&lt;/p&gt;
+&lt;p&gt;这道题的任务是让我们计算一个数乘&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# same curve&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;P&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;E&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;2339&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;2213&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Q&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;7863&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;P&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Q&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;curves-and-logs&#34;&gt;Curves and Logs
+&lt;/h3&gt;&lt;p&gt;即熟悉的椭圆曲线离散对数问题（ECDLP），给出P和Q，寻找一个整数n ，使得Q=nP&lt;/p&gt;
+&lt;p&gt;这里介绍了基于椭圆曲线的Diffie-Hellman Key Exchange（DH密钥交换协议）&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Alice generates a secret random integer $n_{A}$ and calculates $Q_{A}=[n_{A}]G$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Bob generates a secret random integer $n_{B}$ and calculates $Q_{B}=[n_{B}]G$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Alice sends Bob $Q_{A}$, and Bob sends Alice $Q_{B}$. Due to the hardness of ECDLP, an onlooker Eve is unable to calculate $n_{A} \ or \  n_B$ in reasonable time.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Alice then calculates $[n_{A}]Q_{B}$, and Bob calculates $[n_{B}]Q_{A}$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Due to the associativity (结合性) of scalar multiplication, $S=[n_{A}]Q_{B}=[n_{B}]Q_{A}$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Alice and Bob can use $S$ as their shared secret.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这道题的任务是，已知$Q_A$和$n_B$让我们计算出共享密钥，然后提交其x坐标的SHA1哈希值&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# same curve&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;QA&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;E&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;815&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3190&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;nb&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1829&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;S&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nb&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;QA&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;S&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;hashlib&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sha1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;str&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;ans&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sha1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;())&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;hexdigest&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# 需要encode一下才行&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ans&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;efficient-exchange&#34;&gt;Efficient Exchange
+&lt;/h3&gt;&lt;p&gt;高效交换，说的是在发送一个点时，可以只发送x坐标，因为x坐标确定后，y随之也能确定，但是不一定唯一&lt;/p&gt;
+&lt;p&gt;已知x(QA)=4726，nB=6534&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;QA&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;E&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;lift_x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;4726&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# 在已知x坐标情况下，可以获取到一个点&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;nb&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;6534&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;S&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nb&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;QA&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;然后用S的x坐标作为密钥，密文和IV给出了，用题目给出的解密脚本解密即可&lt;/p&gt;
+&lt;p&gt;若不对，则取S逆元的x坐标&lt;/p&gt;
+&lt;h2 id=&#34;end&#34;&gt;End
+&lt;/h2&gt;&lt;p&gt;第一部分先写到这里，目前完成了两个系列的六个题目，主要是偏引导式的入门题目和介绍&lt;/p&gt;
+&lt;p&gt;后面的内容目测了一下基本都是ctf题目的形式，应该难度会提升了&amp;hellip;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>LilCTF 2025</title>
         <link>http://localhost:1313/p/lilctf-2025/</link>
         <pubDate>Thu, 05 Feb 2026 00:00:00 +0000</pubDate>
@@ -16,6 +195,7 @@
         <description>&lt;img src="http://localhost:1313/p/lilctf-2025/1.png" alt="Featured image of post LilCTF 2025" /&gt;&lt;h1 id=&#34;lilctf-2025&#34;&gt;LilCTF 2025
 &lt;/h1&gt;&lt;p&gt;&lt;strong&gt;前言&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;线代crypto belike&amp;hellip;&lt;/p&gt;
+&lt;p&gt;困难，神奇，有趣&lt;/p&gt;
 &lt;h2 id=&#34;ez_math&#34;&gt;ez_math
 &lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -78,21 +258,20 @@ B = \begin{pmatrix}
 f_1a &amp; f_1b \\
 f_2c &amp; f_2d
 \end{pmatrix}
-$$&lt;h1 id=&#34;endpmatrix&#34;&gt;$$
-C = A^{-1}B =\frac{1}{ad-bc}\begin{pmatrix}
-d &amp;amp; -b \
--c &amp;amp; a
-\end{pmatrix}
+$$$$
+C = A^{-1}B = \frac{1}{ad-bc} \begin{pmatrix}
+d &amp; -b \\
+-c &amp; a
+\end{pmatrix} 
 \begin{pmatrix}
-f_1a &amp;amp; f_1b \
-f_2c &amp;amp; f_2d
+f_1a &amp; f_1b \\
+f_2c &amp; f_2d
 \end{pmatrix}
-&lt;/h1&gt;&lt;p&gt;\frac{1}{ad-bc}\begin{pmatrix}
-f_1ad-f_2bc &amp;amp; f_1bd-f_2bd \
--f_1ac+f_2ac &amp;amp; -f_1bc+f_2ad
+= \frac{1}{ad-bc}\begin{pmatrix}
+f_1ad-f_2bc &amp; f_1bd-f_2bd \\
+-f_1ac+f_2ac &amp; -f_1bc+f_2ad
 \end{pmatrix}
-$$&lt;/p&gt;
-&lt;p&gt;故C[0, 0] + C[1, 1] = f1 + f2&lt;/p&gt;
+$$&lt;p&gt;故C[0, 0] + C[1, 1] = f1 + f2&lt;/p&gt;
 &lt;p&gt;另一方面$|C| = |A^{-1}||B| = \frac{|B|}{|A|} = f_1f_2$&lt;/p&gt;
 &lt;p&gt;联立解方程即可，exp&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -132,27 +311,27 @@ $$&lt;/p&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;&lt;strong&gt;方法二&lt;/strong&gt;&lt;/p&gt;
-&lt;h1 id=&#34;endpmatrix-1&#34;&gt;特征值做法，记
+&lt;p&gt;特征值做法，记&lt;/p&gt;
 $$
 \alpha_1 = (a,\ b),\quad
 \alpha_2 = (c,\ d)
-$$
+$$&lt;p&gt;
 则$C=A^{-1}B$，可得$AC=B$，分块
+&lt;/p&gt;
 $$
 \begin{pmatrix}
-\alpha_1 \
+\alpha_1 \\
 \alpha_2
 \end{pmatrix}
-C =
-\begin{pmatrix}
-\alpha_1C \
+C = \begin{pmatrix}
+\alpha_1C \\
 \alpha_2C
 \end{pmatrix}
-&lt;/h1&gt;&lt;p&gt;\begin{pmatrix}
-f_1\alpha_1 \
+=  \begin{pmatrix}
+f_1\alpha_1 \\
 f_2\alpha_2
 \end{pmatrix}
-$$
+$$&lt;p&gt;
 即$\alpha_iC =  f_i\alpha_i$，和特征值定义不太一样，因为标准定义的特征向量在矩阵右边，是一个列向量&lt;/p&gt;
 &lt;p&gt;对$\alpha_iC =  f_i\alpha_i$两边转置可得，$C^T\alpha_i^T =  f_i\alpha_i^T$，这就是标准的定义式了，不过$f_i$现在是$C^T$的特征值，而不难得到$C$和$C^T$具有相同特征值，因为$det(C-\lambda I) = det(C^T -\lambda I)$，(行列式转置值不变)&lt;/p&gt;
 &lt;p&gt;综上，f1和f2为C的两个特征值，利用sage内置函数求即可，显然更简洁&lt;/p&gt;
@@ -610,42 +789,44 @@ $$
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;sa&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;ciphertext = &lt;/span&gt;&lt;span class=&#34;si&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ciphertext&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;h1 id=&#34;endpmatrix-2&#34;&gt;背包格，最初的构造，pi为p的第i比特位(从低位开始)，b的bit长度为95
+&lt;/div&gt;&lt;p&gt;背包格，最初的构造，pi为p的第i比特位(从低位开始)，b的bit长度为95
+&lt;/p&gt;
 $$
-(p_0 \ \  p_1 \ \ \dots \ \ p_{71} \ \  -1)
+(p_0 \ \  p_1 \ \ \dots \ \ p_{71} \ \  -1) 
 \begin{pmatrix}
-1 &amp;amp; 0 &amp;amp; \cdots &amp;amp; 0 &amp;amp; a_0 \
-0 &amp;amp; 1 &amp;amp; \cdots &amp;amp; 0 &amp;amp; a_1 \
-\vdots &amp;amp; \vdots &amp;amp; \ddots &amp;amp; \vdots &amp;amp; \vdots \
-0 &amp;amp; 0 &amp;amp; \cdots &amp;amp; 1 &amp;amp; a_{71} \
-0 &amp;amp; 0 &amp;amp; \cdots &amp;amp; 0 &amp;amp; b
-\end{pmatrix}
-&lt;/h1&gt;&lt;p&gt;(p_0 \ \  p_1 \ \ \dots \ \ p_{71} \ \  0)
-$$
+1 &amp; 0 &amp; \cdots &amp; 0 &amp; a_0 \\
+0 &amp; 1 &amp; \cdots &amp; 0 &amp; a_1 \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots &amp; \vdots \\
+0 &amp; 0 &amp; \cdots &amp; 1 &amp; a_{71} \\
+0 &amp; 0 &amp; \cdots &amp; 0 &amp; b
+\end{pmatrix} =
+(p_0 \ \  p_1 \ \ \dots \ \ p_{71} \ \  0)
+$$&lt;p&gt;
 but给最后一列配了配，还是规约不出来&lt;/p&gt;
 &lt;p&gt;不中了，补一补背包密码的知识，搜到大佬博客&lt;a class=&#34;link&#34; href=&#34;https://dexterjie.github.io/2024/07/29/%e8%83%8c%e5%8c%85%e5%af%86%e7%a0%81/#%e8%83%8c%e5%8c%85%e5%af%86%e7%a0%81&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;背包密码 | DexterJie&amp;rsquo;Blog&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;感觉学到很多压缩后的精华，摘抄如下&lt;/p&gt;
 &lt;p&gt;CTF中出现的背包问题通常形如：$ S = \sum_{i=0}^{n-1} x_i M_i $&lt;/p&gt;
 &lt;p&gt;其中 $M$ 为背包的公钥，$S$ 为密文，记 $n = \operatorname{len}(M)$，背包密度 $d = \frac{n}{\log_2(\max(M))}$&lt;/p&gt;
-&lt;h1 id=&#34;endpmatrix-3&#34;&gt;构造的格有2种，一种是上面的(n+1)*(n+1)的格，另一种也是(n+1)*(n+1)，如下
+&lt;p&gt;构造的格有2种，一种是上面的(n+1)*(n+1)的格，另一种也是(n+1)*(n+1)，如下
+&lt;/p&gt;
 $$
 (p_0 \ \  p_1 \ \ \dots \ \ p_{71} \ \  -1)
 \begin{pmatrix}
-2 &amp;amp; 0 &amp;amp; \cdots &amp;amp; 0 &amp;amp; a_0 \
-0 &amp;amp; 2 &amp;amp; \cdots &amp;amp; 0 &amp;amp; a_1 \
-\vdots &amp;amp; \vdots &amp;amp; \ddots &amp;amp; \vdots &amp;amp; \vdots \
-0 &amp;amp; 0 &amp;amp; \cdots &amp;amp; 2 &amp;amp; a_{71} \
-1 &amp;amp; 1 &amp;amp; \cdots &amp;amp; 1 &amp;amp; b
-\end{pmatrix}
-&lt;/h1&gt;&lt;p&gt;(2p_0-1 \ \  2p_1-1 \ \ \dots \ \ 2p_{71}-1 \ \  0)
-$$
+2 &amp; 0 &amp; \cdots &amp; 0 &amp; a_0 \\
+0 &amp; 2 &amp; \cdots &amp; 0 &amp; a_1 \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots &amp; \vdots \\
+0 &amp; 0 &amp; \cdots &amp; 2 &amp; a_{71} \\
+1 &amp; 1 &amp; \cdots &amp; 1 &amp; b
+\end{pmatrix} = (2p_0-1 \ \  2p_1-1 \ \ \dots \ \ 2p_{71}-1 \ \  0)
+$$&lt;p&gt;
 因此目标向量取值应属于{-1,1}(除去最后一个0)&lt;/p&gt;
 &lt;p&gt;第二种比第一种好在第二种格的行列式会更大一些&lt;/p&gt;
 &lt;p&gt;上面两个格一般在用的时候会在最后一列乘上&lt;code&gt;N = ceil(sqrt(n))&lt;/code&gt;	(个人感觉作用就是配平)&lt;/p&gt;
 &lt;p&gt;另外，规约算法除LLL外还可以用BKZ，sagemath中的BKZ()可以设置参数，例如BKZ(block_size = 16)，指定了BKZ算法中的块大小。默认情况下是block_size = 20，block_size越大，执行速度越慢，但结果更精确&lt;/p&gt;
-&lt;p&gt;[CTF_Repo/The Relation Between Lattice Reduction Algorithm and Knapsack Density at main · DexterJie/CTF_Repo](&lt;a class=&#34;link&#34; href=&#34;https://github.com/DexterJie/CTF_Repo/tree/main/The&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://github.com/DexterJie/CTF_Repo/tree/main/The&lt;/a&gt; Relation Between Lattice Reduction Algorithm and Knapsack Density)更强的是这个实验结果，可以得到几个很有用的信息&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/DexterJie/CTF_Repo/tree/main/The%20Relation%20Between%20Lattice%20Reduction%20Algorithm%20and%20Knapsack%20Density&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;The Relation Between Lattice Reduction Algorithm and Knapsack Density&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;更强的是这个实验结果，可以得到几个很有用的信息&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;第二种格成功率比第一种高&lt;/li&gt;
 &lt;li&gt;BKZ算法比LLL算法成功率高，当然block_size越大成功率越高，实验里测试了20和26&lt;/li&gt;
@@ -808,28 +989,28 @@ $$&lt;p&gt;
 &lt;p&gt;只好再看wp学习了，是想将方程组降维，而key取自vecs数组，将vecs转为一个4096*16的矩阵V1，发现其秩只有13，若为12的话，则12*50=600，刚刚好&lt;/p&gt;
 &lt;p&gt;此时考虑vecs是由特定线性变换Ax+b生成，我们用矩阵V各行减去第一行v0，发现新得到的矩阵V2的秩只有12，我们取出其一组基L(12*16)，在sage中可以用.echelon_form()方法实现，其是将一个矩阵化为行阶梯形，那么显然V2中的任一个(行)向量可由L线性组合表示，进而，V1中的任一向量$v_i = z_i L +v_0$，$z_i$是一个1*12的向量，恰好$2^{12}=4096$，可以变换出完整的vecs&lt;/p&gt;
 &lt;p&gt;求出zi之后，将原等式中的k向量和N矩阵做一个分组操作，可得$nv_i = n(z_iL+v_0)=nLz_i+nv_0$，据此重构一下等式，$N diag(L^T)\vec{z}+N\vec{v}_0\equiv c \pmod 2$，可解出600个z变量，然后重新计算出v向量，即key&lt;/p&gt;
-&lt;h1 id=&#34;endpmatrix-4&#34;&gt;实际写exp注意形状和转置，，还有下面这个
+&lt;p&gt;实际写exp注意形状和转置，，还有下面这个
+&lt;/p&gt;
 $$
 \begin{pmatrix}
-L^\mathsf{T} &amp;amp;  &amp;amp;  &amp;amp;  \
-&amp;amp; L^\mathsf{T} &amp;amp;  &amp;amp;  \
-&amp;amp;  &amp;amp; \ddots &amp;amp;  \
-&amp;amp;  &amp;amp;  &amp;amp; L^\mathsf{T}
+L^\mathsf{T} &amp;  &amp;  &amp;  \\
+ &amp; L^\mathsf{T} &amp;  &amp;  \\
+ &amp;  &amp; \ddots &amp;  \\
+ &amp;  &amp;  &amp; L^\mathsf{T}
 \end{pmatrix}
 \begin{pmatrix}
-z_0 \
-z_1 \
-\vdots \
+z_0 \\
+z_1 \\
+\vdots \\
 z_{49}
 \end{pmatrix}
-&lt;/h1&gt;&lt;p&gt;\begin{pmatrix}
-L^Tz_0 \
-L^Tz_1 \
-\vdots \
+= \begin{pmatrix}
+L^Tz_0 \\
+L^Tz_1 \\
+\vdots \\
 L^Tz_{49}
 \end{pmatrix}
-$$&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+$$&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2

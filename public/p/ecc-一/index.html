@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="ECC学习-(一)\r前言\n之前零零散散做过几道ecc的基础题目，但是没有系统性的学习，许多知识点和攻击手法也只是停于表面，没有理解其原理，故有此文。主要借助Cryptohack上的ECC专栏进行学习，共计23个题目，希望最后都能理解掌握\n下面的介绍内容摘自Cryptohack\nThe use of elliptic curves for public-key cryptography was first suggested in 1985. After resisting decades of attacks, they started to see widespread use from around 2005, providing several benefits over previous public-key cryptosystems such as RSA.\nSmaller EC keys offer greater strength, with a 256-bit EC key having the same security level as a 3072-bit RSA key. Furthermore, several operations using those keys (including signing) can be more efficient both time- and memory-wise. Finally, since ECC is more complex than RSA, it has the welcome effect of encouraging developers to make use of trusted libraries rather than rolling their own.\n">
+<title>ECC-(一)</title>
+
+<link rel='canonical' href='http://localhost:1313/p/ecc-%E4%B8%80/'>
+
+<link rel="stylesheet" href="/scss/style.min.4d36f8dc1fd48129e1635deb4b8eb2870fa09474f7280c4cb606d40b2526994b.css"><meta property='og:title' content="ECC-(一)">
+<meta property='og:description' content="ECC学习-(一)\r前言\n之前零零散散做过几道ecc的基础题目，但是没有系统性的学习，许多知识点和攻击手法也只是停于表面，没有理解其原理，故有此文。主要借助Cryptohack上的ECC专栏进行学习，共计23个题目，希望最后都能理解掌握\n下面的介绍内容摘自Cryptohack\nThe use of elliptic curves for public-key cryptography was first suggested in 1985. After resisting decades of attacks, they started to see widespread use from around 2005, providing several benefits over previous public-key cryptosystems such as RSA.\nSmaller EC keys offer greater strength, with a 256-bit EC key having the same security level as a 3072-bit RSA key. Furthermore, several operations using those keys (including signing) can be more efficient both time- and memory-wise. Finally, since ECC is more complex than RSA, it has the welcome effect of encouraging developers to make use of trusted libraries rather than rolling their own.\n">
+<meta property='og:url' content='http://localhost:1313/p/ecc-%E4%B8%80/'>
+<meta property='og:site_name' content='Hata的小屋'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2026-02-20T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-02-20T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="ECC-(一)">
+<meta name="twitter:description" content="ECC学习-(一)\r前言\n之前零零散散做过几道ecc的基础题目，但是没有系统性的学习，许多知识点和攻击手法也只是停于表面，没有理解其原理，故有此文。主要借助Cryptohack上的ECC专栏进行学习，共计23个题目，希望最后都能理解掌握\n下面的介绍内容摘自Cryptohack\nThe use of elliptic curves for public-key cryptography was first suggested in 1985. After resisting decades of attacks, they started to see widespread use from around 2005, providing several benefits over previous public-key cryptosystems such as RSA.\nSmaller EC keys offer greater strength, with a 256-bit EC key having the same security level as a 3072-bit RSA key. Furthermore, several operations using those keys (including signing) can be more efficient both time- and memory-wise. Finally, since ECC is more complex than RSA, it has the welcome effect of encouraging developers to make use of trusted libraries rather than rolling their own.\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <figure class="site-avatar">
+            <a href="/">
+                
+                
+                
+                
+                <img src="/img/avatar_hu_1f41586fb0ce9a39.png" width="300"
+                    height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                
+            </a>
+            
+            <span class="emoji">🤔</span>
+            
+        </figure>
+        
+        
+
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Hata的小屋</a></h1>
+            <h2 class="site-description">刻舟求剑</h2>
+        </div>
+    </header>
+
+    
+    <ol class="menu-social">
+        
+        <li>
+            <a href="https://github.com/hataovo" target="_blank" title="GitHub" rel="me">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+            </a>
+        </li>
+        
+    </ol>
+    
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+        <li>
+            <a href="/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                <span>主页</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/archives/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                <span>归档</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/categories/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+                <span>分类</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/search/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                <span>搜索</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/links/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                <span>链接</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/about/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                <span>关于</span>
+            </a>
+            </li>
+            
+            
+
+            <li class="menu-bottom-section">
+                <ol class="menu">
+                    
+                    
+
+                    
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                    
+                </ol>
+            </li>
+    </ol>
+</aside>
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#background">Background</a></li>
+    <li><a href="#starter">Starter</a>
+      <ol>
+        <li><a href="#point-negation">Point Negation</a></li>
+        <li><a href="#point-addition">Point Addition</a></li>
+        <li><a href="#scalar-multiplication">Scalar Multiplication</a></li>
+        <li><a href="#curves-and-logs">Curves and Logs</a></li>
+        <li><a href="#efficient-exchange">Efficient Exchange</a></li>
+      </ol>
+    </li>
+    <li><a href="#end">End</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AF%86%E7%A0%81%E5%AD%A6%E4%B9%A0/" style="background-color: #2a9d8f; color: #fff;">
+                密码学习
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/ecc-%E4%B8%80/">ECC-(一)</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2026-02-20T00:00:00Z'>Feb 20, 2026</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="ecc学习-一">ECC学习-(一)
+</h1><p><strong>前言</strong></p>
+<p>之前零零散散做过几道ecc的基础题目，但是没有系统性的学习，许多知识点和攻击手法也只是停于表面，没有理解其原理，故有此文。主要借助Cryptohack上的ECC专栏进行学习，共计23个题目，希望最后都能理解掌握</p>
+<p>下面的介绍内容摘自Cryptohack</p>
+<p>The use of elliptic curves for public-key cryptography was first suggested in 1985. After resisting decades of attacks, they started to see widespread use from around 2005, providing several benefits over previous public-key cryptosystems such as RSA.</p>
+<p>Smaller EC keys offer greater strength, with a 256-bit EC key having the same security level as a 3072-bit RSA key. Furthermore, several operations using those keys (including signing) can be more efficient both time- and memory-wise. Finally, since ECC is more complex than RSA, it has the welcome effect of encouraging developers to make use of trusted libraries rather than rolling their own.</p>
+<p>These challenges aim to give you an intuition for the trapdoor function behind ECC; dip your toes into the mathematical structure underlying it; and have you breaking popular schemes like ECDSA.</p>
+<p>可见，ecc是一种比较新的，高效的公钥密码体系，相应地，其也更为复杂</p>
+<p>不过，Cryptohack官网不让在其他平台发布题解，原因是防止初学者不劳而获，而Cryptohack的题解似乎一搜一大把，而且也应该没人会看我的博客，若真有不妥，后面就删掉了</p>
+<h2 id="background">Background
+</h2><p>Elliptic Curve Cryptography (ECC) 椭圆曲线密码学</p>
+<p>考虑 Weierstrass equations 最典型的形式，形如$E:Y^2=X^3+aX+b$</p>
+<p>一条椭圆曲线上的点(以及无穷远点)和点加运算构成了一个<strong>交换群</strong>，无穷远点在群中充当单位元的作用，一个点的逆元即为其关于x轴对称的点</p>
+<p>加法规则：一线三点相加为0(无穷远点)，下面的图是直观的点加的几何形式</p>
+<ol>
+<li>要计算P+Q，做出过PQ的直线交于第三点R，则P+Q = -R</li>
+<li>要计算P+Q，但是直线PQ与椭圆曲线没有第三个交点，而是在Q点与曲线相切，则P+Q+Q = 0，即P+Q = -Q，更容易理解的是，要计算Q+Q，故做过Q点的切线交于第三点P，此时Q+Q = -P</li>
+<li>P和Q横坐标相同，此时互为逆元，相加为0</li>
+<li>特殊情况，过P的切线斜率不存在，此时P+P = 0</li>
+</ol>
+<p><img src="/p/ecc-%E4%B8%80/1.png"
+	width="1014"
+	height="306"
+	srcset="/p/ecc-%E4%B8%80/1_hu_8e20b2ca73b0f7f8.png 480w, /p/ecc-%E4%B8%80/1_hu_51d98ee9b4b989a8.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="331"
+		data-flex-basis="795px"
+	
+></p>
+<p>Weierstrass 方程的参数a和b需满足$4a^3+27b^3 \neq 0$，为了保证曲线上没有奇点，奇点是曲线尖点或自相交的点，导致曲线在该点不光滑，这样的曲线在椭圆曲线理论中不被认为是有效的，它不具备良好的群结构</p>
+<p>在 ECC 中，我们研究有限域 Fp 上的椭圆曲线。这意味着我们对曲线进行取模，椭圆曲线不再是曲线，而是一组坐 x,y 标为整数的离散的点</p>
+<h2 id="starter">Starter
+</h2><p>在这个系列中，使用固定的椭圆曲线$E:Y^2=X^3+497X+1768\pmod {9739}$</p>
+<h3 id="point-negation">Point Negation
+</h3><p>找到点P(8045,6936)的逆元Q，即P+Q=0</p>
+<p>题目说注意处理负数(negative number)，那么就是(8045,-6936) -&gt; (8045,2803)</p>
+<h3 id="point-addition">Point Addition
+</h3><p>之前从几何角度直观展示了点加，下面是具体的坐标运算公式
+</p>
+$$
+\begin{aligned}
+&\text{(a) If } P = \mathcal{O}, \text{ then } P + Q = Q. \\
+&\text{(b) Otherwise, if } Q = \mathcal{O}, \text{ then } P + Q = P. \\
+&\text{(c) Otherwise, write } P = (x_1, y_1) \text{ and } Q = (x_2, y_2). \\
+&\text{(d) If } x_1 = x_2 \text{ and } y_1 = -y_2, \text{ then } P + Q = \mathcal{O}. \\
+&\text{(e) Otherwise:} \\
+&\quad \text{(e1) if } P \neq Q: \lambda = \dfrac{y_2 - y_1}{x_2 - x_1}. \\
+&\quad \text{(e2) if } P = Q: \lambda = \dfrac{3x_1^2 + a}{2y_1}. \\
+&\text{(f) } x_3 = \lambda^2 - x_1 - x_2. \\
+&\text{(h) } y_3 = \lambda(x_1 - x_3) - y_1. \\
+&\text{(i) } P + Q = (x_3, y_3).
+\end{aligned}
+$$<p>
+这道题的任务是让我们计算(P+P+Q+R)的和，应当是自己设计算法去算，不过我这里就直接用现成的了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="mi">9739</span>
+</span></span><span class="line"><span class="cl"><span class="n">A</span> <span class="o">=</span> <span class="mi">497</span>
+</span></span><span class="line"><span class="cl"><span class="n">B</span> <span class="o">=</span> <span class="mi">1768</span>
+</span></span><span class="line"><span class="cl"><span class="n">E</span> <span class="o">=</span> <span class="n">EllipticCurve</span><span class="p">(</span><span class="n">GF</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="p">[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">P</span> <span class="o">=</span> <span class="n">E</span><span class="p">(</span><span class="mi">493</span><span class="p">,</span><span class="mi">5564</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">Q</span> <span class="o">=</span> <span class="n">E</span><span class="p">(</span><span class="mi">1539</span><span class="p">,</span><span class="mi">4742</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">R</span> <span class="o">=</span> <span class="n">E</span><span class="p">(</span><span class="mi">4403</span><span class="p">,</span><span class="mi">5202</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">P</span> <span class="ow">in</span> <span class="n">E</span> <span class="ow">and</span> <span class="n">Q</span> <span class="ow">in</span> <span class="n">E</span> <span class="ow">and</span> <span class="n">R</span> <span class="ow">in</span> <span class="n">E</span> <span class="c1"># 可用 in 判断点是否在线上</span>
+</span></span><span class="line"><span class="cl"><span class="n">ans</span> <span class="o">=</span> <span class="n">P</span> <span class="o">+</span> <span class="n">P</span> <span class="o">+</span> <span class="n">Q</span> <span class="o">+</span> <span class="n">R</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="scalar-multiplication">Scalar Multiplication
+</h3><p>标量乘，即数乘，Q=kP，一个常见的优化就是利用k的二进制展开加速计算，之前在 <a class="link" href="https://hataovo.github.io/p/isctf-2025/#%e6%b2%89%e8%bf%b7%e6%95%b0%e5%ad%a6%e7%9a%84%e5%b0%8f%e8%93%9d%e9%b2%a8"  target="_blank" rel="noopener"
+    >link</a> 有提及过</p>
+<p>这道题的任务是让我们计算一个数乘</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># same curve</span>
+</span></span><span class="line"><span class="cl"><span class="n">P</span> <span class="o">=</span> <span class="n">E</span><span class="p">(</span><span class="mi">2339</span><span class="p">,</span><span class="mi">2213</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">Q</span> <span class="o">=</span> <span class="mi">7863</span> <span class="o">*</span> <span class="n">P</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="curves-and-logs">Curves and Logs
+</h3><p>即熟悉的椭圆曲线离散对数问题（ECDLP），给出P和Q，寻找一个整数n ，使得Q=nP</p>
+<p>这里介绍了基于椭圆曲线的Diffie-Hellman Key Exchange（DH密钥交换协议）</p>
+<ul>
+<li>
+<p>Alice generates a secret random integer $n_{A}$ and calculates $Q_{A}=[n_{A}]G$</p>
+</li>
+<li>
+<p>Bob generates a secret random integer $n_{B}$ and calculates $Q_{B}=[n_{B}]G$</p>
+</li>
+<li>
+<p>Alice sends Bob $Q_{A}$, and Bob sends Alice $Q_{B}$. Due to the hardness of ECDLP, an onlooker Eve is unable to calculate $n_{A} \ or \  n_B$ in reasonable time.</p>
+</li>
+<li>
+<p>Alice then calculates $[n_{A}]Q_{B}$, and Bob calculates $[n_{B}]Q_{A}$.</p>
+</li>
+<li>
+<p>Due to the associativity (结合性) of scalar multiplication, $S=[n_{A}]Q_{B}=[n_{B}]Q_{A}$.</p>
+</li>
+<li>
+<p>Alice and Bob can use $S$ as their shared secret.</p>
+</li>
+</ul>
+<p>这道题的任务是，已知$Q_A$和$n_B$让我们计算出共享密钥，然后提交其x坐标的SHA1哈希值</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># same curve</span>
+</span></span><span class="line"><span class="cl"><span class="n">QA</span> <span class="o">=</span> <span class="n">E</span><span class="p">(</span><span class="mi">815</span><span class="p">,</span><span class="mi">3190</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nb</span> <span class="o">=</span> <span class="mi">1829</span>
+</span></span><span class="line"><span class="cl"><span class="n">S</span> <span class="o">=</span> <span class="n">nb</span> <span class="o">*</span> <span class="n">QA</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha1</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">ans</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span> <span class="c1"># 需要encode一下才行</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="efficient-exchange">Efficient Exchange
+</h3><p>高效交换，说的是在发送一个点时，可以只发送x坐标，因为x坐标确定后，y随之也能确定，但是不一定唯一</p>
+<p>已知x(QA)=4726，nB=6534</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">QA</span> <span class="o">=</span> <span class="n">E</span><span class="o">.</span><span class="n">lift_x</span><span class="p">(</span><span class="mi">4726</span><span class="p">)</span> <span class="c1"># 在已知x坐标情况下，可以获取到一个点</span>
+</span></span><span class="line"><span class="cl"><span class="n">nb</span> <span class="o">=</span> <span class="mi">6534</span>
+</span></span><span class="line"><span class="cl"><span class="n">S</span> <span class="o">=</span> <span class="n">nb</span> <span class="o">*</span> <span class="n">QA</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后用S的x坐标作为密钥，密文和IV给出了，用题目给出的解密脚本解密即可</p>
+<p>若不对，则取S逆元的x坐标</p>
+<h2 id="end">End
+</h2><p>第一部分先写到这里，目前完成了两个系列的六个题目，主要是偏引导式的入门题目和介绍</p>
+<p>后面的内容目测了一下基本都是ctf题目的形式，应该难度会提升了&hellip;</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/rsa-copper/">
+        
+        
+            <div class="article-image">
+                <img src="/p/rsa-copper/111.82dd1bc5058d1f60cc46b9194d19b4d8_hu_5bf6c48af516b25d.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post RSA-copper"
+                        
+                        data-hash="md5-gt0bxQWNH2DMRrkZTRm02A==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">RSA-copper</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/rsa-%E5%89%AA%E6%9E%9D/">
+        
+        
+            <div class="article-image">
+                <img src="/p/rsa-%E5%89%AA%E6%9E%9D/111.9735f259acdd2343d92fc362ae716f3d_hu_e00e9fc4340e1ac2.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post RSA-剪枝"
+                        
+                        data-hash="md5-lzXyWazdI0PZL8NirnFvPQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">RSA-剪枝</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/">
+        
+        
+            <div class="article-image">
+                <img src="/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/123.95a3d75ac58a906e1f4881e3baba7afe_hu_478b74b8f412d6e5.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post RSA-密钥文件"
+                        
+                        data-hash="md5-laPXWsWKkG4fSIHjurp6/g==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">RSA-密钥文件</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/222.e52d617d6040038a5292e7e1bec4f1f6_hu_ccaf7b8354d2954f.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 密码技术能力提升题目练习"
+                        
+                        data-hash="md5-5S1hfWBAA4pSkufhvsTx9g==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">密码技术能力提升题目练习</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2025 - 
+        
+        2026 hata
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.884460734613d5e85247b63e1915405c54071b98eccd53eda431ec100faee589.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
