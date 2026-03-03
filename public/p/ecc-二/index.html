@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="ECC学习-(二)\r前言\n本想按顺序，在第二部分完成Parameter Choice系列的，但上手后发现由于我数学功底严重不足，导致做起来很吃力，只好先做了其他的题目\nSignatures\rECDSA\n密钥生成\n1、选择一条椭圆曲线E和基点G，G的阶为n (椭圆曲线的阶也是n，也就是说G是一个生成元)\n2、选择私钥$d_A$，计算公钥$Q = d_AG$，Q即为公钥\n签名\n1、取随机数k，计算$P=k*G$\n2、取P的x坐标，$r \\equiv x_P \\pmod n$\n3、使用一个哈希函数计算m的哈希值（m一般为签名信息），用H(m)表示\n4、计算$s \\equiv k^{-1}(H(m)+rd_A) \\pmod n$\n5、(r, s)做为签名值\n验签\n1、接受方在收到消息(m)和签名值(r, s)后，进行以下运算\n2、计算h = H(m)\n3、计算 $\\omega \\equiv s^{-1} \\pmod n$\n4、计算$u_1 = h\\omega$，$u_2=r\\omega$\n5、计算$X = (x_1,y_1)=u_1G+u_2Q$\n6、若X不存在，则签名错误；计算$v\\equiv x_1 \\pmod n$\n7、若 v == r，签名正确\n简单证明 $$\rX =u_1G+u_2Q=h\\omega G + r\\omega d_A G = \\omega(h+rd_A)G = \\omega skG = \\omega s P = P\r$$若k泄露，则能从一组(r, s)中算出私钥d\n">
+<title>ECC-(二)</title>
+
+<link rel='canonical' href='http://localhost:1313/p/ecc-%E4%BA%8C/'>
+
+<link rel="stylesheet" href="/scss/style.min.4d36f8dc1fd48129e1635deb4b8eb2870fa09474f7280c4cb606d40b2526994b.css"><meta property='og:title' content="ECC-(二)">
+<meta property='og:description' content="ECC学习-(二)\r前言\n本想按顺序，在第二部分完成Parameter Choice系列的，但上手后发现由于我数学功底严重不足，导致做起来很吃力，只好先做了其他的题目\nSignatures\rECDSA\n密钥生成\n1、选择一条椭圆曲线E和基点G，G的阶为n (椭圆曲线的阶也是n，也就是说G是一个生成元)\n2、选择私钥$d_A$，计算公钥$Q = d_AG$，Q即为公钥\n签名\n1、取随机数k，计算$P=k*G$\n2、取P的x坐标，$r \\equiv x_P \\pmod n$\n3、使用一个哈希函数计算m的哈希值（m一般为签名信息），用H(m)表示\n4、计算$s \\equiv k^{-1}(H(m)+rd_A) \\pmod n$\n5、(r, s)做为签名值\n验签\n1、接受方在收到消息(m)和签名值(r, s)后，进行以下运算\n2、计算h = H(m)\n3、计算 $\\omega \\equiv s^{-1} \\pmod n$\n4、计算$u_1 = h\\omega$，$u_2=r\\omega$\n5、计算$X = (x_1,y_1)=u_1G+u_2Q$\n6、若X不存在，则签名错误；计算$v\\equiv x_1 \\pmod n$\n7、若 v == r，签名正确\n简单证明 $$\rX =u_1G+u_2Q=h\\omega G + r\\omega d_A G = \\omega(h+rd_A)G = \\omega skG = \\omega s P = P\r$$若k泄露，则能从一组(r, s)中算出私钥d\n">
+<meta property='og:url' content='http://localhost:1313/p/ecc-%E4%BA%8C/'>
+<meta property='og:site_name' content='Hata的小屋'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2026-03-03T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-03-03T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="ECC-(二)">
+<meta name="twitter:description" content="ECC学习-(二)\r前言\n本想按顺序，在第二部分完成Parameter Choice系列的，但上手后发现由于我数学功底严重不足，导致做起来很吃力，只好先做了其他的题目\nSignatures\rECDSA\n密钥生成\n1、选择一条椭圆曲线E和基点G，G的阶为n (椭圆曲线的阶也是n，也就是说G是一个生成元)\n2、选择私钥$d_A$，计算公钥$Q = d_AG$，Q即为公钥\n签名\n1、取随机数k，计算$P=k*G$\n2、取P的x坐标，$r \\equiv x_P \\pmod n$\n3、使用一个哈希函数计算m的哈希值（m一般为签名信息），用H(m)表示\n4、计算$s \\equiv k^{-1}(H(m)+rd_A) \\pmod n$\n5、(r, s)做为签名值\n验签\n1、接受方在收到消息(m)和签名值(r, s)后，进行以下运算\n2、计算h = H(m)\n3、计算 $\\omega \\equiv s^{-1} \\pmod n$\n4、计算$u_1 = h\\omega$，$u_2=r\\omega$\n5、计算$X = (x_1,y_1)=u_1G+u_2Q$\n6、若X不存在，则签名错误；计算$v\\equiv x_1 \\pmod n$\n7、若 v == r，签名正确\n简单证明 $$\rX =u_1G+u_2Q=h\\omega G + r\\omega d_A G = \\omega(h+rd_A)G = \\omega skG = \\omega s P = P\r$$若k泄露，则能从一组(r, s)中算出私钥d\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <figure class="site-avatar">
+            <a href="/">
+                
+                
+                
+                
+                <img src="/img/avatar_hu_1f41586fb0ce9a39.png" width="300"
+                    height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                
+            </a>
+            
+            <span class="emoji">🤔</span>
+            
+        </figure>
+        
+        
+
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Hata的小屋</a></h1>
+            <h2 class="site-description">刻舟求剑</h2>
+        </div>
+    </header>
+
+    
+    <ol class="menu-social">
+        
+        <li>
+            <a href="https://github.com/hataovo" target="_blank" title="GitHub" rel="me">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+            </a>
+        </li>
+        
+    </ol>
+    
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+        <li>
+            <a href="/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                <span>主页</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/archives/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                <span>归档</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/categories/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+                <span>分类</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/search/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                <span>搜索</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/links/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                <span>链接</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/about/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                <span>关于</span>
+            </a>
+            </li>
+            
+            
+
+            <li class="menu-bottom-section">
+                <ol class="menu">
+                    
+                    
+
+                    
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                    
+                </ol>
+            </li>
+    </ol>
+</aside>
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#signatures">Signatures</a>
+      <ol>
+        <li><a href="#digestive">Digestive</a></li>
+        <li><a href="#curveball">Curveball</a></li>
+        <li><a href="#prosign-3">ProSign 3</a></li>
+        <li><a href="#no-random-no-bias">No Random, No Bias</a></li>
+      </ol>
+    </li>
+    <li><a href="#side-channels">Side Channels</a>
+      <ol>
+        <li><a href="#montgomerys-ladder">Montgomery&rsquo;s Ladder</a></li>
+        <li><a href="#double-and-broken">Double and Broken</a></li>
+      </ol>
+    </li>
+    <li><a href="#edwards-curves">Edwards Curves</a>
+      <ol>
+        <li><a href="#edwards-goes-degenerate">Edwards Goes Degenerate</a></li>
+      </ol>
+    </li>
+    <li><a href="#end">End</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AF%86%E7%A0%81%E5%AD%A6%E4%B9%A0/" style="background-color: #2a9d8f; color: #fff;">
+                密码学习
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/ecc-%E4%BA%8C/">ECC-(二)</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2026-03-03T00:00:00Z'>Mar 03, 2026</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 14 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="ecc学习-二">ECC学习-(二)
+</h1><p><strong>前言</strong></p>
+<p>本想按顺序，在第二部分完成Parameter Choice系列的，但上手后发现由于我数学功底严重不足，导致做起来很吃力，只好先做了其他的题目</p>
+<h2 id="signatures">Signatures
+</h2><p><strong>ECDSA</strong></p>
+<p><strong>密钥生成</strong></p>
+<p>1、选择一条椭圆曲线E和基点G，G的阶为n (椭圆曲线的阶也是n，也就是说G是一个生成元)</p>
+<p>2、选择私钥$d_A$，计算公钥$Q = d_AG$，Q即为公钥</p>
+<p><strong>签名</strong></p>
+<p>1、取随机数k，计算$P=k*G$</p>
+<p>2、取P的x坐标，$r \equiv x_P \pmod n$</p>
+<p>3、使用一个哈希函数计算m的哈希值（m一般为签名信息），用H(m)表示</p>
+<p>4、计算$s \equiv k^{-1}(H(m)+rd_A) \pmod n$</p>
+<p>5、(r, s)做为签名值</p>
+<p><strong>验签</strong></p>
+<p>1、接受方在收到消息(m)和签名值(r, s)后，进行以下运算</p>
+<p>2、计算h = H(m)</p>
+<p>3、计算 $\omega \equiv s^{-1} \pmod n$</p>
+<p>4、计算$u_1 = h\omega$，$u_2=r\omega$</p>
+<p>5、计算$X = (x_1,y_1)=u_1G+u_2Q$</p>
+<p>6、若X不存在，则签名错误；计算$v\equiv x_1 \pmod n$</p>
+<p>7、若 v == r，签名正确</p>
+<p><strong>简单证明</strong>
+</p>
+$$
+X =u_1G+u_2Q=h\omega G + r\omega d_A G = \omega(h+rd_A)G = \omega skG = \omega s P = P
+$$<p><strong>若k泄露</strong>，则能从一组(r, s)中算出私钥d</p>
+<p><strong>若k复用</strong></p>
+<p>则对应的r也一样</p>
+<p>$s_1^{-1}(H(m_1)+rd_A) \equiv s_2^{-1}(H(m_2)+rd_A) \pmod n $</p>
+<p>$s_1^{-1}H(m_1) + s_1^{-1}rd_A \equiv s_2^{-1}H(m_2) + s_2^{-1}rd_A \pmod n$</p>
+<p>$r(s_1^{-1}-s_2^{-1})d_A \equiv s_2^{-1}H(m_2) - s_1^{-1}H(m_1) \pmod n$</p>
+<p>最后两边乘个模逆即可得到私钥</p>
+<h3 id="digestive">Digestive
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">hashlib</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">string</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ecdsa</span> <span class="kn">import</span> <span class="n">SigningKey</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">SK</span> <span class="o">=</span> <span class="n">SigningKey</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span> <span class="c1"># uses NIST192p</span>
+</span></span><span class="line"><span class="cl"><span class="n">VK</span> <span class="o">=</span> <span class="n">SK</span><span class="o">.</span><span class="n">verifying_key</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">HashFunc</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">digest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># return hashlib.sha256(data).digest()</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@chal.route</span><span class="p">(</span><span class="s1">&#39;/digestive/sign/&lt;username&gt;/&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sanitized_username</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">username</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">msg</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&#34;admin&#34;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&#34;username&#34;</span><span class="p">:</span> <span class="n">sanitized_username</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">signature</span> <span class="o">=</span> <span class="n">SK</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">hashfunc</span><span class="o">=</span><span class="n">HashFunc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># remember to remove the backslashes from the double-encoded JSON</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;msg&#34;</span><span class="p">:</span> <span class="n">msg</span><span class="p">,</span> <span class="s2">&#34;signature&#34;</span><span class="p">:</span> <span class="n">signature</span><span class="o">.</span><span class="n">hex</span><span class="p">()}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@chal.route</span><span class="p">(</span><span class="s1">&#39;/digestive/verify/&lt;msg&gt;/&lt;signature&gt;/&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">signature</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">VK</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span><span class="n">signature</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">hashfunc</span><span class="o">=</span><span class="n">HashFunc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">except</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;error&#34;</span><span class="p">:</span> <span class="s2">&#34;Signature verification failed&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">verified_input</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="s2">&#34;admin&#34;</span> <span class="ow">in</span> <span class="n">verified_input</span> <span class="ow">and</span> <span class="n">verified_input</span><span class="p">[</span><span class="s2">&#34;admin&#34;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;flag&#34;</span><span class="p">:</span> <span class="n">FLAG</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;error&#34;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">verified_input</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> is not an admin&#34;</span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Python 的 json 模块提供了 json.dumps() 将字典转换为 JSON 字符串，以及 json.loads() 将 JSON 字符串解析为字典。此外，布尔值在 JSON 中写作 true/false，在 Python 中写作 True/False</p>
+<p>翻阅sign函数的源码发现，其在取哈希函数返回结果时，只会取前面若干固定长度的值，而这个题的哈希函数又有问题，他直接返回的是数据原始内容，这就导致我们可以伪造前缀一样的数据</p>
+<p>在验证时，利用字典的特性，在后面覆写一个&quot;admin&quot;: True，json.loads()后可以绕过这层校验</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">username1</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span> <span class="o">*</span> <span class="mi">50</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 提交 aaa...a 进行签名，实际上的数据是字节串msg1 b&#39;{&#34;admin&#34;: false, &#34;username&#34;: &#34;aaa...a&#34;}&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># json.dumps() 把 False -&gt; false</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">msg2</span> <span class="o">=</span> <span class="s1">&#39;{&#34;admin&#34;: false, &#34;username&#34;: &#34;aaa...a&#34;, &#34;admin&#34;: true}&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># msg2和msg1的前缀一样，相当于原始数据一样，那么验签可以通过</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 在 json.loads() 后，变成字典 {&#39;admin&#39;: True, &#39;username&#39;: &#39;aaa...a&#39;}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>结果如下</p>
+<p><img src="/p/ecc-%E4%BA%8C/1.png"
+	width="1244"
+	height="1277"
+	srcset="/p/ecc-%E4%BA%8C/1_hu_639d4f1f60b404d0.png 480w, /p/ecc-%E4%BA%8C/1_hu_5e5a03b2b87e9ef.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="97"
+		data-flex-basis="233px"
+	
+></p>
+<h3 id="curveball">Curveball
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="ch">#!/usr/bin/env python3</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">fastecdsa</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">fastecdsa.point</span> <span class="kn">import</span> <span class="n">Point</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">fastecdsa.curve</span> <span class="kn">import</span> <span class="n">P256</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">listener</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">FLAG</span> <span class="o">=</span> <span class="s2">&#34;crypto{????????????????????????????????????}&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">G</span> <span class="o">=</span> <span class="n">P256</span><span class="o">.</span><span class="n">G</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="n">G</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">G</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="p">[</span><span class="mh">0x6B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C296</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="mh">0x4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Challenge</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">before_input</span> <span class="o">=</span> <span class="s2">&#34;Welcome to my secure search engine backed by trusted certificate library!</span><span class="se">\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">trusted_certs</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;www.cryptohack.org&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;public_key&#34;</span><span class="p">:</span> <span class="n">Point</span><span class="p">(</span><span class="mh">0xE9E4EBA2737E19663E993CF62DFBA4AF71C703ACA0A01CB003845178A51B859D</span><span class="p">,</span> <span class="mh">0x179DF068FC5C380641DB2661121E568BB24BF13DE8A8968EF3D98CCF84DAF4A9</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="n">P256</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;curve&#34;</span><span class="p">:</span> <span class="s2">&#34;secp256r1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;generator&#34;</span><span class="p">:</span> <span class="p">[</span><span class="n">G</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">G</span><span class="o">.</span><span class="n">y</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;www.bing.com&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;public_key&#34;</span><span class="p">:</span> <span class="n">Point</span><span class="p">(</span><span class="mh">0x3B827FF5E8EA151E6E51F8D0ABF08D90F571914A595891F9998A5BD49DFA3531</span><span class="p">,</span> <span class="mh">0xAB61705C502CA0F7AA127DEC096B2BBDC9BD3B4281808B3740C320810888592A</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="n">P256</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;curve&#34;</span><span class="p">:</span> <span class="s2">&#34;secp256r1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;generator&#34;</span><span class="p">:</span> <span class="p">[</span><span class="n">G</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">G</span><span class="o">.</span><span class="n">y</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;www.gchq.gov.uk&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;public_key&#34;</span><span class="p">:</span> <span class="n">Point</span><span class="p">(</span><span class="mh">0xDEDFC883FEEA09DE903ECCB03C756B382B2302FFA296B03E23EEDF94B9F5AF94</span><span class="p">,</span> <span class="mh">0x15CEBDD07F7584DBC7B3F4DEBBA0C13ECD2D2D8B750CBF97438AF7357CEA953D</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="n">P256</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;curve&#34;</span><span class="p">:</span> <span class="s2">&#34;secp256r1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;generator&#34;</span><span class="p">:</span> <span class="p">[</span><span class="n">G</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">G</span><span class="o">.</span><span class="n">y</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">search_trusted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Q</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">host</span><span class="p">,</span> <span class="n">cert</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trusted_certs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">Q</span> <span class="o">==</span> <span class="n">cert</span><span class="p">[</span><span class="s1">&#39;public_key&#39;</span><span class="p">]:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">host</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">sign_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">g</span> <span class="o">*</span> <span class="n">d</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">connection_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">packet</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">d</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s1">&#39;private_key&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="s2">&#34;Private key is insecure, certificate rejected.&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">packet_host</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">curve</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s1">&#39;curve&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s1">&#39;generator&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">g</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="n">P256</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sign_point</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cached</span><span class="p">,</span> <span class="n">host</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_trusted</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">cached</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="n">host</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">trusted_certs</span><span class="p">[</span><span class="n">packet_host</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;public_key&#34;</span><span class="p">:</span> <span class="n">Q</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;curve&#34;</span><span class="p">:</span> <span class="s2">&#34;secp256r1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;generator&#34;</span><span class="p">:</span> <span class="n">G</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="s2">&#34;Site added to trusted connections&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">bing_it</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="sa">f</span><span class="s2">&#34;Hey bing! Tell me about </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">#</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># This challenge function is called on your input, which must be JSON</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># encoded</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">challenge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">your_input</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">host</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_host</span><span class="p">(</span><span class="n">your_input</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">host</span> <span class="o">==</span> <span class="s2">&#34;www.bing.com&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bing_it</span><span class="p">(</span><span class="n">FLAG</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bing_it</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">builtins</span><span class="p">;</span> <span class="n">builtins</span><span class="o">.</span><span class="n">Challenge</span> <span class="o">=</span> <span class="n">Challenge</span> <span class="c1"># hack to enable challenge to be run locally, see https://cryptohack.org/faq/#listener</span>
+</span></span><span class="line"><span class="cl"><span class="n">listener</span><span class="o">.</span><span class="n">start_server</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">13382</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>实测后发现，只有一次交互机会，我们可以提供一个json，包含private_key，host，curve，generator四个内容，核心函数是connection_host函数，其会计算我们提供的 Q = private_key * generator，若算出的Q和已知列表中 <a class="link" href="https://www.bing.com"  target="_blank" rel="noopener"
+    >www.bing.com</a> 对应的 public_key (记为点P)一样，即可获得flag</p>
+<p>关键点在于private_key和generator都是我们可以指定的，直白地想法是传private_key=1，generator=P，但是这种情况被ban了，故可以获取P的阶ord，然后传(ord+1, P)，算出来也还是P，而P的阶可以拿曲线的阶来用，一查就找到了，payload如下 (json里的数用十六进制会报错，十进制没问题)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">{&#34;private_key&#34;: 115792089210356248762697446949407573529996955224135760342422259061068512044370, &#34;host&#34;: &#34;www.bing.com&#34;, &#34;curve&#34;: &#34;secp256r1&#34;, &#34;generator&#34;: [26917031336335630350805290904899574903292792639991422008541635695952008983857, 77517656757371332161127542375026653060402730453393832579023072993157413624106]}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="prosign-3">ProSign 3
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="ch">#!/usr/bin/env python3</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">hashlib</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">bytes_to_long</span><span class="p">,</span> <span class="n">long_to_bytes</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ecdsa.ecdsa</span> <span class="kn">import</span> <span class="n">Public_key</span><span class="p">,</span> <span class="n">Private_key</span><span class="p">,</span> <span class="n">Signature</span><span class="p">,</span> <span class="n">generator_192</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">listener</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randrange</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">FLAG</span> <span class="o">=</span> <span class="s2">&#34;crypto{?????????????????????????}&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">g</span> <span class="o">=</span> <span class="n">generator_192</span>
+</span></span><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">order</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Challenge</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">before_input</span> <span class="o">=</span> <span class="s2">&#34;Welcome to ProSign 3. You can sign_time or verify.</span><span class="se">\n</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">secret</span> <span class="o">=</span> <span class="n">randrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">pubkey</span> <span class="o">=</span> <span class="n">Public_key</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span> <span class="o">*</span> <span class="n">secret</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">privkey</span> <span class="o">=</span> <span class="n">Private_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pubkey</span><span class="p">,</span> <span class="n">secret</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">sha1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sha1_hash</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sha1_hash</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">sha1_hash</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">sign_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&#34;%m&#34;</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&#34;%S&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="n">current</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&#34;Current time is </span><span class="si">{</span><span class="n">current</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">hsh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">privkey</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">bytes_to_long</span><span class="p">(</span><span class="n">hsh</span><span class="p">),</span> <span class="n">randrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;msg&#34;</span><span class="p">:</span> <span class="n">msg</span><span class="p">,</span> <span class="s2">&#34;r&#34;</span><span class="p">:</span> <span class="nb">hex</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">r</span><span class="p">),</span> <span class="s2">&#34;s&#34;</span><span class="p">:</span> <span class="nb">hex</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">s</span><span class="p">)}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sig_r</span><span class="p">,</span> <span class="n">sig_s</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">hsh</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">()))</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sig_r</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sig_r</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sig_s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sig_s</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sig</span> <span class="o">=</span> <span class="n">Signature</span><span class="p">(</span><span class="n">sig_r</span><span class="p">,</span> <span class="n">sig_s</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pubkey</span><span class="o">.</span><span class="n">verifies</span><span class="p">(</span><span class="n">hsh</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="kc">True</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="kc">False</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">#</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># This challenge function is called on your input, which must be JSON</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># encoded</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">challenge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">your_input</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="s1">&#39;option&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">your_input</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;error&#34;</span><span class="p">:</span> <span class="s2">&#34;You must send an option to this server&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">elif</span> <span class="n">your_input</span><span class="p">[</span><span class="s1">&#39;option&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;sign_time&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">signature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sign_time</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="n">signature</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">elif</span> <span class="n">your_input</span><span class="p">[</span><span class="s1">&#39;option&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;verify&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">msg</span> <span class="o">=</span> <span class="n">your_input</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">r</span> <span class="o">=</span> <span class="n">your_input</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">s</span> <span class="o">=</span> <span class="n">your_input</span><span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">verified</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">verified</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="n">msg</span> <span class="o">==</span> <span class="s2">&#34;unlock&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="bp">self</span><span class="o">.</span><span class="n">exit</span> <span class="o">=</span> <span class="kc">True</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;flag&#34;</span><span class="p">:</span> <span class="n">FLAG</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;result&#34;</span><span class="p">:</span> <span class="s2">&#34;Message verified&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;result&#34;</span><span class="p">:</span> <span class="s2">&#34;Bad signature&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;error&#34;</span><span class="p">:</span> <span class="s2">&#34;Decoding fail&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">builtins</span><span class="p">;</span> <span class="n">builtins</span><span class="o">.</span><span class="n">Challenge</span> <span class="o">=</span> <span class="n">Challenge</span> <span class="c1"># hack to enable challenge to be run locally, see https://cryptohack.org/faq/#listener</span>
+</span></span><span class="line"><span class="cl"><span class="n">listener</span><span class="o">.</span><span class="n">start_server</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">13381</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><del>有点阴</del> sign_time函数内用的随机数k取自randrange(1, n)，而这个n不是<code>n = g.order()</code>，而是<code>n = int(now.strftime(&quot;%S&quot;)</code>，这个n的取值范围是0到59，故可以先拿一组签名，枚举k，进一步可以算出私钥，然后可以伪造&quot;unlock&quot;的签名 (交互没有次数限制)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ecdsa.ecdsa</span> <span class="kn">import</span> <span class="n">Public_key</span><span class="p">,</span> <span class="n">Private_key</span><span class="p">,</span> <span class="n">Signature</span><span class="p">,</span> <span class="n">generator_192</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">hashlib</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">bytes_to_long</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">g</span> <span class="o">=</span> <span class="n">generator_192</span>
+</span></span><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">order</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">sha1</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sha1_hash</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sha1_hash</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">sha1_hash</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">solve_d</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&#34;Current time is 2:42&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hsh</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">sha1</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">()))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">r</span> <span class="o">=</span> <span class="mh">0xc013b8cb3620f4482f9e82fde0ae9eeef53ccfa0f05b46f3</span>
+</span></span><span class="line"><span class="cl">    <span class="n">s</span> <span class="o">=</span> <span class="mh">0xf7d54775b985995423e57fd84acceb63c7c463ec006e321b</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">60</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tmp</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">g</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">tmp</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">==</span> <span class="n">r</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span>
+</span></span><span class="line"><span class="cl">    <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="n">k</span> <span class="o">-</span> <span class="n">hsh</span><span class="p">)</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">d</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Current time is 2:14&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">r</span> <span class="o">=</span> <span class="mh">0xa37abc6c431f9ac398bf5bd1aa6678320ace8ecb93d23f2a</span>
+</span></span><span class="line"><span class="cl">    <span class="n">s</span> <span class="o">=</span> <span class="mh">0xffe7af869f7b7bbfb17a49d13fe198d9f18e6ef53330387d</span>    
+</span></span><span class="line"><span class="cl">    <span class="n">hsh</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">sha1</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">()))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sig</span> <span class="o">=</span> <span class="n">Signature</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">pubkey</span><span class="o">.</span><span class="n">verifies</span><span class="p">(</span><span class="n">hsh</span><span class="p">,</span> <span class="n">sig</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">d</span> <span class="o">=</span> <span class="n">solve_d</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">pubkey</span> <span class="o">=</span> <span class="n">Public_key</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">privkey</span> <span class="o">=</span> <span class="n">Private_key</span><span class="p">(</span><span class="n">pubkey</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">test</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&#34;unlock&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">hsh</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl"><span class="n">sig</span> <span class="o">=</span> <span class="n">privkey</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">bytes_to_long</span><span class="p">(</span><span class="n">hsh</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># 随便取一个k</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">r</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">s</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 最后的payload，需提交十六进制数据</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span><span class="s2">&#34;option&#34;</span><span class="p">:</span> <span class="s2">&#34;verify&#34;</span><span class="p">,</span> <span class="s2">&#34;msg&#34;</span><span class="p">:</span> <span class="s2">&#34;unlock&#34;</span><span class="p">,</span> <span class="s2">&#34;r&#34;</span><span class="p">:</span> <span class="s2">&#34;0x188da80eb03090f67cbf20eb43a18800f4ff0afd82ff1012&#34;</span><span class="p">,</span> <span class="s2">&#34;s&#34;</span><span class="p">:</span> <span class="s2">&#34;0xf21d59e608c22c82dc026f2f40cc892901f1ab2452841b35&#34;</span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="no-random-no-bias">No Random, No Bias
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha1</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">bytes_to_long</span><span class="p">,</span> <span class="n">long_to_bytes</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ecdsa</span> <span class="kn">import</span> <span class="n">ellipticcurve</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ecdsa.ecdsa</span> <span class="kn">import</span> <span class="n">curve_256</span><span class="p">,</span> <span class="n">generator_256</span><span class="p">,</span> <span class="n">Public_key</span><span class="p">,</span> <span class="n">Private_key</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">G</span> <span class="o">=</span> <span class="n">generator_256</span>
+</span></span><span class="line"><span class="cl"><span class="n">q</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">order</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">FLAG</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;crypto{??????????????????}&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">hide_flag</span><span class="p">(</span><span class="n">privkey</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">x</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">FLAG</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span> <span class="o">=</span> <span class="n">curve_256</span><span class="o">.</span><span class="n">p</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">b</span> <span class="o">=</span> <span class="n">curve_256</span><span class="o">.</span><span class="n">b</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ysqr</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="mi">3</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span>
+</span></span><span class="line"><span class="cl">    <span class="n">y</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">ysqr</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="mi">4</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Q</span> <span class="o">=</span> <span class="n">ellipticcurve</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">curve_256</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">T</span> <span class="o">=</span> <span class="n">privkey</span><span class="o">.</span><span class="n">secret_multiplier</span><span class="o">*</span><span class="n">Q</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">x</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">y</span><span class="p">()))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">genKeyPair</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">d</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pubkey</span> <span class="o">=</span> <span class="n">Public_key</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">d</span><span class="o">*</span><span class="n">G</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">privkey</span> <span class="o">=</span> <span class="n">Private_key</span><span class="p">(</span><span class="n">pubkey</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">pubkey</span><span class="p">,</span> <span class="n">privkey</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">ecdsa_sign</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">privkey</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hsh</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">nonce</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="n">privkey</span><span class="o">.</span><span class="n">secret_multiplier</span><span class="p">)</span> <span class="o">+</span> <span class="n">hsh</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sig</span> <span class="o">=</span> <span class="n">privkey</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">bytes_to_long</span><span class="p">(</span><span class="n">hsh</span><span class="p">),</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">nonce</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;msg&#34;</span><span class="p">:</span> <span class="n">msg</span><span class="p">,</span> <span class="s2">&#34;r&#34;</span><span class="p">:</span> <span class="nb">hex</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">r</span><span class="p">),</span> <span class="s2">&#34;s&#34;</span><span class="p">:</span> <span class="nb">hex</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">s</span><span class="p">)}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">pubkey</span><span class="p">,</span> <span class="n">privkey</span> <span class="o">=</span> <span class="n">genKeyPair</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">hidden_flag</span> <span class="o">=</span> <span class="n">hide_flag</span><span class="p">(</span><span class="n">privkey</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">sig1</span> <span class="o">=</span> <span class="n">ecdsa_sign</span><span class="p">(</span><span class="s1">&#39;I have hidden the secret flag as a point of an elliptic curve using my private key.&#39;</span><span class="p">,</span> <span class="n">privkey</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sig2</span> <span class="o">=</span> <span class="n">ecdsa_sign</span><span class="p">(</span><span class="s1">&#39;The discrete logarithm problem is very hard to solve, so it will remain a secret forever.&#39;</span><span class="p">,</span> <span class="n">privkey</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sig3</span> <span class="o">=</span> <span class="n">ecdsa_sign</span><span class="p">(</span><span class="s1">&#39;Good luck!&#39;</span><span class="p">,</span> <span class="n">privkey</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hidden flag:&#39;</span><span class="p">,</span> <span class="n">hidden_flag</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Public key:&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pubkey</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">x</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">pubkey</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">y</span><span class="p">())),</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">sig1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">sig2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">sig3</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>对ecdsa略有改动，具体是在随机数k的选取方式上，对应于代码中的nonce，涉及到了一个未知数privkey.secret_multiplier，但是因为套了一层sha1，没办法直接解方程组解出来，比直觉上要难</p>
+<p>后来也是找到了一个题解 <a class="link" href="https://hackmd.io/@L4m/B1Vpr_vK0#Hidden-Number-Problem"  target="_blank" rel="noopener"
+    >Lattice - HackMD</a> ，发现竟是用hnp解的，<del>真是什么莫名奇妙的问题都能归到hnp里</del></p>
+<p>由于做了一层sha1，只好将他们视作3个无关的变量，结合ecdsa的 $s \equiv k^{-1}(H(m)+rd_A) \pmod n$，k就是nonce，可得3个式子，其中h，r，s已知，k是小量
+</p>
+$$
+s_ik_i \equiv h_i + r_id_A  \pmod n \\
+k_i \equiv s_i^{-1}h_i + s_i^{-1}r_id_A \pmod n \\
+k_i = s_i^{-1}h_i + s_i^{-1}r_id_A - t_in
+$$<p>
+而sha1返回的是160bit左右，其余值在模n意义下，大概为256bit，可以构造如下的hnp格，$B = 2^{160}$
+</p>
+$$
+(-t_1, -t_2, -t_3,1,d_A)
+\begin{bmatrix}
+n & & & \\
+& n & & \\
+& & n & \\
+s_1^{-1}h_1 & s_2^{-1}h_2 & s_3^{-1}h_3 & B \\
+s_1^{-1}r_1 & s_2^{-1}r_2 & s_3^{-1}r_3 & & \frac{B}{n}
+\end{bmatrix} = 
+(k_1,k_2,k_3,B,\frac{Bd_A}{n})
+$$<p>
+有意思的是这个格里有个分数$\frac{B}{n}$，故声明矩阵时为QQ，而QQ上的矩阵也可以进行LLL，(之前看hnp看这个分数以为其只是个配平的整数，今天才发现原来不是整数)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ecdsa.ecdsa</span> <span class="kn">import</span> <span class="n">generator_256</span><span class="p">,</span> <span class="n">curve_256</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha1</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">bytes_to_long</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># G = generator_256</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># q = G.order()</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># p = curve_256.p()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="mi">115792089210356248762697446949407573530086143415290314195533631308867097853951</span>
+</span></span><span class="line"><span class="cl"><span class="n">q</span> <span class="o">=</span> <span class="mi">115792089210356248762697446949407573529996955224135760342422259061068512044369</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">msg1</span> <span class="o">=</span> <span class="s1">&#39;I have hidden the secret flag as a point of an elliptic curve using my private key.&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">msg2</span> <span class="o">=</span> <span class="s1">&#39;The discrete logarithm problem is very hard to solve, so it will remain a secret forever.&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">msg3</span> <span class="o">=</span> <span class="s1">&#39;Good luck!&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">r1</span> <span class="o">=</span> <span class="mh">0x91f66ac7557233b41b3044ab9daf0ad891a8ffcaf99820c3cd8a44fc709ed3ae</span>
+</span></span><span class="line"><span class="cl"><span class="n">s1</span> <span class="o">=</span> <span class="mh">0x1dd0a378454692eb4ad68c86732404af3e73c6bf23a8ecc5449500fcab05208d</span>
+</span></span><span class="line"><span class="cl"><span class="n">r2</span> <span class="o">=</span> <span class="mh">0xe8875e56b79956d446d24f06604b7705905edac466d5469f815547dea7a3171c</span>
+</span></span><span class="line"><span class="cl"><span class="n">s2</span> <span class="o">=</span> <span class="mh">0x582ecf967e0e3acf5e3853dbe65a84ba59c3ec8a43951bcff08c64cb614023f8</span>
+</span></span><span class="line"><span class="cl"><span class="n">r3</span> <span class="o">=</span> <span class="mh">0x566ce1db407edae4f32a20defc381f7efb63f712493c3106cf8e85f464351ca6</span>
+</span></span><span class="line"><span class="cl"><span class="n">s3</span> <span class="o">=</span> <span class="mh">0x9e4304a36d2c83ef94e19a60fb98f659fa874bfb999712ceb58382e2ccda26ba</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="p">[</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="n">r3</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">msg</span> <span class="o">=</span> <span class="p">[</span><span class="n">msg1</span><span class="p">,</span> <span class="n">msg2</span><span class="p">,</span> <span class="n">msg3</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">h</span> <span class="o">=</span> <span class="p">[</span><span class="n">bytes_to_long</span><span class="p">(</span><span class="n">sha1</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="n">q</span>
+</span></span><span class="line"><span class="cl"><span class="n">B</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">160</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">A</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">(</span><span class="n">QQ</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">A</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">A</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">B</span><span class="o">/</span><span class="n">n</span>
+</span></span><span class="line"><span class="cl"><span class="n">A</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">%</span> <span class="n">n</span>
+</span></span><span class="line"><span class="cl"><span class="n">A</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">%</span> <span class="n">n</span>
+</span></span><span class="line"><span class="cl"><span class="n">A</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">%</span> <span class="n">n</span>
+</span></span><span class="line"><span class="cl"><span class="n">A</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">%</span> <span class="n">n</span>
+</span></span><span class="line"><span class="cl"><span class="n">A</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">%</span> <span class="n">n</span>
+</span></span><span class="line"><span class="cl"><span class="n">A</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">%</span> <span class="n">n</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">A</span><span class="o">.</span><span class="n">LLL</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">B</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">d</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span> <span class="o">//</span> <span class="n">B</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># d = -5687835041414401518037487927537571677695910561554102725890750391076891295276</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>发现规约出的目标向量中d是个负数，其余全为正符合预期，故给整个目标向量取反也显然不对，事实上，回看前面的式子，发现其实 $d,d+n,d-n$ 等等这些都符合等式，不过发现负数也能自动处理</p>
+<p>最后，根据题意，privkey.secret_multiplier应当指的就是私钥d，$T = dQ$，现在已知T和d，要求Q，这也是容易的，只需两边同乘 d模order(Q)的逆元 即可 $d^{-1}T = d^{-1}dQ = Q$，因为 d 的取值在模order(Q)意义下，不过Q的阶不知道，拿G的阶算即可 order(Q) | order(G)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ecdsa.ecdsa</span> <span class="kn">import</span> <span class="n">generator_256</span><span class="p">,</span> <span class="n">curve_256</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ecdsa.ellipticcurve</span> <span class="kn">import</span> <span class="n">Point</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">long_to_bytes</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">G</span> <span class="o">=</span> <span class="n">generator_256</span>
+</span></span><span class="line"><span class="cl"><span class="n">q</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">order</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="n">curve_256</span><span class="o">.</span><span class="n">p</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">pub</span> <span class="o">=</span> <span class="p">(</span><span class="mi">48780765048182146279105449292746800142985733726316629478905429239240156048277</span><span class="p">,</span> <span class="mi">74172919609718191102228451394074168154654001177799772446328904575002795731796</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">d</span> <span class="o">=</span> <span class="o">-</span><span class="mi">5687835041414401518037487927537571677695910561554102725890750391076891295276</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">((</span><span class="n">d</span> <span class="o">*</span> <span class="n">G</span><span class="p">)</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">==</span> <span class="n">pub</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">((</span><span class="n">d</span> <span class="o">*</span> <span class="n">G</span><span class="p">)</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">==</span> <span class="n">pub</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">dinv</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">T</span> <span class="o">=</span> <span class="p">(</span><span class="mi">16807196250009982482930925323199249441776811719221084165690521045921016398804</span><span class="p">,</span> <span class="mi">72892323560996016030675756815328265928288098939353836408589138718802282948311</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">T</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">curve_256</span><span class="p">,</span> <span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">((</span><span class="n">dinv</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">x</span><span class="p">()))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="side-channels">Side Channels
+</h2><h3 id="montgomerys-ladder">Montgomery&rsquo;s Ladder
+</h3><p>介绍了计算倍点时的蒙哥马利二进制展开算法，算是比较熟悉了</p>
+<p>这道题的曲线方程不是以往的 Weierstrass 形式，而是 Montgomery 形式$E:By^2=x^3+Ax^2+x$，$y^2$前面的B似乎没什么用，一般都会把其约为1</p>
+<p>容易理解，对于不同表达形式的曲线，点加的几何形式是一样的，但是对应的坐标运算表达式是不一样的</p>
+<p>在sage中，一般的声明语句为 EllipticCurve([a1,a2,a3,a4,a6])，对应的曲线形式为$y^2 + a_1xy + a_3y = x^3 + a_2x^2 + a_4x + a_6$</p>
+<p>这个题涉及的曲线是$E:Y^2=X^3+486662X^2+X \pmod{2^{255}−19}$，本意应是自己写一个 Montgomery 版本的点加函数和优化后的倍点函数，不过在sage中声明好后，直接用就行了 XD</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="mi">2</span><span class="o">^</span><span class="mi">255</span> <span class="o">-</span><span class="mi">19</span>
+</span></span><span class="line"><span class="cl"><span class="n">E</span> <span class="o">=</span> <span class="n">EllipticCurve</span><span class="p">(</span><span class="n">GF</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">486662</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">G</span> <span class="o">=</span> <span class="n">E</span><span class="o">.</span><span class="n">lift_x</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">Q</span> <span class="o">=</span> <span class="mh">0x1337c0decafe</span> <span class="o">*</span> <span class="n">G</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="double-and-broken">Double and Broken
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ecc_side_channel</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">double_and_add</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">bytes_to_long</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">FLAG</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;crypto{?????????????????????????????????????}&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Secp256k1 curve parameters</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">256</span> <span class="o">-</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span> <span class="o">-</span> <span class="mi">977</span>
+</span></span><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="mi">7</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Generator </span>
+</span></span><span class="line"><span class="cl"><span class="n">gx</span> <span class="o">=</span> <span class="mh">0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798</span>
+</span></span><span class="line"><span class="cl"><span class="n">gy</span> <span class="o">=</span> <span class="mh">0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8</span>
+</span></span><span class="line"><span class="cl"><span class="n">G</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">gx</span><span class="p">,</span> <span class="n">gy</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Private key</span>
+</span></span><span class="line"><span class="cl"><span class="n">d</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">FLAG</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Side channel data collection</span>
+</span></span><span class="line"><span class="cl"><span class="n">collected_data</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Q</span><span class="p">,</span> <span class="n">leak</span> <span class="o">=</span> <span class="n">double_and_add</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">collected_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">leak</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;collected_data.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">collected_data</span><span class="p">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>说是和侧信道相关，但是这个代码看着有点不知所云，给的collected_data.txt是一个50*359的二维列表，说是和功耗有关，数值大概可以看出有大小之分</p>
+<p>大概能猜出其意思是：蒙哥马利优化算法基于二进制展开，359应该代表359比特，即进行了359次操作，若比特位为1，则需进行二倍和点加操作，功耗大，若比特位为0，则只二倍操作，功耗小，而给了50组数据应该是要取其平均值，据此进行判断</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;collected_data.txt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">data</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl"><span class="n">avg</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">359</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tmp</span> <span class="o">=</span> <span class="mi">0</span> 
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tmp</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">avg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span> <span class="o">//</span> <span class="mi">50</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># print(avg)</span>
+</span></span><span class="line"><span class="cl"><span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">avg</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">130</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">d</span> <span class="o">+=</span> <span class="s1">&#39;1&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">d</span> <span class="o">+=</span> <span class="s1">&#39;0&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">long_to_bytes</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">)))</span> <span class="c1"># 逆一下，应是从低bit向高bit运算的</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="edwards-curves">Edwards Curves
+</h2><p>又介绍了一种新的曲线表达形式 Edwards 爱德华曲线 $x^2 + y^2 = 1+ dx^2y^2$</p>
+<p>其在处理点加时有优势，不必区分P是否等于Q，有统一的坐标表达式
+</p>
+$$
+(x_1, y_1) + (x_2, y_2) = \left( \frac{x_1y_2 + x_2y_1}{1 + dx_1x_2y_1y_2}, \frac{y_1y_2 - x_1x_2}{1 - dx_1x_2y_1y_2} \right)
+$$$$
+2(x_1, y_1) = \left( \frac{2x_1y_1}{1 + dx_1^2y_1^2}, \frac{y_1^2 - x_1^2}{1 - dx_1^2y_1^2} \right)
+$$<p>不难看出其实是一样的，实际问题中一般在有限域Fp上进行</p>
+<p>神奇的是，爱德华曲线可以代换为之前提过的蒙哥马利曲线，做代换如下
+</p>
+$$
+\begin{cases}
+u &= \dfrac{1+y}{1-y} \\
+v &= \dfrac{2(1+y)}{x(1-y)} = \dfrac{2u}{x} \\
+A &= \dfrac{4}{1-d} - 2 \\
+B &= \dfrac{1}{1-d}
+\end{cases}
+$$<p>可得方程</p>
+$$
+Bv^2 = u^3 + Au^2 + u
+$$<p>
+不知道这是怎么构造出来的，但是验证了一下确实是对的</p>
+<p>形式很相近的，有<strong>扭曲爱德华曲线</strong> (Twisted Edwards)，$ax^2 + y^2 = 1+ dx^2y^2$，多了一个系数a，其点加坐标表达式如下，略有不同
+</p>
+$$
+(x_1, y_1) + (x_2, y_2) = \left( \frac{x_1y_2 + x_2y_1}{1 + dx_1x_2y_1y_2}, \frac{y_1y_2 - ax_1x_2}{1 - dx_1x_2y_1y_2} \right)
+$$$$
+2(x_1, y_1) = \left( \frac{2x_1y_1}{1 + dx_1^2y_1^2}, \frac{y_1^2 - ax_1^2}{1 - dx_1^2y_1^2} \right)
+$$<p>
+同样地，其也可以代换为蒙哥马利形式
+</p>
+$$
+\begin{cases}
+u &= \dfrac{1+y}{1-y} \\
+v &= \dfrac{1+y}{x(1-y)} = \dfrac{u}{x} \\
+A &= \dfrac{2(a+d)}{a-d} \\
+B &= \dfrac{4}{a-d}
+\end{cases}
+$$<p>可得方程</p>
+$$
+Bv^2 = u^3 + Au^2 + u
+$$<h3 id="edwards-goes-degenerate">Edwards Goes Degenerate
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">inverse</span><span class="p">,</span> <span class="n">bytes_to_long</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">AES</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.Padding</span> <span class="kn">import</span> <span class="n">pad</span><span class="p">,</span> <span class="n">unpad</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha1</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">FLAG</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;crypto{????????????????????????????????????}&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">TwistedEdwards</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># Elliptic curve in Edwards form:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># -x**2 + y**2 = 1 + d*x**2*y**2</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># birationally equivalent to the Montgomery curve:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># y**2 = x**3 + 2*(1-d)/(1+d)*x**2 + x</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">x0bit</span><span class="p">,</span> <span class="n">y0</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="n">d</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">base_point</span> <span class="o">=</span> <span class="p">(</span><span class="n">x0bit</span><span class="p">,</span> <span class="n">y0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">recover_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xbit</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">xsqr</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">inverse</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">xsqr</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="mi">4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">==</span> <span class="n">xsqr</span> <span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">x</span> <span class="o">&amp;</span> <span class="mi">1</span> <span class="o">!=</span> <span class="n">xbit</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="n">p</span> <span class="o">-</span> <span class="n">x</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="n">x</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compressed_point</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">xbit</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">compressed_point</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recover_x</span><span class="p">(</span><span class="n">xbit</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># complete point addition formulas</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">P1</span><span class="p">,</span> <span class="n">P2</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">P1</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">P2</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">C</span> <span class="o">=</span> <span class="n">x1</span><span class="o">*</span><span class="n">x2</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span>
+</span></span><span class="line"><span class="cl">        <span class="n">D</span> <span class="o">=</span> <span class="n">y1</span><span class="o">*</span><span class="n">y2</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span>
+</span></span><span class="line"><span class="cl">        <span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="o">*</span><span class="n">C</span><span class="o">*</span><span class="n">D</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x3</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">E</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="n">x1</span> <span class="o">+</span> <span class="n">y1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x2</span> <span class="o">+</span> <span class="n">y2</span><span class="p">)</span> <span class="o">-</span> <span class="n">C</span> <span class="o">-</span> <span class="n">D</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span>
+</span></span><span class="line"><span class="cl">        <span class="n">y3</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">E</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">D</span> <span class="o">+</span> <span class="n">C</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span>
+</span></span><span class="line"><span class="cl">        <span class="n">z3</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">E</span><span class="o">**</span><span class="mi">2</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span>
+</span></span><span class="line"><span class="cl">        <span class="n">z3inv</span> <span class="o">=</span> <span class="n">inverse</span><span class="p">(</span><span class="n">z3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">(</span><span class="n">x3</span><span class="o">*</span><span class="n">z3inv</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">y3</span><span class="o">*</span><span class="n">z3inv</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># left-to-right double-and-add</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">single_mul</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">compressed_point</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">compressed_point</span><span class="p">)</span>        
+</span></span><span class="line"><span class="cl">        <span class="n">t</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">R</span> <span class="o">=</span> <span class="n">P</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="n">bit</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">            <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">bit</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">P</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">,</span> <span class="n">R</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">gen_key_pair</span><span class="p">(</span><span class="n">curve</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">n</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">curve</span><span class="o">.</span><span class="n">order</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">P</span> <span class="o">=</span> <span class="n">curve</span><span class="o">.</span><span class="n">single_mul</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">curve</span><span class="o">.</span><span class="n">base_point</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">n</span><span class="p">,</span> <span class="n">P</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">gen_shared_secret</span><span class="p">(</span><span class="n">curve</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">xbit</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">curve</span><span class="o">.</span><span class="n">single_mul</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">P</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">y</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">encrypt_flag</span><span class="p">(</span><span class="n">shared_secret</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># Derive AES key from shared secret</span>
+</span></span><span class="line"><span class="cl">    <span class="n">key</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">shared_secret</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">16</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># Encrypt flag</span>
+</span></span><span class="line"><span class="cl">    <span class="n">iv</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cipher</span> <span class="o">=</span> <span class="n">AES</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">AES</span><span class="o">.</span><span class="n">MODE_CBC</span><span class="p">,</span> <span class="n">iv</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pad</span><span class="p">(</span><span class="n">FLAG</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># Prepare data to send</span>
+</span></span><span class="line"><span class="cl">    <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;iv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iv</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;encrypted_flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ciphertext</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">data</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># curve parameters</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># birationally equivalent to the Montgomery curve y**2 = x**3 + 337*x**2 + x mod p</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="mi">110791754886372871786646216601736686131457908663834453133932404548926481065303</span>
+</span></span><span class="line"><span class="cl"><span class="n">order</span> <span class="o">=</span> <span class="mi">27697938721593217946661554150434171532902064063497989437820057596877054011573</span>
+</span></span><span class="line"><span class="cl"><span class="n">d</span> <span class="o">=</span> <span class="mi">14053231445764110580607042223819107680391416143200240368020924470807783733946</span>
+</span></span><span class="line"><span class="cl"><span class="n">x0bit</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="n">y0</span> <span class="o">=</span> <span class="mi">11</span>
+</span></span><span class="line"><span class="cl"><span class="n">curve</span> <span class="o">=</span> <span class="n">TwistedEdwards</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">x0bit</span><span class="p">,</span> <span class="n">y0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Generate key pairs</span>
+</span></span><span class="line"><span class="cl"><span class="n">n_a</span><span class="p">,</span> <span class="n">P_alice</span> <span class="o">=</span> <span class="n">gen_key_pair</span><span class="p">(</span><span class="n">curve</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">n_b</span><span class="p">,</span> <span class="n">P_bob</span> <span class="o">=</span> <span class="n">gen_key_pair</span><span class="p">(</span><span class="n">curve</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Alice sends public key: </span><span class="si">{</span><span class="n">P_alice</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Bob sends public key: </span><span class="si">{</span><span class="n">P_bob</span><span class="si">}</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Encrypted flag with shared secret</span>
+</span></span><span class="line"><span class="cl"><span class="n">shared_secret</span> <span class="o">=</span> <span class="n">gen_shared_secret</span><span class="p">(</span><span class="n">curve</span><span class="p">,</span> <span class="n">n_a</span><span class="p">,</span> <span class="n">P_bob</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">encrypted_flag</span> <span class="o">=</span> <span class="n">encrypt_flag</span><span class="p">(</span><span class="n">shared_secret</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Alice sends encrypted_flag: </span><span class="si">{</span><span class="n">encrypted_flag</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl"># Elliptic curve in Edwards form:
+</span></span><span class="line"><span class="cl"># -x**2 + y**2 = 1 + d*x**2*y**2
+</span></span><span class="line"><span class="cl"># birationally equivalent to the Montgomery curve:
+</span></span><span class="line"><span class="cl"># y**2 = x**3 + 2*(1-d)/(1+d)*x**2 + x
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>对于这一段注释，结合上面的公式 $x^2$ 的系数确实没问题，但是 $y^2$ 的系数不应当是1，这是为什么呢，ai给出的解释是通过下面的代换，将 $y^2$ 的系数归1，实际上是多了一个缩放因子
+</p>
+$$
+u' = \frac{1 + y}{1 - y}
+$$$$
+v' = \frac{1 + y}{x(1 - y)} \cdot \sqrt{B} = \sqrt{B} \cdot v
+$$<p>这一系列变换，从扭爱德华到蒙哥马利再到系数缩放，得到的曲线都是**双有理等价（Birationally equivalent）**的，其是代数几何中的一个核心概念，简单理解：两条看起来方程式完全不同的曲线，在数学的本质结构上是“同一条曲线”的两种不同表达方式</p>
+<p>这样的话，用给出的d去计算<code>2 * (1-d) * pow((1+d), -1, p) % p</code>，得到的确实是337，和注释对应上了</p>
+<p>源代码中还有不少有用信息</p>
+<p>在表示一个点时，用的是压缩后的形式(x0bit, y0)，其中x0bit表示的是x的最低比特位，只有0和1两种取值用以区分从一个y得出的两个x，具体细节在recover_x函数中</p>
+<p>recover_x函数的思路是，由$-x^2 + y^2 = 1 + dx^2y^2$，先把 $x^2$ 算出来，p模4余3，可以方便的开平方得到两个候选值，可以记为 $x_0,p-x_0$ ，不难发现其最低为必定是一个为0一个为1，然后<code>x &amp; 1 =? xbit</code>进行区分</p>
+<p>add函数实现了a=-1时的加法，不过具体代码不是直来直去，做了一些操作，可能有什么别的作用</p>
+<p>single_mul函数实现了倍点算法，依旧二进制展开计算，这里可以看到，返回值是<code>(R[0] &amp; 1, R[1])</code>，可以解释recover_x区分x的做法</p>
+<p>不难验证，对于爱德华曲线和扭爱德华曲线，其<strong>单位元</strong>是点 <strong>(0,1)</strong></p>
+<p>说了一通，但是没有触及到这个题的本质，下面开始正题</p>
+<p>首先发现这里的p有问题，p-1光滑，但是order是一个素数。而且，用已知的三个点尝试去调用recover_x函数，发现返回的都是0，这是因为<code>if x**2 == xsqr</code>这一步没有<code>x**2 % p</code>，故导致这个条件基本上一定不会成立。若在判断中加上求余p，也只有基点能正确处理，alice和bob的公钥仍然返回0，说明已经是出问题了</p>
+<p>检索 Edwards Degenerate 这些关键词，可以找到一些资料，关键的一点是这个式子，由加法公式可得 $(0, y_1) + (0, y_2) = (0, y_1y_2)$，进一步的，有 $k(0,y_1) = (0,y_1^k)$，这就是 Degenerate(退化) 的含义</p>
+<p>最后，由于本题recover_x的问题，导致生成密钥时，$P_a = n_aG$，实际上等价于$y_{pa} \equiv 11^{n_a} \pmod p$，而最开始说的p有问题，这个题就解决了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="mi">110791754886372871786646216601736686131457908663834453133932404548926481065303</span>
+</span></span><span class="line"><span class="cl"><span class="n">pa</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">109790246752332785586117900442206937983841168568097606235725839233151034058387</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">pb</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">45290526009220141417047094490842138744068991614521518736097631206718264930032</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">na</span> <span class="o">=</span> <span class="n">discrete_log</span><span class="p">(</span><span class="n">GF</span><span class="p">(</span><span class="n">p</span><span class="p">)(</span><span class="n">pa</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">GF</span><span class="p">(</span><span class="n">p</span><span class="p">)(</span><span class="mi">11</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">nb</span> <span class="o">=</span> <span class="n">discrete_log</span><span class="p">(</span><span class="n">GF</span><span class="p">(</span><span class="n">p</span><span class="p">)(</span><span class="n">pb</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">GF</span><span class="p">(</span><span class="n">p</span><span class="p">)(</span><span class="mi">11</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="k">assert</span> <span class="nb">pow</span><span class="p">(</span><span class="n">pb</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">na</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="nb">pow</span><span class="p">(</span><span class="n">pa</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">nb</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 之后可算出共享密钥，解密即可</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后想说的是，虽然代码里注释一直在说蒙哥马利曲线，但是实际攻击中并没有用到。而且代码里进行点运算之前并没有检查点是否真的在曲线上，导致出了问题</p>
+<h2 id="end">End
+</h2><p>ecc这块接下来可能会花很长时间，断断续续的研究剩下的题目和数学原理了，距离做完遥遥无期啊 (っ﹏-) .｡o</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/ecc-%E4%B8%80/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">ECC-(一)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/rsa-copper/">
+        
+        
+            <div class="article-image">
+                <img src="/p/rsa-copper/111.82dd1bc5058d1f60cc46b9194d19b4d8_hu_5bf6c48af516b25d.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post RSA-copper"
+                        
+                        data-hash="md5-gt0bxQWNH2DMRrkZTRm02A==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">RSA-copper</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/rsa-%E5%89%AA%E6%9E%9D/">
+        
+        
+            <div class="article-image">
+                <img src="/p/rsa-%E5%89%AA%E6%9E%9D/111.9735f259acdd2343d92fc362ae716f3d_hu_e00e9fc4340e1ac2.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post RSA-剪枝"
+                        
+                        data-hash="md5-lzXyWazdI0PZL8NirnFvPQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">RSA-剪枝</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/">
+        
+        
+            <div class="article-image">
+                <img src="/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/123.95a3d75ac58a906e1f4881e3baba7afe_hu_478b74b8f412d6e5.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post RSA-密钥文件"
+                        
+                        data-hash="md5-laPXWsWKkG4fSIHjurp6/g==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">RSA-密钥文件</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E5%AF%86%E7%A0%81%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E6%8F%90%E5%8D%87%E9%A2%98%E7%9B%AE%E7%BB%83%E4%B9%A0/222.e52d617d6040038a5292e7e1bec4f1f6_hu_ccaf7b8354d2954f.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 密码技术能力提升题目练习"
+                        
+                        data-hash="md5-5S1hfWBAA4pSkufhvsTx9g==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">密码技术能力提升题目练习</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2025 - 
+        
+        2026 hata
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.884460734613d5e85247b63e1915405c54071b98eccd53eda431ec100faee589.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
