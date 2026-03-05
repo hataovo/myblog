@@ -66,15 +66,6 @@
 &lt;/ul&gt;
 </description>
         </item>
-        <item>
-        <title>nothing</title>
-        <link>http://localhost:1313/p/nothing/</link>
-        <pubDate>Wed, 01 Jan 2025 00:00:00 +0000</pubDate>
-        
-        <guid>http://localhost:1313/p/nothing/</guid>
-        <description>&lt;img src="http://localhost:1313/p/nothing/222.png" alt="Featured image of post nothing" /&gt;&lt;p&gt;看看图片吧~&lt;/p&gt;
-</description>
-        </item>
         
     </channel>
 </rss>

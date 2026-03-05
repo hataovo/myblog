@@ -520,7 +520,7 @@ $$&lt;p&gt;&lt;strong&gt;若k泄露&lt;/strong&gt;，则能从一组(r, s)中算
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;listener&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;start_server&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;port&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;13381&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;~~有点阴，~~sign_time函数内用的随机数k取自randrange(1, n)，而这个n不是&lt;code&gt;n = g.order()&lt;/code&gt;，而是&lt;code&gt;n = int(now.strftime(&amp;quot;%S&amp;quot;)&lt;/code&gt;，这个n的取值范围是0到59，故可以先拿一组签名，枚举k，进一步可以算出私钥，然后可以伪造&amp;quot;unlock&amp;quot;的签名 (交互没有次数限制)&lt;/p&gt;
+&lt;/div&gt;&lt;p&gt;&lt;del&gt;有点阴&lt;/del&gt; sign_time函数内用的随机数k取自randrange(1, n)，而这个n不是&lt;code&gt;n = g.order()&lt;/code&gt;，而是&lt;code&gt;n = int(now.strftime(&amp;quot;%S&amp;quot;)&lt;/code&gt;，这个n的取值范围是0到59，故可以先拿一组签名，枚举k，进一步可以算出私钥，然后可以伪造&amp;quot;unlock&amp;quot;的签名 (交互没有次数限制)&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
@@ -1023,7 +1023,7 @@ $$
 Bv^2 = u^3 + Au^2 + u
 $$&lt;p&gt;
 不知道这是怎么构造出来的，但是验证了一下确实是对的&lt;/p&gt;
-&lt;p&gt;形式很相近的，有&lt;strong&gt;扭曲爱德华曲线&lt;/strong&gt;，$ax^2 + y^2 = 1+ dx^2y^2$，多了一个系数a，其点加坐标表达式如下，略有不同
+&lt;p&gt;形式很相近的，有&lt;strong&gt;扭曲爱德华曲线&lt;/strong&gt; (Twisted Edwards)，$ax^2 + y^2 = 1+ dx^2y^2$，多了一个系数a，其点加坐标表达式如下，略有不同
 &lt;/p&gt;
 $$
 (x_1, y_1) + (x_2, y_2) = \left( \frac{x_1y_2 + x_2y_1}{1 + dx_1x_2y_1y_2}, \frac{y_1y_2 - ax_1x_2}{1 - dx_1x_2y_1y_2} \right)

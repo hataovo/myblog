@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Blockchain入门-(一)\r前言\n之前就想学点别的东西，但又不知道学什么好，感觉区块链可能比较好玩，就看一看\n本文主要了解一些基础概念以及 remix 和 metamask 的基本使用\n基础概念阐述\r注：这部分内容大多摘抄自 CTF Wiki\n一些名词英汉互译\rEthereum：以太坊\nEther：以太币（简称 ETH）\nSolidity：用于编写智能合约的高级语言\nSmart Contract：智能合约\nSolidity\rSolidity 是一种用于编写智能合约的高级语言，语法类似于 JavaScript。在以太坊平台上，Solidity 编写的智能合约可以被编译成字节码在以太坊虚拟机 EVM 上运行\nRemix\r基于浏览器的 Solidity 编译器和集成开发环境，提供了交互式界面，以及编译、调用测试、发布等一系列功能，使用方便 http://remix.ethereum.org/\nMetaMask\r一个外部账户通常由私钥文件控制，拥有私钥的用户就可以拥有对应地址的账户里的 Ether 使用权。我们通常把管理这些数字密钥的软件称为钱包，而我们所说的备份钱包其实就是备份账户的私钥文件\nmetamask是非常好用也是用的最多的以太坊钱包，头像是小狐狸标识，Chrome 提供了其插件，其不仅可以管理外部账户，而且可以便捷切换测试链网络，并且可以自定义 RPC 网络\nRPC\rRPC（Remote Procedure Call）远程过程调用是一种协议，允许应用程序向其他计算机上的程序请求服务，即一个程序（客户端）与另一个程序（服务器）进行通信并执行代码。当客户端发出 RPC 调用时，请求通过网络传送到 RPC 服务器，服务器处理请求并返回响应\n在区块链中，它提供了一个标准化的窗口，让外部应用程序能够：读取区块链数据（查询余额、交易详情、区块信息、智能合约状态等）；向区块链写入数据（发送交易、部署或调用智能合约）；获取网络状态等\n账户\r在以太坊中，一个重要的概念就是账户（Account），分为两种类型，分别是外部账户和合约账户\n外部账户 外部账户是由人创建的，可以存储以太币，是由公钥和私钥控制的账户。每个外部账户拥有一对公私钥，这对密钥用于签署交易，它的地址由公钥决定。外部账户不能包含以太坊虚拟机代码\n一个外部账户具有以下特性\n拥有一定的 Ether\n可以发送交易、通过私钥控制\n没有相关联的代码\n合约账户 合约账户是由外部账户创建的账户，包含合约代码 (合约账户和外部账户最大的不同就是它还存有智能合约)。合约账户的地址是由合约创建时合约创建者的地址，以及该地址发出的交易共同计算得出的。\n一个合约账户具有以下特性\n拥有一定的 Ether\n有相关联的代码，代码通过交易或者其他合约发送的调用来激活\n当合约被执行时，只能操作合约账户拥有的特定存储\n一个以太坊的账户包含 4 个部分：\nnonce: 已执行交易总数，用来标示该账户发出的交易数量 balance: 账持币数量，记录账户的以太币余额 storageRoot: 存储区的哈希值，指向智能合约账户的存储数据区 codeHash: 代码区的哈希值，指向智能合约账户存储的智能合约代码 交易\r交易（Transaction）是以太坊整体结构中的重要部分，它将以太坊的账户连接起来，起到价值的传递作用。以太坊的交易主要是指一条外部账户发送到区块链上另一账户的消息的签名数据包，其主要包含发送者的签名、接收者的地址以及发送者转移给接收者的以太币数量等内容\n">
+<title>Blockchain入门-(一)</title>
+
+<link rel='canonical' href='http://localhost:1313/p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/'>
+
+<link rel="stylesheet" href="/scss/style.min.4d36f8dc1fd48129e1635deb4b8eb2870fa09474f7280c4cb606d40b2526994b.css"><meta property='og:title' content="Blockchain入门-(一)">
+<meta property='og:description' content="Blockchain入门-(一)\r前言\n之前就想学点别的东西，但又不知道学什么好，感觉区块链可能比较好玩，就看一看\n本文主要了解一些基础概念以及 remix 和 metamask 的基本使用\n基础概念阐述\r注：这部分内容大多摘抄自 CTF Wiki\n一些名词英汉互译\rEthereum：以太坊\nEther：以太币（简称 ETH）\nSolidity：用于编写智能合约的高级语言\nSmart Contract：智能合约\nSolidity\rSolidity 是一种用于编写智能合约的高级语言，语法类似于 JavaScript。在以太坊平台上，Solidity 编写的智能合约可以被编译成字节码在以太坊虚拟机 EVM 上运行\nRemix\r基于浏览器的 Solidity 编译器和集成开发环境，提供了交互式界面，以及编译、调用测试、发布等一系列功能，使用方便 http://remix.ethereum.org/\nMetaMask\r一个外部账户通常由私钥文件控制，拥有私钥的用户就可以拥有对应地址的账户里的 Ether 使用权。我们通常把管理这些数字密钥的软件称为钱包，而我们所说的备份钱包其实就是备份账户的私钥文件\nmetamask是非常好用也是用的最多的以太坊钱包，头像是小狐狸标识，Chrome 提供了其插件，其不仅可以管理外部账户，而且可以便捷切换测试链网络，并且可以自定义 RPC 网络\nRPC\rRPC（Remote Procedure Call）远程过程调用是一种协议，允许应用程序向其他计算机上的程序请求服务，即一个程序（客户端）与另一个程序（服务器）进行通信并执行代码。当客户端发出 RPC 调用时，请求通过网络传送到 RPC 服务器，服务器处理请求并返回响应\n在区块链中，它提供了一个标准化的窗口，让外部应用程序能够：读取区块链数据（查询余额、交易详情、区块信息、智能合约状态等）；向区块链写入数据（发送交易、部署或调用智能合约）；获取网络状态等\n账户\r在以太坊中，一个重要的概念就是账户（Account），分为两种类型，分别是外部账户和合约账户\n外部账户 外部账户是由人创建的，可以存储以太币，是由公钥和私钥控制的账户。每个外部账户拥有一对公私钥，这对密钥用于签署交易，它的地址由公钥决定。外部账户不能包含以太坊虚拟机代码\n一个外部账户具有以下特性\n拥有一定的 Ether\n可以发送交易、通过私钥控制\n没有相关联的代码\n合约账户 合约账户是由外部账户创建的账户，包含合约代码 (合约账户和外部账户最大的不同就是它还存有智能合约)。合约账户的地址是由合约创建时合约创建者的地址，以及该地址发出的交易共同计算得出的。\n一个合约账户具有以下特性\n拥有一定的 Ether\n有相关联的代码，代码通过交易或者其他合约发送的调用来激活\n当合约被执行时，只能操作合约账户拥有的特定存储\n一个以太坊的账户包含 4 个部分：\nnonce: 已执行交易总数，用来标示该账户发出的交易数量 balance: 账持币数量，记录账户的以太币余额 storageRoot: 存储区的哈希值，指向智能合约账户的存储数据区 codeHash: 代码区的哈希值，指向智能合约账户存储的智能合约代码 交易\r交易（Transaction）是以太坊整体结构中的重要部分，它将以太坊的账户连接起来，起到价值的传递作用。以太坊的交易主要是指一条外部账户发送到区块链上另一账户的消息的签名数据包，其主要包含发送者的签名、接收者的地址以及发送者转移给接收者的以太币数量等内容\n">
+<meta property='og:url' content='http://localhost:1313/p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/'>
+<meta property='og:site_name' content='Hata的小屋'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2026-03-05T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-03-05T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="Blockchain入门-(一)">
+<meta name="twitter:description" content="Blockchain入门-(一)\r前言\n之前就想学点别的东西，但又不知道学什么好，感觉区块链可能比较好玩，就看一看\n本文主要了解一些基础概念以及 remix 和 metamask 的基本使用\n基础概念阐述\r注：这部分内容大多摘抄自 CTF Wiki\n一些名词英汉互译\rEthereum：以太坊\nEther：以太币（简称 ETH）\nSolidity：用于编写智能合约的高级语言\nSmart Contract：智能合约\nSolidity\rSolidity 是一种用于编写智能合约的高级语言，语法类似于 JavaScript。在以太坊平台上，Solidity 编写的智能合约可以被编译成字节码在以太坊虚拟机 EVM 上运行\nRemix\r基于浏览器的 Solidity 编译器和集成开发环境，提供了交互式界面，以及编译、调用测试、发布等一系列功能，使用方便 http://remix.ethereum.org/\nMetaMask\r一个外部账户通常由私钥文件控制，拥有私钥的用户就可以拥有对应地址的账户里的 Ether 使用权。我们通常把管理这些数字密钥的软件称为钱包，而我们所说的备份钱包其实就是备份账户的私钥文件\nmetamask是非常好用也是用的最多的以太坊钱包，头像是小狐狸标识，Chrome 提供了其插件，其不仅可以管理外部账户，而且可以便捷切换测试链网络，并且可以自定义 RPC 网络\nRPC\rRPC（Remote Procedure Call）远程过程调用是一种协议，允许应用程序向其他计算机上的程序请求服务，即一个程序（客户端）与另一个程序（服务器）进行通信并执行代码。当客户端发出 RPC 调用时，请求通过网络传送到 RPC 服务器，服务器处理请求并返回响应\n在区块链中，它提供了一个标准化的窗口，让外部应用程序能够：读取区块链数据（查询余额、交易详情、区块信息、智能合约状态等）；向区块链写入数据（发送交易、部署或调用智能合约）；获取网络状态等\n账户\r在以太坊中，一个重要的概念就是账户（Account），分为两种类型，分别是外部账户和合约账户\n外部账户 外部账户是由人创建的，可以存储以太币，是由公钥和私钥控制的账户。每个外部账户拥有一对公私钥，这对密钥用于签署交易，它的地址由公钥决定。外部账户不能包含以太坊虚拟机代码\n一个外部账户具有以下特性\n拥有一定的 Ether\n可以发送交易、通过私钥控制\n没有相关联的代码\n合约账户 合约账户是由外部账户创建的账户，包含合约代码 (合约账户和外部账户最大的不同就是它还存有智能合约)。合约账户的地址是由合约创建时合约创建者的地址，以及该地址发出的交易共同计算得出的。\n一个合约账户具有以下特性\n拥有一定的 Ether\n有相关联的代码，代码通过交易或者其他合约发送的调用来激活\n当合约被执行时，只能操作合约账户拥有的特定存储\n一个以太坊的账户包含 4 个部分：\nnonce: 已执行交易总数，用来标示该账户发出的交易数量 balance: 账持币数量，记录账户的以太币余额 storageRoot: 存储区的哈希值，指向智能合约账户的存储数据区 codeHash: 代码区的哈希值，指向智能合约账户存储的智能合约代码 交易\r交易（Transaction）是以太坊整体结构中的重要部分，它将以太坊的账户连接起来，起到价值的传递作用。以太坊的交易主要是指一条外部账户发送到区块链上另一账户的消息的签名数据包，其主要包含发送者的签名、接收者的地址以及发送者转移给接收者的以太币数量等内容\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <figure class="site-avatar">
+            <a href="/">
+                
+                
+                
+                
+                <img src="/img/avatar_hu_1f41586fb0ce9a39.png" width="300"
+                    height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                
+            </a>
+            
+            <span class="emoji">🤔</span>
+            
+        </figure>
+        
+        
+
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Hata的小屋</a></h1>
+            <h2 class="site-description">刻舟求剑</h2>
+        </div>
+    </header>
+
+    
+    <ol class="menu-social">
+        
+        <li>
+            <a href="https://github.com/hataovo" target="_blank" title="GitHub" rel="me">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+            </a>
+        </li>
+        
+    </ol>
+    
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+        <li>
+            <a href="/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                <span>主页</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/archives/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                <span>归档</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/categories/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+                <span>分类</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/search/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                <span>搜索</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/links/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                <span>链接</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/about/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                <span>关于</span>
+            </a>
+            </li>
+            
+            
+
+            <li class="menu-bottom-section">
+                <ol class="menu">
+                    
+                    
+
+                    
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                    
+                </ol>
+            </li>
+    </ol>
+</aside>
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#基础概念阐述">基础概念阐述</a>
+      <ol>
+        <li><a href="#一些名词英汉互译">一些名词英汉互译</a></li>
+        <li><a href="#solidity">Solidity</a></li>
+        <li><a href="#remix">Remix</a></li>
+        <li><a href="#metamask">MetaMask</a></li>
+        <li><a href="#rpc">RPC</a></li>
+        <li><a href="#账户">账户</a></li>
+        <li><a href="#交易">交易</a></li>
+      </ol>
+    </li>
+    <li><a href="#入门例题">入门例题</a>
+      <ol>
+        <li><a href="#t1-区块链以太坊的约定">[T1] 区块链：以太坊的约定</a></li>
+        <li><a href="#t2-区块链智能合约">[T2] 区块链：智能合约</a></li>
+        <li><a href="#t3-区块链intbug">[T3] 区块链：INTbug</a></li>
+      </ol>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE%E5%AD%A6%E4%B9%A0/" >
+                区块链学习
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/">Blockchain入门-(一)</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2026-03-05T00:00:00Z'>Mar 05, 2026</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="blockchain入门-一">Blockchain入门-(一)
+</h1><p><strong>前言</strong></p>
+<p>之前就想学点别的东西，但又不知道学什么好，感觉区块链可能比较好玩，就看一看</p>
+<p>本文主要了解一些基础概念以及 remix 和 metamask 的基本使用</p>
+<h2 id="基础概念阐述">基础概念阐述
+</h2><p><strong>注：这部分内容大多摘抄自 <a class="link" href="https://ctf-wiki.org/blockchain/introduction/"  target="_blank" rel="noopener"
+    >CTF Wiki</a></strong></p>
+<h3 id="一些名词英汉互译">一些名词英汉互译
+</h3><p>Ethereum：以太坊</p>
+<p>Ether：以太币（简称 ETH）</p>
+<p>Solidity：用于编写智能合约的高级语言</p>
+<p>Smart Contract：智能合约</p>
+<h3 id="solidity">Solidity
+</h3><p>Solidity 是一种用于编写智能合约的高级语言，语法类似于 JavaScript。在以太坊平台上，Solidity 编写的智能合约可以被编译成字节码在以太坊虚拟机 EVM 上运行</p>
+<h3 id="remix">Remix
+</h3><p>基于浏览器的 Solidity 编译器和集成开发环境，提供了交互式界面，以及编译、调用测试、发布等一系列功能，使用方便  <a class="link" href="http://remix.ethereum.org/#optimize=false&amp;runs=200&amp;evmVersion=null"  target="_blank" rel="noopener"
+    >http://remix.ethereum.org/</a></p>
+<h3 id="metamask">MetaMask
+</h3><p>一个外部账户通常由私钥文件控制，拥有私钥的用户就可以拥有对应地址的账户里的 Ether 使用权。我们通常把管理这些数字密钥的软件称为<strong>钱包</strong>，而我们所说的备份钱包其实就是备份账户的私钥文件</p>
+<p>metamask是非常好用也是用的最多的以太坊钱包，头像是<strong>小狐狸</strong>标识，Chrome 提供了其插件，其不仅可以管理外部账户，而且可以便捷切换测试链网络，并且可以自定义 RPC 网络</p>
+<h3 id="rpc">RPC
+</h3><p>RPC（Remote Procedure Call）远程过程调用是一种协议，允许应用程序向<strong>其他计算机</strong>上的程序请求服务，即一个程序（客户端）与另一个程序（服务器）进行通信并执行代码。当客户端发出 RPC 调用时，请求通过网络传送到 RPC 服务器，服务器处理请求并返回响应</p>
+<p>在区块链中，它提供了一个标准化的窗口，让外部应用程序能够：读取区块链数据（查询余额、交易详情、区块信息、智能合约状态等）；向区块链写入数据（发送交易、部署或调用智能合约）；获取网络状态等</p>
+<h3 id="账户">账户
+</h3><p>在以太坊中，一个重要的概念就是账户（Account），分为两种类型，分别是外部账户和合约账户</p>
+<ul>
+<li>外部账户</li>
+</ul>
+<p>外部账户是由人创建的，可以存储以太币，是由公钥和私钥控制的账户。每个外部账户拥有一对公私钥，这对密钥用于签署交易，它的地址由公钥决定。外部账户不能包含以太坊虚拟机代码</p>
+<p>一个外部账户具有以下特性</p>
+<p>拥有一定的 Ether</p>
+<p>可以发送交易、通过私钥控制</p>
+<p>没有相关联的代码</p>
+<ul>
+<li>合约账户</li>
+</ul>
+<p>合约账户是由外部账户创建的账户，包含合约代码 (合约账户和外部账户最大的不同就是它还存有智能合约)。合约账户的地址是由合约创建时合约<strong>创建者的地址</strong>，以及该地址发出的<strong>交易</strong>共同计算得出的。</p>
+<p>一个合约账户具有以下特性</p>
+<p>拥有一定的 Ether</p>
+<p>有相关联的代码，代码通过交易或者其他合约发送的调用来激活</p>
+<p>当合约被执行时，只能操作合约账户拥有的特定存储</p>
+<hr>
+<p>一个以太坊的账户包含 4 个部分：</p>
+<ul>
+<li>nonce: 已执行交易总数，用来标示该账户发出的交易数量</li>
+<li>balance: 账持币数量，记录账户的以太币余额</li>
+<li>storageRoot: 存储区的哈希值，指向智能合约账户的存储数据区</li>
+<li>codeHash: 代码区的哈希值，指向智能合约账户存储的智能合约代码</li>
+</ul>
+<h3 id="交易">交易
+</h3><p>交易（Transaction）是以太坊整体结构中的重要部分，它将以太坊的账户连接起来，起到价值的传递作用。以太坊的交易主要是指一条外部账户发送到区块链上另一账户的消息的签名数据包，其主要包含发送者的签名、接收者的地址以及发送者转移给接收者的以太币数量等内容</p>
+<p>以太坊上的每一笔交易都需要支付一定的费用，用于支付交易执行所需要的计算开销。计算开销的费用并不是以太币直接计算的，而是引入 Gas 作为执行开销的基本单位，通过 GasPrice 与以太币进行换算</p>
+<p><strong>交易费用</strong></p>
+<ul>
+<li>Gas: 衡量一笔交易所消耗的计算资源的基本单位</li>
+<li>Gas Price: 一单位 Gas 所需的手续费（Ether）</li>
+<li>Gas Limit: 交易发送者愿意为这笔交易执行所支付的最大 Gas 数量</li>
+</ul>
+<p><strong>交易内容</strong></p>
+<p>以太坊中的交易是指存储一条从外部账户发送到区块链上另一个账户的消息的签名数据包，它既可以是简单的转账，也可以是包含智能合约代码的消息。一条交易包含以下内容：</p>
+<ul>
+<li>from: 交易发送者的地址，必填</li>
+<li>to: 交易接收者的地址，如果为空则意味这是一个创建智能合约的交易</li>
+<li>value: 发送者要转移给接收者的以太币数量</li>
+<li>data: 存在的数据字段，如果存在，则表明该交易是一个创建或者调用智能合约的交易</li>
+<li>Gas Limit: 表示交易允许消耗的最大 Gas 数量</li>
+<li>GasPrice: 发送者愿意支付给矿工的 Gas 单价</li>
+<li>nonce: 用来区别同一账户发出的不同交易的标记</li>
+<li>hash: 由以上信息生成的散列值（哈希值）</li>
+<li>r、s、v: 交易签名的三个部分，由发送者的私钥对交易 hash 进行签名生成</li>
+</ul>
+<hr>
+<p>在不同场景下，交易有三种类型</p>
+<ul>
+<li>转帐交易</li>
+</ul>
+<p>转账是最简单的一种交易，从一个账户向另一个账户发送 Ether，发送转账交易时只需要指定交易的发送者、接收者、转移的 Ether 数量即可（在客户端发送交易时，Gas Limit、Gas Price、nonce、hash、签名可以按照默认方式生成），如下所示</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">web3.eth.sendTransaction({
+</span></span><span class="line"><span class="cl">    from: &#34;0x88D3052D12527F1FbE3a6E1444EA72c4DdB396c2&#34;,
+</span></span><span class="line"><span class="cl">    to: &#34;0x75e65F3C1BB334ab927168Bd49F5C44fbB4D480f&#34;,
+</span></span><span class="line"><span class="cl">    value: 1000
+</span></span><span class="line"><span class="cl">})
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>创建合约的交易</li>
+</ul>
+<p>创建合约是指将合约部署到区块链上，这也是通过交易来完成的。创建合约时，to 字段是一个空字符串，data 字段是合约编译后的二进制代码，在之后合约被调用时，该代码的执行结果将作为合约代码，如下所示</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">web3.eth.sendTransaction({
+</span></span><span class="line"><span class="cl">    from: &#34;0x88D3052D12527F1FbE3a6E1444EA72c4DdB396c2&#34;,
+</span></span><span class="line"><span class="cl">    data: &#34;contract binary code&#34;
+</span></span><span class="line"><span class="cl">})
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>执行合约的交易</li>
+</ul>
+<p>该交易中，to 字段是要调用的智能合约的地址，通过 data 字段指定要调用的方法以及向该方法传入参数，如下所示</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">web3.eth.sendTransaction({
+</span></span><span class="line"><span class="cl">    from: &#34;0x88D3052D12527F1FbE3a6E1444EA72c4DdB396c2&#34;,
+</span></span><span class="line"><span class="cl">    to: &#34;0x75e65F3C1BB334ab927168Bd49F5C44fbB4D480f&#34;,
+</span></span><span class="line"><span class="cl">    data: &#34;hash of the invoked method signature and encoded parameters&#34;
+</span></span><span class="line"><span class="cl">})
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="入门例题">入门例题
+</h2><p>取自 NewStar CTF 2025 的三道 misc</p>
+<h3 id="t1-区块链以太坊的约定">[T1] 区块链：以太坊的约定
+</h3><p>有四个小问题</p>
+<p>1、注册小狐狸钱包，并提交小狐狸钱包助记词个数</p>
+<p>用浏览器插件可以注册，助记词个数为12</p>
+<p>2、1145141919810 Gwei 等于多少 ETH（只保留整数）</p>
+<p>进制转换工具 <a class="link" href="https://eth-converter.com/"  target="_blank" rel="noopener"
+    >https://eth-converter.com/</a> 得到 1145 ETH</p>
+<p>3、查询账号 <code>0x949F8fc083006CC5fb51Da693a57D63eEc90C675</code> 第一次交易记录的日期，形式如 <code>20230820</code></p>
+<p>使用区块链浏览器 <a class="link" href="https://sepolia.etherscan.io/"  target="_blank" rel="noopener"
+    >https://sepolia.etherscan.io/</a> 查看地址第一次交易</p>
+<ul>
+<li>
+<p>Etherscan 是 Ethereum 主网最知名的区块链浏览器</p>
+</li>
+<li>
+<p>Sepolia 是一个广泛使用的以太坊测试网络，开发者会在这里部署和测试智能合约，使用的ETH测试币没有实际价值</p>
+</li>
+</ul>
+<p>在 <a class="link" href="https://sepolia.etherscan.io/"  target="_blank" rel="noopener"
+    >https://sepolia.etherscan.io/</a> 中可以查看和搜索在 Sepolia 测试网上发生的所有交易、区块、地址、智能合约等信息</p>
+<p>在主页搜索地址，找一找即可找到 20240614</p>
+<p>4、使用 remix 编译运行附件中的合约，将输出进行提交</p>
+<p>在 remix 网站中编译运行文件，左侧边栏 Deploy &amp; run transactions 中 Deployed Contracts 点击 getResult 可以得到结果 solidity</p>
+<h3 id="t2-区块链智能合约">[T2] 区块链：智能合约
+</h3><p>题目描述中告诉合约地址：<code>0x88DC8f1de5Ff74d644C1a1defDc54869E5Ce3c08</code></p>
+<p>给了一个.sol文件，内容如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="c1">// SPDX-License-Identifier: MIT
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">pragma solidity</span> <span class="o">^</span><span class="mi">0</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">contract</span> <span class="nc">SimpleVault</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">string</span> <span class="k">private</span> <span class="n">flag</span> <span class="o">=</span> <span class="s">&#34;flag{fake_flag}&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint256</span> <span class="k">private</span> <span class="n">password</span> <span class="o">=</span> <span class="mh">0x0721</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 使用映射来记录每个地址的解锁状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">mapping</span><span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">bool</span><span class="p">)</span> <span class="k">public</span> <span class="n">unlocked</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">unlock</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_password</span><span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 检查当前调用者是否已经解锁，如果已经解锁，则无需再次操作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nb">require</span><span class="p">(</span><span class="o">!</span><span class="n">unlocked</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">],</span> <span class="s">&#34;Already unlocked!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">_password</span> <span class="o">==</span> <span class="n">password</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// 只修改当前调用者（msg.sender）的解锁状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">unlocked</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">getFlag</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="k">memory</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 检查当前调用者是否已解锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nb">require</span><span class="p">(</span><span class="n">unlocked</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">],</span> <span class="s">&#34;Vault is locked. Unlock it first!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">flag</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>语法不太懂，但是逻辑比较简单。先编译，切换环境为 Injected Provider - MetaMask (直接在 Remix 的默认环境（Remix VM）相当于在本地测试)，然后把合约地址填入，点at address</p>
+<p><img src="/p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/1.png"
+	width="1115"
+	height="682"
+	srcset="/p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/1_hu_f265139014f82dee.png 480w, /p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/1_hu_ab626982ccd34c9f.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="163"
+		data-flex-basis="392px"
+	
+></p>
+<p>在 metamask 中把网络切到 Sepolia 测试网</p>
+<p><img src="/p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/2.png"
+	width="384"
+	height="277"
+	srcset="/p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/2_hu_95c62c71a2846132.png 480w, /p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/2_hu_19ee2fdfea97a6d0.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="138"
+		data-flex-basis="332px"
+	
+></p>
+<p>然后去题目给的 Sepolia 测试链水龙头地址：https://sepolia-faucet.pk910.de/ 搞点币</p>
+<p>在unlocked里填上自己的地址，unlock里填密码，然后点击，会发起一笔交易，在 metamask 插件里同意，然后等一会即可，unlocked 状态变为 true，点击 getflag 即可</p>
+<p><img src="/p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/3.png"
+	width="278"
+	height="273"
+	srcset="/p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/3_hu_a48c9664bef041b1.png 480w, /p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/3_hu_b0178d156e839401.png 1024w"
+	loading="lazy"
+	
+		alt="3"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="101"
+		data-flex-basis="244px"
+	
+></p>
+<h3 id="t3-区块链intbug">[T3] 区块链：INTbug
+</h3><p>同样是一个.sol附件和一个合约地址 0xB6748b3B308b382E28438cc72872e2D70369D90b</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="c1">// SPDX-License-Identifier: MIT
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">pragma solidity</span> <span class="o">^</span><span class="mi">0</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">contract</span> <span class="nc">SimpleOverflowVault</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">string</span> <span class="k">private</span> <span class="n">flag</span> <span class="o">=</span> <span class="s">&#34;flag{fake_fake_fake}&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">mapping</span><span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">bool</span><span class="p">)</span> <span class="k">public</span> <span class="n">unlocked</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">mapping</span><span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint256</span><span class="p">)</span> <span class="k">public</span> <span class="n">userPoints</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint256</span> <span class="k">public</span> <span class="n">totalPoints</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">mapping</span><span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint256</span><span class="p">)</span> <span class="k">private</span> <span class="n">userSpentPoints</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">event</span> <span class="nc">PointsAdded</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">user</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">points</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">event</span> <span class="nc">PointsUsed</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">user</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">points</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">constructor</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">totalPoints</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">userSpentPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">addPoints</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">points</span><span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#34;Points must be greater than 0&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">userSpentPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">userSpentPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">userPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">+=</span> <span class="n">points</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">totalPoints</span> <span class="o">+=</span> <span class="n">points</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">emit</span> <span class="n">PointsAdded</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">,</span> <span class="n">points</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">usePoints</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">points</span><span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#34;Points must be greater than 0&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">userPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">points</span><span class="p">,</span> <span class="s">&#34;Insufficient points&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">userSpentPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">userSpentPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">userPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">-=</span> <span class="n">points</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="kr">unchecked</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">totalPoints</span> <span class="o">-=</span> <span class="n">points</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">userSpentPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">-=</span> <span class="n">points</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">userSpentPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">unlocked</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">emit</span> <span class="n">PointsUsed</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">,</span> <span class="n">points</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">getFlag</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="k">memory</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">unlocked</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">],</span> <span class="s">&#34;Vault is locked. Trigger integer underflow first!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">flag</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">getSpentPoints</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">userSpentPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">?</span> <span class="mi">1000</span> <span class="o">:</span> <span class="n">userSpentPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">resetUser</span><span class="p">()</span> <span class="k">external</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">uint256</span> <span class="n">userCurrentPoints</span> <span class="o">=</span> <span class="n">userPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">userCurrentPoints</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="kr">unchecked</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">totalPoints</span> <span class="o">-=</span> <span class="n">userCurrentPoints</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="n">userPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">userSpentPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">unlocked</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>漏洞点在于，无符号整数，如是负数，实际上是一个很大的数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl">        <span class="kr">unchecked</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">totalPoints</span> <span class="o">-=</span> <span class="n">points</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">userSpentPoints</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">-=</span> <span class="n">points</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>先调用 addPoints 获取一个比1000大的值，如2000，然后调用 usePoints，使用2000点数</p>
+<p>这时 userSpentPoints[msg.sender] = 1000，减去2000发生下溢，满足 userSpentPoints[msg.sender] &gt; 1000 条件，可以获取flag</p>
+<p><img src="/p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/4.png"
+	width="276"
+	height="399"
+	srcset="/p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/4_hu_33235b4c7ea7fcd1.png 480w, /p/blockchain%E5%85%A5%E9%97%A8-%E4%B8%80/4_hu_7bece89b6d6a24f3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="69"
+		data-flex-basis="166px"
+	
+></p>
+<h2 id="参考">参考
+</h2><ol>
+<li><a class="link" href="https://ctf-wiki.org/blockchain/introduction/"  target="_blank" rel="noopener"
+    >Blockchain Security Overview - CTF Wiki</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2025 - 
+        
+        2026 hata
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.884460734613d5e85247b63e1915405c54071b98eccd53eda431ec100faee589.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
