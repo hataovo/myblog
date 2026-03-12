@@ -1004,7 +1004,7 @@ $$<p>
 因此目标向量取值应属于{-1,1}(除去最后一个0)</p>
 <p>第二种比第一种好在第二种格的行列式会更大一些</p>
 <p>上面两个格一般在用的时候会在最后一列乘上<code>N = ceil(sqrt(n))</code>	(个人感觉作用就是配平)</p>
-<p>另外，规约算法除LLL外还可以用BKZ，sagemath中的BKZ()可以设置参数，例如BKZ(block_size = 16)，指定了BKZ算法中的块大小。默认情况下是block_size = 20，block_size越大，执行速度越慢，但结果更精确</p>
+<p>另外，规约算法除LLL外还可以用BKZ，sagemath中的BKZ()可以设置参数，例如BKZ(block_size = 16)，指定了BKZ算法中的块大小。默认情况下是block_size = 10，block_size越大，执行速度越慢，但结果更精确</p>
 <p><a class="link" href="https://github.com/DexterJie/CTF_Repo/tree/main/The%20Relation%20Between%20Lattice%20Reduction%20Algorithm%20and%20Knapsack%20Density"  target="_blank" rel="noopener"
     >The Relation Between Lattice Reduction Algorithm and Knapsack Density</a></p>
 <p>更强的是这个实验结果，可以得到几个很有用的信息</p>

@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="HNP\r前言\n本文记录hnp有关内容以及一些例题，前面的内容和代码主要参考了 | 独奏の小屋\n暂时没有专门收录的例题，后面再随缘补充吧\n基本概念\rHNP 即 the Hidden Number Problem，隐藏数问题，种类比较多，主要参考 | 独奏の小屋 的分类进行整理\nLHNP(线性隐藏数问题)\r给出了如下的方程组，e较小，目标是恢复出x $$\r\\left\\{\\begin{array}{l}\rc_{0}=r_{0} \\cdot x+e_{0} \\\\\rc_{2}=r_{2} \\cdot x+e_{2} \\\\\r\\ \\ \\ \\ \\ \\ \\vdots \\\\\rc_{n-1}=r_{n-1} \\cdot x+e_{n-1}\r\\end{array} \\pmod p \\right.\r$$ 先去掉模p，得到$e_i = c_i -r_i x +k_ip$，然后利用线性关系构造格 $$\r(k_0,k_1,...,k_{n-1},x,1)\r\\left[\\begin{array}{cccccc}\rp & & & & & \\\\\r& p & & & & \\\\\r& & \\ddots & & & \\\\\r& & & p & & \\\\\r-r_{0} & -r_{1} & \\cdots & -r_{n-1} & K/p & \\\\\rc_{0} & c_{1} & \\cdots & c_{n-1} & & K\r\\end{array}\\right] = (e_0,e_1,...,e_{n-1},Kx/p,K)\r$$ 这是一个(n+2)*(n+2)的格子，前(n+2)列就是利用方程组构造的，为了凑成方阵，又在后面添了两列，一方面要配平，另一方面也要让使得左边向量最后两个分量x和1出现在目标向量时，和e的数量级差不多大，更好规约\n">
+<title>格密码-HNP</title>
+
+<link rel='canonical' href='http://localhost:1313/p/%E6%A0%BC%E5%AF%86%E7%A0%81-hnp/'>
+
+<link rel="stylesheet" href="/scss/style.min.4d36f8dc1fd48129e1635deb4b8eb2870fa09474f7280c4cb606d40b2526994b.css"><meta property='og:title' content="格密码-HNP">
+<meta property='og:description' content="HNP\r前言\n本文记录hnp有关内容以及一些例题，前面的内容和代码主要参考了 | 独奏の小屋\n暂时没有专门收录的例题，后面再随缘补充吧\n基本概念\rHNP 即 the Hidden Number Problem，隐藏数问题，种类比较多，主要参考 | 独奏の小屋 的分类进行整理\nLHNP(线性隐藏数问题)\r给出了如下的方程组，e较小，目标是恢复出x $$\r\\left\\{\\begin{array}{l}\rc_{0}=r_{0} \\cdot x+e_{0} \\\\\rc_{2}=r_{2} \\cdot x+e_{2} \\\\\r\\ \\ \\ \\ \\ \\ \\vdots \\\\\rc_{n-1}=r_{n-1} \\cdot x+e_{n-1}\r\\end{array} \\pmod p \\right.\r$$ 先去掉模p，得到$e_i = c_i -r_i x +k_ip$，然后利用线性关系构造格 $$\r(k_0,k_1,...,k_{n-1},x,1)\r\\left[\\begin{array}{cccccc}\rp & & & & & \\\\\r& p & & & & \\\\\r& & \\ddots & & & \\\\\r& & & p & & \\\\\r-r_{0} & -r_{1} & \\cdots & -r_{n-1} & K/p & \\\\\rc_{0} & c_{1} & \\cdots & c_{n-1} & & K\r\\end{array}\\right] = (e_0,e_1,...,e_{n-1},Kx/p,K)\r$$ 这是一个(n+2)*(n+2)的格子，前(n+2)列就是利用方程组构造的，为了凑成方阵，又在后面添了两列，一方面要配平，另一方面也要让使得左边向量最后两个分量x和1出现在目标向量时，和e的数量级差不多大，更好规约\n">
+<meta property='og:url' content='http://localhost:1313/p/%E6%A0%BC%E5%AF%86%E7%A0%81-hnp/'>
+<meta property='og:site_name' content='Hata的小屋'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2026-03-12T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-03-12T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="格密码-HNP">
+<meta name="twitter:description" content="HNP\r前言\n本文记录hnp有关内容以及一些例题，前面的内容和代码主要参考了 | 独奏の小屋\n暂时没有专门收录的例题，后面再随缘补充吧\n基本概念\rHNP 即 the Hidden Number Problem，隐藏数问题，种类比较多，主要参考 | 独奏の小屋 的分类进行整理\nLHNP(线性隐藏数问题)\r给出了如下的方程组，e较小，目标是恢复出x $$\r\\left\\{\\begin{array}{l}\rc_{0}=r_{0} \\cdot x+e_{0} \\\\\rc_{2}=r_{2} \\cdot x+e_{2} \\\\\r\\ \\ \\ \\ \\ \\ \\vdots \\\\\rc_{n-1}=r_{n-1} \\cdot x+e_{n-1}\r\\end{array} \\pmod p \\right.\r$$ 先去掉模p，得到$e_i = c_i -r_i x +k_ip$，然后利用线性关系构造格 $$\r(k_0,k_1,...,k_{n-1},x,1)\r\\left[\\begin{array}{cccccc}\rp & & & & & \\\\\r& p & & & & \\\\\r& & \\ddots & & & \\\\\r& & & p & & \\\\\r-r_{0} & -r_{1} & \\cdots & -r_{n-1} & K/p & \\\\\rc_{0} & c_{1} & \\cdots & c_{n-1} & & K\r\\end{array}\\right] = (e_0,e_1,...,e_{n-1},Kx/p,K)\r$$ 这是一个(n+2)*(n+2)的格子，前(n+2)列就是利用方程组构造的，为了凑成方阵，又在后面添了两列，一方面要配平，另一方面也要让使得左边向量最后两个分量x和1出现在目标向量时，和e的数量级差不多大，更好规约\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <figure class="site-avatar">
+            <a href="/">
+                
+                
+                
+                
+                <img src="/img/avatar_hu_1f41586fb0ce9a39.png" width="300"
+                    height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                
+            </a>
+            
+            <span class="emoji">🤔</span>
+            
+        </figure>
+        
+        
+
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Hata的小屋</a></h1>
+            <h2 class="site-description">刻舟求剑</h2>
+        </div>
+    </header>
+
+    
+    <ol class="menu-social">
+        
+        <li>
+            <a href="https://github.com/hataovo" target="_blank" title="GitHub" rel="me">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+            </a>
+        </li>
+        
+    </ol>
+    
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+        <li>
+            <a href="/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                <span>主页</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/archives/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                <span>归档</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/categories/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+                <span>分类</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/search/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                <span>搜索</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/links/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                <span>链接</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/about/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                <span>关于</span>
+            </a>
+            </li>
+            
+            
+
+            <li class="menu-bottom-section">
+                <ol class="menu">
+                    
+                    
+
+                    
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                    
+                </ol>
+            </li>
+    </ol>
+</aside>
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#基本概念">基本概念</a>
+      <ol>
+        <li><a href="#lhnp线性隐藏数问题">LHNP(线性隐藏数问题)</a></li>
+        <li><a href="#echnp椭圆曲线隐藏数问题">ECHNP(椭圆曲线隐藏数问题)</a>
+          <ol>
+            <li><a href="#形式">形式</a></li>
+            <li><a href="#推导">推导</a></li>
+            <li><a href="#代码">代码</a></li>
+          </ol>
+        </li>
+        <li><a href="#llbp线性位泄露问题">LLBP(线性位泄露问题)</a>
+          <ol>
+            <li><a href="#形式-1">形式</a></li>
+            <li><a href="#msb">MSB</a></li>
+            <li><a href="#lsb">LSB</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AF%86%E7%A0%81%E5%AD%A6%E4%B9%A0/" style="background-color: #2a9d8f; color: #fff;">
+                密码学习
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E6%A0%BC%E5%AF%86%E7%A0%81-hnp/">格密码-HNP</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2026-03-12T00:00:00Z'>Mar 12, 2026</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 5 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="hnp">HNP
+</h1><p><strong>前言</strong></p>
+<p>本文记录hnp有关内容以及一些例题，前面的内容和代码主要参考了 <a class="link" href="https://hasegawaazusa.github.io/hidden-number-problem.html"  target="_blank" rel="noopener"
+    >| 独奏の小屋</a></p>
+<p>暂时没有专门收录的例题，后面再随缘补充吧</p>
+<h2 id="基本概念">基本概念
+</h2><p>HNP 即 the Hidden Number Problem，隐藏数问题，种类比较多，主要参考 <a class="link" href="https://hasegawaazusa.github.io/hidden-number-problem.html"  target="_blank" rel="noopener"
+    >| 独奏の小屋</a> 的分类进行整理</p>
+<h3 id="lhnp线性隐藏数问题">LHNP(线性隐藏数问题)
+</h3><p>给出了如下的方程组，e较小，目标是恢复出x
+</p>
+$$
+\left\{\begin{array}{l}
+c_{0}=r_{0} \cdot x+e_{0} \\
+c_{2}=r_{2} \cdot x+e_{2} \\
+\ \ \  \ \  \ \vdots \\
+c_{n-1}=r_{n-1} \cdot x+e_{n-1}
+\end{array} \pmod p \right.
+$$<p>
+先去掉模p，得到$e_i = c_i -r_i x +k_ip$，然后利用线性关系构造格
+</p>
+$$
+(k_0,k_1,...,k_{n-1},x,1)
+\left[\begin{array}{cccccc}
+p & & & & & \\
+& p & & & & \\
+& & \ddots & & & \\
+& & & p & & \\
+-r_{0} & -r_{1} & \cdots & -r_{n-1} & K/p & \\
+c_{0} & c_{1} & \cdots & c_{n-1} & & K
+\end{array}\right] = 
+(e_0,e_1,...,e_{n-1},Kx/p,K)
+$$<p>
+这是一个(n+2)*(n+2)的格子，前(n+2)列就是利用方程组构造的，为了凑成方阵，又在后面添了两列，一方面要配平，另一方面也要让使得左边向量最后两个分量x和1出现在目标向量时，和e的数量级差不多大，更好规约</p>
+<p>故K取为$e_i$的上界，考虑到x和p差不多大，故倒数第二列补充的是K/p</p>
+<h3 id="echnp椭圆曲线隐藏数问题">ECHNP(椭圆曲线隐藏数问题)
+</h3><h4 id="形式">形式
+</h4><p>一条给定的椭圆曲线(参数已知)，取两个点R和P，其中R已知，P未知，$O = P + tR$，t可以自己取，然后可以得知$int(O[0]) - e$这样的形式，e是一个较小的量，也就是O点横坐标的高位信息，目标是恢复P的横坐标</p>
+<h4 id="推导">推导
+</h4><p>核心思想和步骤如下</p>
+<p>记$h_t \equiv (P+tR)_x - e_t \equiv \left(\frac{y_{P}-y_{Q}}{x_{P}-x_{Q}}\right)^{2}-x_{P}-x_{Q}-e_{t} \pmod p$，其中$Q=tR$（是已知量），那么ht的值是我们已知的</p>
+<p>特殊地，先考虑t=0的情况，则有$x_P = h_0+e_0$，然后因为我们想要的是P的横坐标，故把P的纵坐标给表示出来，有下面的式子$y_{P}=\frac{x_{P}^{3}+a x_{P}+b+y_{Q}^{2}-\left(h_{0}+e_{0}+x_{P}+x_{Q}\right)\left(x_{P}-x_{Q}\right)^2}{2 y_{Q}}$(这一步即两边通分然后用曲线表达式化简），在这个式子里，右边只有e0和xp两个未知数</p>
+<p>接下来考虑<strong>共轭对</strong>$P+Q$和$P-Q$，首先有这两个式子$x_Q = x_{-Q},y_Q = -y_{-Q}$，然后做的工作是计算$(P+Q)_x+(P-Q)_x$，其得到的结果(等号右边)只有xp这一个未知数，这里就不放了</p>
+<p>然后$h_i =(P+Q)_x -e_i ,h_{-i} =(P-Q)_x -e_{-i}$，构造$\tilde{h}_i = h_i + h_{-i}, \quad \tilde{e}_i = e_i + e_{-i}$，具体地，即$(P+Q)_x+(P-Q)_x = h_i+e_i +h_{-i}+e_{-i} = \tilde{h}_i+\tilde{e}_i = g(x_P)$，右边的复杂表达式就用g抽象了，那么这个等式只有$\tilde{e}_i$和xp两个未知数，再代入$x_P = h_0+e_0$，那么就是一个关于$(\tilde{e}_i,e_0)$的方程，其形式如下</p>
+<p>$F_i(X,Y)= X^{2}Y + A_{i}X^{2} + A_{0,i}XY + B_{i}X + B_{0,i}Y + C_{i}$，满足$F_i(e_0,\tilde{e}_i) \equiv 0 \pmod p$，$Q = iR$</p>
+<p>当然，各个系数都有其表达式，这里也不放了，然后我们可以得到d组$(e_0,\tilde{e}_i)$方程，据此构造格
+</p>
+$$
+\left(1,\ e_{0},\ \tilde{e}_{1},\ \cdots,\ \tilde{e}_{d},\ e_{0}^{2},\ e_{0}\tilde{e}_{1},\ \cdots,\ e_{0}\tilde{e}_{d},\ k_{1},\ \cdots,\ k_{d}\right)
+\left[\begin{array}{cccc}
+-C_{1} & -C_{2} & \cdots & -C_{d} \\
+-B_{1} & -B_{2} & \cdots & -B_{d} \\
+-B_{0,1} & 0 & \cdots & 0 \\
+0 & -B_{0,2} & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & -B_{0,d} \\
+-A_{1} & -A_{2} & \cdots & -A_{d} \\
+-A_{0,1} & 0 & \cdots & 0 \\
+0 & -A_{0,2} & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & -A_{0,d} \\
+p &  &  &  \\
+ & p &  &  \\
+ &  &  &  \\
+ &  & \ddots &  \\
+ &  &  & p
+\end{array}\right] =
+\left( e_0^2 \tilde{e}_1,\ \cdots,\ e_0^2 \tilde{e}_d \right)
+$$<p>
+这是一个(3d+3)*d的格，同样地，为了将其凑成一个方阵，我们将其变成下面的形式，P是d阶单位阵*p，R是上面的系数矩阵，E的内容如下，k是e的比特位，是一个(2d+3)阶的对角阵(1+(d+1)+(d+1))，同样为了使目标向量各分量数量级相当，简单验证了一下，大小也没问题
+</p>
+$$
+M = \begin{bmatrix}
+E & R \\
+0 & P
+\end{bmatrix}
+$$$$
+E = \begin{bmatrix}
+2^{3k} & 0 & \cdots & 0 & 0 & \cdots & 0 \\
+0 & 2^{2k} & \cdots & 0 & 0 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & 2^{2k} & 0 & \cdots & 0 \\
+0 & 0 & \cdots & 0 & 2^{k} & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & 0 & 0 & \cdots & 2^{k}
+\end{bmatrix}
+$$<p>M是一个(3d+3)*(3d+3)的格，最后的线性关系是
+</p>
+$$
+\left(1,\ e_{0},\ \tilde{e}_{1},\ \cdots,\ \tilde{e}_{d},\ e_{0}^{2},\ e_{0}\tilde{e}_{1},\ \cdots,\ e_{0}\tilde{e}_{d},\ k_{1},\ \cdots,\ k_{d}\right)M = \\
+\left(2^{3 k},\ e_{0} 2^{2k},\ \tilde{e}_{1} 2^{2k},\ \cdots,\ \tilde{e}_{d} 2^{2k},\ e_{0}^{2} 2^{k},\ e_{0}\tilde{e}_{1} 2^{k},\ \cdots,\ e_{0}\tilde{e}_{d} 2^{k},\ e_{0}^{2}\tilde{e}_{1},\ \cdots,\ e_{0}^{2}\tilde{e}_{d}\right)
+$$<blockquote>
+<p>算了算前面的部分，后面看着计算量很庞大啊，没有算了，而且表示出来的$y_P$，也没有用上，算$\tilde{h}_i$的时候分子上的y项都是平方直接拿曲线表达式代换了，可能后面会用到？emm&hellip;</p>
+</blockquote>
+<h4 id="代码">代码
+</h4><p>取自<a class="link" href="https://hasegawaazusa.github.io/hidden-number-problem.html"  target="_blank" rel="noopener"
+    >| 独奏の小屋</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+</span></span><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+</span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
+</span></span><span class="line"><span class="cl"><span class="n">E</span> <span class="o">=</span> <span class="n">EllipticCurve</span><span class="p">(</span><span class="n">GF</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">G</span> <span class="o">=</span> <span class="n">E</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">hs</span> <span class="o">=</span> <span class="n">hs</span>
+</span></span><span class="line"><span class="cl"><span class="n">k</span> <span class="o">=</span> <span class="mi">163</span>
+</span></span><span class="line"><span class="cl"><span class="n">d</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="n">Ai</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">A0i</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">Bi</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">B0i</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">Ci</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Q</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">G</span>
+</span></span><span class="line"><span class="cl">    <span class="n">xQ</span> <span class="o">=</span> <span class="n">ZZ</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Ai</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">xQ</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">A0i</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">hs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">xQ</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Bi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">hs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">hs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">xQ</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">hs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xQ</span> <span class="o">-</span> <span class="n">a</span> <span class="o">-</span> <span class="n">xQ</span> <span class="o">^</span> <span class="mi">2</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">B0i</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">hs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">xQ</span><span class="p">)</span> <span class="o">^</span> <span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Ci</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">hs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">xQ</span><span class="p">)</span> <span class="o">^</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">((</span><span class="n">hs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="mi">2</span> <span class="o">+</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">xQ</span> <span class="o">+</span> <span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">xQ</span> <span class="o">^</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">hs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">b</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">R</span> <span class="o">=</span> <span class="n">block_matrix</span><span class="p">(</span><span class="n">ZZ</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="n">matrix</span><span class="p">(</span><span class="n">Ci</span><span class="p">),</span> <span class="o">-</span><span class="n">matrix</span><span class="p">(</span><span class="n">Bi</span><span class="p">),</span> <span class="o">-</span><span class="n">diagonal_matrix</span><span class="p">(</span><span class="n">B0i</span><span class="p">),</span> <span class="o">-</span><span class="n">matrix</span><span class="p">(</span><span class="n">Ai</span><span class="p">),</span> <span class="o">-</span><span class="n">diagonal_matrix</span><span class="p">(</span><span class="n">A0i</span><span class="p">)],</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">P</span> <span class="o">=</span> <span class="n">diagonal_matrix</span><span class="p">(</span><span class="n">ZZ</span><span class="p">,</span> <span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">E</span> <span class="o">=</span> <span class="n">block_diagonal_matrix</span><span class="p">([</span><span class="n">matrix</span><span class="p">([</span><span class="mi">8</span><span class="o">^</span><span class="n">k</span><span class="p">]),</span> <span class="n">diagonal_matrix</span><span class="p">([</span><span class="mi">4</span><span class="o">^</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">diagonal_matrix</span><span class="p">([</span><span class="mi">2</span><span class="o">^</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))])</span>
+</span></span><span class="line"><span class="cl"><span class="n">M</span> <span class="o">=</span> <span class="n">block_matrix</span><span class="p">([[</span><span class="n">E</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">P</span><span class="p">]])</span>
+</span></span><span class="line"><span class="cl"><span class="n">shortest_vector</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">LLL</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">es</span> <span class="o">=</span> <span class="n">shortest_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">^</span> <span class="n">k</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="n">es</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">es</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">es</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">xP</span> <span class="o">=</span> <span class="n">ZZ</span><span class="p">(</span><span class="n">hs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">es</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">xP</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="llbp线性位泄露问题">LLBP(线性位泄露问题)
+</h3><h4 id="形式-1">形式
+</h4><p>形如
+</p>
+$$
+a_i x \equiv b_i \pmod N
+$$<p>
+方程组，已知 ai, N。bi 的部分位已知，需要求出 x</p>
+<h4 id="msb">MSB
+</h4><p>最高位泄露的情况</p>
+<p>记 N 的位数为 $\eta$，bi 泄露的最高位位数为 $\rho$，故 bi 可表示为
+</p>
+$$
+b_i = h_i + s_i
+$$<p>
+hi 是已知的高位，si 是未知的低位，进一步有
+</p>
+$$
+x \equiv a_i^{-1}(h_i+s_i) \pmod N
+$$<p>
+取两个方程可得
+</p>
+$$
+a_0^{-1}(h_0+s_0) \equiv a_i^{-1}(h_i+s_i) \pmod N \\
+s_i \equiv a_ia_0^{-1}s_0+a_ia_0^{-1}h_0 - h_i \pmod N
+$$<p>
+令 $A_i = a_ia_0^{-1}$, $B_i= a_ia_0^{-1}h_0 -h_i$, 则 $s_i \equiv A_i s_0 + B_i \pmod N$</p>
+<p>可以构造出格如下，这是一个 (n+2)*(n+2) 的格，K 取 $2^{\eta-\rho}$
+</p>
+$$
+(k_1, \cdots, k_n, s_0, 1) \begin{bmatrix}
+N & & & \\
+& \ddots & & \\
+& & N & \\
+A_1 & \cdots & A_n & 1 \\
+B_1 & \cdots & B_n & &K
+\end{bmatrix} = (s_1, \cdots, s_n, s_0, K)
+$$<h4 id="lsb">LSB
+</h4><p>最低位泄露的情况</p>
+<p>记 N 的位数为 $\eta$，bi 泄露的最低位位数为 $\rho$，故 bi 可表示为
+</p>
+$$
+b_i = 2^{\rho}s_i + l_i
+$$<p>
+li 是已知的低位，si 是未知的低位，进一步有
+</p>
+$$
+x \equiv a_i^{-1}(2^{\rho}s_i + l_i) \pmod N
+$$<p>
+取两个方程可得
+</p>
+$$
+a_0^{-1}(2^{\rho}s_0 + l_0) \equiv a_i^{-1}(2^{\rho}s_i + l_i) \pmod N \\
+2^{\rho}s_i \equiv a_ia_0^{-1}2^{\rho}s_0+a_ia_0^{-1}l_0 - l_i \pmod N
+$$<p>
+令 $A_i = a_ia_0^{-1}$, $B_i= \frac{a_ia_0^{-1}l_0 -l_i}{2^{\rho}}$, 则 $s_i \equiv A_i s_0 + B_i \pmod N$</p>
+<p>可以构造出格如下，这是一个 (n+2)*(n+2) 的格，K 取 $2^{\eta-\rho}$
+</p>
+$$
+(k_1, \cdots, k_n, s_0, 1) \begin{bmatrix}
+N & & & \\
+& \ddots & & \\
+& & N & \\
+A_1 & \cdots & A_n & 1 \\
+B_1 & \cdots & B_n & &K
+\end{bmatrix} = (s_1, \cdots, s_n, s_0, K)
+$$<p>
+可以看出基本上一样</p>
+<h2 id="参考">参考
+</h2><ol>
+<li><a class="link" href="https://hasegawaazusa.github.io/hidden-number-problem.html"  target="_blank" rel="noopener"
+    >| 独奏の小屋</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/ecc-%E4%BA%8C/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">ECC-(二)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/ecc-%E4%B8%80/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">ECC-(一)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/rsa-copper/">
+        
+        
+            <div class="article-image">
+                <img src="/p/rsa-copper/111.82dd1bc5058d1f60cc46b9194d19b4d8_hu_5bf6c48af516b25d.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post RSA-copper"
+                        
+                        data-hash="md5-gt0bxQWNH2DMRrkZTRm02A==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">RSA-copper</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/rsa-%E5%89%AA%E6%9E%9D/">
+        
+        
+            <div class="article-image">
+                <img src="/p/rsa-%E5%89%AA%E6%9E%9D/111.9735f259acdd2343d92fc362ae716f3d_hu_e00e9fc4340e1ac2.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post RSA-剪枝"
+                        
+                        data-hash="md5-lzXyWazdI0PZL8NirnFvPQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">RSA-剪枝</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/">
+        
+        
+            <div class="article-image">
+                <img src="/p/rsa-%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6/123.95a3d75ac58a906e1f4881e3baba7afe_hu_478b74b8f412d6e5.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post RSA-密钥文件"
+                        
+                        data-hash="md5-laPXWsWKkG4fSIHjurp6/g==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">RSA-密钥文件</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2025 - 
+        
+        2026 hata
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.884460734613d5e85247b63e1915405c54071b98eccd53eda431ec100faee589.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

@@ -418,7 +418,7 @@ $$
 
 上面两个格一般在用的时候会在最后一列乘上`N = ceil(sqrt(n))`	(个人感觉作用就是配平)
 
-另外，规约算法除LLL外还可以用BKZ，sagemath中的BKZ()可以设置参数，例如BKZ(block_size = 16)，指定了BKZ算法中的块大小。默认情况下是block_size = 20，block_size越大，执行速度越慢，但结果更精确
+另外，规约算法除LLL外还可以用BKZ，sagemath中的BKZ()可以设置参数，例如BKZ(block_size = 16)，指定了BKZ算法中的块大小。默认情况下是block_size = 10，block_size越大，执行速度越慢，但结果更精确
 
 [The Relation Between Lattice Reduction Algorithm and Knapsack Density](https://github.com/DexterJie/CTF_Repo/tree/main/The%20Relation%20Between%20Lattice%20Reduction%20Algorithm%20and%20Knapsack%20Density)
 
