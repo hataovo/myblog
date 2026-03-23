@@ -71,7 +71,8 @@ $$&lt;p&gt;
 此外，鸡块师傅博客中提到把这个分块矩阵最下面一横块移到最上面规约更快，我没有验证过&lt;/p&gt;
 &lt;h3 id=&#34;primal-attack-优化&#34;&gt;primal attack 优化
 &lt;/h3&gt;&lt;p&gt;上面的格子比较好想，但是有两个问题，一个是矩阵规模大，规约慢，另一个则是目标向量中的s分量不是小量，其出现在目标向量中不利于规约，那么我们的目标就把目标向量中的s去掉，只留下e分量&lt;/p&gt;
-&lt;p&gt;同样先做一个转置$s^TA^T+e^T \equiv b^T \pmod q$，$A^T$是一个n&lt;em&gt;m(n&amp;lt;m)的矩阵，可以用初等行变换将其变成一个简化行阶梯形矩阵(RREF)，并且由于A中的元素是随机选的，其大概率上一定满足两个条件：秩为n以及前n个列向量线性无关，也就是说$A^T$可以变换成$K = [I_n,A&#39;_{n\cdot (m-n)}]$这样的形式，而这一过程可表示为$PA^T = K$，P是一个可逆矩阵， 那么可以做以下变形$s^TA^T = s^T(P^{-1}P)A^T =  (s^TP^{-1})PA^T$，记$s&#39; =s^TP^{-1}$，这时有$s&#39;K-b^T \equiv -e^T \pmod q$，那么就和上面的构造一样了
+&lt;p&gt;同样先做一个转置$s^TA^T+e^T \equiv b^T \pmod q$，$A^T$是一个n*m(n&amp;lt;m)的矩阵，可以用初等行变换将其变成一个简化行阶梯形矩阵(RREF)，并且由于A中的元素是随机选的，其大概率上一定满足两个条件：秩为n以及前n个列向量线性无关，也就是说$A^T$可以变换成$K = [I_n,A&#39;_{n\cdot (m-n)}]$这样的形式，而这一过程可表示为$PA^T = K$，P是一个可逆矩阵， 那么可以做以下变形$s^TA^T = s^T(P^{-1}P)A^T =  (s^TP^{-1})PA^T$，记$s&#39; =s^TP^{-1}$，这时有$s&#39;K-b^T \equiv -e^T \pmod q$，那么就和上面的构造一样了
+&lt;/p&gt;
 $$
 (s_0&#39;, s_1&#39;,...,s_{n-1}&#39;,1,-k_0,-k_1,...,-k_{m-1})
 \begin{pmatrix}
@@ -80,27 +81,24 @@ K \\
 qI_{m}
 \end{pmatrix} = 
 (-e_0, -e_1, ...,-e_{m-1})
-$$
-发现这个格是一个(m+n+1)&lt;/em&gt;(m)的，不是一个方阵，还可以再处理&lt;/p&gt;
-&lt;p&gt;注意到格的最左上角(K中的左边矩阵)是单位阵，而s’向量是模q下的，他与单位阵计算乘积得到的每个值肯定也都小于q，不需要再去减去kq，故格中的$qI_m$可以变成$qI_{m-n}$(其他地方补充0调整)，并且调整一下顺序，此时的格变成下面的样子，是一个(m+1)*(m+1)的方阵，(最后面添了一列，右下角的1在对角线上)
+$$&lt;p&gt;
+发现这个格是一个(m+n+1)*(m)的，不是一个方阵，还可以再处理&lt;/p&gt;
+&lt;p&gt;注意到格的最左上角(K中的左边矩阵)是单位阵，而s’向量是模q下的，他与单位阵计算乘积得到的每个值肯定也都小于q，不需要再去减去kq，故格中的$qI_m$可以变成$qI_{m-n}$(其他地方补充0调整)，并且调整一下顺序，此时的格变成下面的样子，是一个(m+1)*(m+1)的方阵，(最后面添了一列，右下角的1在对角线上)&lt;/p&gt;
 $$
 \begin{pmatrix}
-1 &amp;amp; &amp;amp; &amp;amp; &amp;amp; a_{1,1}^{\prime} &amp;amp; a_{2,1}^{\prime} &amp;amp; \cdots &amp;amp; a_{m-n,1}^{\prime} \
-&amp;amp; \ddots &amp;amp; &amp;amp; &amp;amp; \vdots &amp;amp; \vdots &amp;amp; &amp;amp; \vdots \
-&amp;amp; &amp;amp; 1 &amp;amp; &amp;amp; a_{1,n}^{\prime} &amp;amp; a_{2,n}^{\prime} &amp;amp; \cdots &amp;amp; a_{m-n,n}^{\prime} \
-&amp;amp; &amp;amp; &amp;amp;  &amp;amp; p &amp;amp; &amp;amp; &amp;amp; \
-&amp;amp; &amp;amp; &amp;amp; &amp;amp;  &amp;amp; p&amp;amp; &amp;amp; \
-&amp;amp; &amp;amp; &amp;amp; &amp;amp; &amp;amp;  &amp;amp;\ddots &amp;amp; \&lt;/p&gt;
-&lt;p&gt;&amp;amp; &amp;amp; &amp;amp; &amp;amp; &amp;amp; &amp;amp; &amp;amp;p  \
--b_{0}&amp;amp; &amp;amp; \cdots&amp;amp; &amp;amp; &amp;amp; \cdots&amp;amp; &amp;amp; -b_{m-1} &amp;amp; 1
+1 &amp; &amp; &amp; &amp; a_{1,1}^{\prime} &amp; a_{2,1}^{\prime} &amp; \cdots &amp; a_{m-n,1}^{\prime} \\
+&amp; \ddots &amp; &amp; &amp; \vdots &amp; \vdots &amp; &amp; \vdots \\
+&amp; &amp; 1 &amp; &amp; a_{1,n}^{\prime} &amp; a_{2,n}^{\prime} &amp; \cdots &amp; a_{m-n,n}^{\prime} \\
+&amp; &amp; &amp;  &amp; p &amp; &amp; &amp; \\
+&amp; &amp; &amp; &amp;  &amp; p&amp; &amp; \\
+&amp; &amp; &amp; &amp; &amp;  &amp;\ddots &amp; \\
+&amp; &amp; &amp; &amp; &amp; &amp; &amp;p  \\
+-b_{0}&amp; &amp; \cdots&amp; &amp; &amp; \cdots&amp; &amp; -b_{m-1} &amp; 1
 \end{pmatrix}
-&lt;/p&gt;
+$$&lt;p&gt;线性关系如下&lt;/p&gt;
 $$
-线性关系如下
-$$&lt;p&gt;
-(s_0&amp;rsquo;, s_1&amp;rsquo;,&amp;hellip;,s_{n-1}&amp;rsquo;,-k_{n},&amp;hellip;,-k_{m-1},1)L =(-e_0, -e_1, &amp;hellip;,-e_{m-1},1)
-$$&lt;/p&gt;
-&lt;hr&gt;
+(s_0&#39;, s_1&#39;,...,s_{n-1}&#39;,-k_{n},...,-k_{m-1},1)L =(-e_0, -e_1, ...,-e_{m-1},1)
+$$&lt;hr&gt;
 &lt;p&gt;附上上面两个版本的代码，同样取自鸡块师傅的博客&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -282,7 +280,7 @@ $$&lt;/p&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;A&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;B&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;M&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;load&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;output.sobj&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;179427755448118581754304040408782324521&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;179427755448118581754304040408782324521&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;# 交互式下查看 A 即可得到 n&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;12397066081240970369&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;q&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;14473404777572784809&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
