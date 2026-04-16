@@ -1,6 +1,6 @@
 +++
 title = "格密码-HNP"
-date = "2026-03-12"
+date = "2026-04-16"
 categories = ["密码学习"]
 
 +++
@@ -11,7 +11,7 @@ categories = ["密码学习"]
 
 本文记录hnp有关内容以及一些例题，前面的内容和代码主要参考了 [| 独奏の小屋](https://hasegawaazusa.github.io/hidden-number-problem.html)
 
-暂时没有专门收录的例题，后面再随缘补充吧
+以及一些收录的例题，后续慢慢补充中
 
 ## 基本概念
 
@@ -23,7 +23,7 @@ HNP 即 the Hidden Number Problem，隐藏数问题，种类比较多，主要�
 $$
 \left\{\begin{array}{l}
 c_{0}=r_{0} \cdot x+e_{0} \\
-c_{2}=r_{2} \cdot x+e_{2} \\
+c_{1}=r_{1} \cdot x+e_{1} \\
 \ \ \  \ \  \ \vdots \\
 c_{n-1}=r_{n-1} \cdot x+e_{n-1}
 \end{array} \pmod p \right.
@@ -166,6 +166,8 @@ $$
 
 #### MSB
 
+**注：下面分析的是有 n+1 组数据**
+
 最高位泄露的情况
 
 记 N 的位数为 $\eta$，bi 泄露的最高位位数为 $\rho$，故 bi 可表示为
@@ -225,6 +227,217 @@ B_1 & \cdots & B_n & &K
 $$
 可以看出基本上一样
 
-## 参考
+## 例题
+
+### [DesCTF 2026] Low Bits, High Risk
+
+```python
+from hashlib import *
+from secrets import randbelow
+from ecdsa import SigningKey, SECP160r1, util
+
+leak = 3
+total = 61
+mask = (1 << leak) - 1
+
+def main():
+    sk = SigningKey.generate(curve=SECP160r1)
+    vk = sk.verifying_key
+    q = SECP160r1.order
+    print(hex(vk.pubkey.point.x()))
+    print(hex(vk.pubkey.point.y()))
+    d = sk.privkey.secret_multiplier
+    flag = "DesCTF{" + md5(str(d).encode()).hexdigest() + "}"
+    for i in range(total):
+        msg = f"msg-{i}".encode()
+        digest = sha1(msg).digest()
+        h = int.from_bytes(digest, "big") % q
+        k = randbelow(q - 1) + 1
+        sig = sk.sign_digest(digest, sigencode=util.sigencode_string, k=k)
+        r, s = util.sigdecode_string(sig, q)
+        print(f"({hex(h)}, {hex(int(r))}, {hex(int(s))}, {hex(k & mask)}),")
+
+if __name__ == "__main__":
+    main()
+
+'''
+0x8e0a0071e8cf437efec4233ff8444a4ff8adba2f
+0xa869fce702b70799c443b450a4d41cc4f65b3eee
+(0x525931a9ff8ef95025939a57275ecedc2730421f, 0x5288ed7146c188ebda9b6c8909726c3d6f957891, 0x334c301c2d861fa8cceecabc542a5cb7dd7df7d9, 0x6),
+(0x4b21047e1112dbfee487b4f23471f2fb438e268, 0x82878368ef18996109bf10adae81e1acaeb9fa25, 0xd4d9ec1faa9534a3fa4ff0fe78488ebf175cdfec, 0x4),
+(0xdd2e98102508e178fdf1e289ac8342250da6408f, 0x38069b3213a57a077a38938d082a7590d0a21b95, 0xcff1f76af8f15422bb288c8af372332cc6ace970, 0x1),
+... 略
+'''
+```
+
+背景是 ECDSA，核心等式依旧是
+$$
+s \equiv k^{-1}(H(m)+rd_A) \pmod n
+$$
+目标是把私钥 d 求出来，给了61组消息及对应的签名，即 (h(m), r, s)
+
+此外重要的额外信息是 `k & mask`，也就是泄露了每次用的 k 的低3位的信息
+
+通过这个题，仔细看后发现了 LHNP 和 LLBP 构造格的思想是不一样的
+
+[1] 一开始的做法，构造的相当于是 LHNP 的格，就是利用线性方程的思想去构造
+
+设 $k =k_l +2^3 k_h$，对签名公式变形一下然后代入
+$$
+sk = sk_l+8sk_h = H +rd_A \pmod n \\
+k_l+8k_h \equiv s^{-1}H+s^{-1}rd_A \pmod n \\
+k_h = 8^{-1}s^{-1}H - 8^{-1}k_l +8^{-1}s^{-1}rd_A +t_i n
+$$
+构造如下的格，其中 $A_i =8^{-1}s_i^{-1}r_i, \  B_i = 8^{-1}s_i^{-1}H-8^{-1}k_{li}, \ K = 2^{156}$
+$$
+(t_0,...,t_{60},d_A,1) \begin{pmatrix}
+n & & & \\
+& \ddots & & \\
+& & n & \\
+A_0 & \cdots & A_{60} & 1/8 \\
+B_0 & \cdots & B_{60} & &K
+\end{pmatrix} = (k_{h0},...,k_{h60},d_A/8,K)
+$$
+
+> 这里声明的是 QQ 上的矩阵，然后规约；发现 QQ 上的矩阵只能用 LLL，不能用 BKZ
+
+但是用 LLL 又出不来，故需要做一些调整
+
+$k_{hi}$ 的范围大概是 $(0, n/8)$，则目标向量中的每个分量也大致落在这个范围内，对其做一个中心化 (中心处理为0)，即 $-n \le 16k_{hi}-n \le n$
+
+原始等式 $k_{hi} = A_id +B_i +t_i n $，则变形为 $16k_{hi}-n = 16A_id +(16B_i -n)+16t_i n $
+
+与此同时，K 调整为 n，d 也不再除8，就取 d，这样格矩阵内也没有分数了
+$$
+(t_0,...,t_{60},d_A,1) \begin{pmatrix}
+16n & & & \\
+& \ddots & & \\
+& & 16n & \\
+16A_0 & \cdots & 16A_{60} & 1 \\
+16B_0-n & \cdots & 16B_{60}-n & &n
+\end{pmatrix} = (16k_{h0}-n,...,16k_{h60}-n,d_A,n)
+$$
+
+```python
+q = SECP160r1.order
+n = q
+data = [...]
+
+a = []
+b = []
+for h, r, s, l in data:
+    invs = pow(s, -1, n)
+    inv8 = pow(8, -1, n)
+    tmpa = (invs * inv8 * r) % n 
+    tmpb = (invs * inv8 * h - inv8 * l) % n 
+    a.append(tmpa)
+    b.append(tmpb)
+
+L = matrix(ZZ, 63, 63)
+for i in range(61):
+    L[i, i] = 16 * n
+    L[-2, i] = 16 * int(a[i])
+    L[-1, i] = 16 * int(b[i]) - n
+L[-2, -2] = 1
+L[-1, -1] = n
+K = n
+
+# block_size 调至36可以找到正确解
+for ans in L.BKZ(block_size=36):
+    if abs(ans[-1]) == K:
+        d = ans[-2]
+        print(d)
+```
+
+> 突然发现在 sage 里写 pow(a, -1, p) 返回的值的类型是模意义下的整数，不是普通整数，故需要 int() 转换一下；奇怪了，以前怎么没遇到过这种问题
+
+[2] 再回看了一下 LLBP 的格，发现不一样，本质上是利用第一个等式和第 i 个等式这种两个式子的形式去构造
+$$
+sk \equiv h+rd_A \pmod n
+$$
+变形成 $ax \equiv b \pmod n$ 的形式，如下，多了一个常数项
+$$
+rs^{-1}d_A \equiv k -s^{-1}h \pmod n \\
+d_A \equiv r^{-1}s(k -s^{-1}h) \equiv r^{-1}sk-r^{-1}h \pmod n
+$$
+类似地，联立可得
+$$
+r_0^{-1}s_0k_0-r_0^{-1}h_0 \equiv r_i^{-1}s_ik_i-r_i^{-1}h_i \pmod n
+$$
+把 k 展开，代入
+$$
+r_0^{-1}s_0(k_{l0} +2^3 k_{h0})-r_0^{-1}h_0 \equiv r_i^{-1}s_i(k_{li} +2^3 k_{hi})-r_i^{-1}h_i \pmod n
+$$
+往标准形式上变形
+$$
+(k_{li} +2^3 k_{hi})-s_i^{-1}h_i \equiv r_is_i^{-1}r_0^{-1}s_0(k_{l0} +2^3 k_{h0})-r_is_i^{-1}r_0^{-1}h_0 \pmod n \\
+2^3 k_{hi} \equiv r_is_i^{-1}r_0^{-1}s_0(k_{l0} +2^3 k_{h0})-r_is_i^{-1}r_0^{-1}h_0 +s_i^{-1}h_i - k_{li}\pmod n \\
+2^3 k_{hi} \equiv r_is_i^{-1}r_0^{-1}s_02^3 k_{h0}+r_is_i^{-1}r_0^{-1}s_0k_{l0}-r_is_i^{-1}r_0^{-1}h_0 +s_i^{-1}h_i - k_{li}\pmod n
+$$
+两边同乘 $8^{-1}$ 后，令 $A_i = r_is_i^{-1}r_0^{-1}s_0 $，右边剩余的为 $B_i$
+
+则构造出了 $k_{hi}\equiv A_ik_{h0}+B_i \pmod n$ 的形式，构造和模板一样的格
+$$
+(t_1, \cdots, t_n, k_{h0}, 1) \begin{pmatrix}
+N & & & \\
+& \ddots & & \\
+& & N & \\
+A_1 & \cdots & A_n & 1 \\
+B_1 & \cdots & B_n & &K
+\end{pmatrix} = (k_{h1}, \cdots, k_{hn}, k_{h0}, K)
+$$
+一样地，直接用不行，中心化一下 $k_{hi} = A_ik_{h0}+B_i +t_in$ 变为 $16k_{hi}-n = 16A_ik_{h0} +(16B_i -n)+16t_i n $
+
+```python
+q = SECP160r1.order
+n = q
+data = [...]
+
+a = []
+b = []
+h0, r0, s0, l0 = (0x525931a9ff8ef95025939a57275ecedc2730421f, 0x5288ed7146c188ebda9b6c8909726c3d6f957891, 0x334c301c2d861fa8cceecabc542a5cb7dd7df7d9, 0x6)
+invr0 = pow(r0, -1, n)
+inv8 = pow(8, -1, n)
+
+for h, r, s, l in data:
+    invr = pow(r, -1, n)
+    invs = pow(s, -1, n)
+    tmpa = (r * invs * invr0 * s0) % n 
+    tmpb = (r * invs * invr0 * s0 * l0 - r * invs * invr0 * h0 + invs * h - l) % n 
+    tmpb = (tmpb * inv8) % n
+    a.append(tmpa)
+    b.append(tmpb)
+
+L = matrix(ZZ, 62, 62)
+for i in range(60):
+    L[i, i] = 16 * n
+    L[-2, i] = 16 * int(a[i + 1])
+    L[-1, i] = 16 * int(b[i + 1]) - n
+L[-2, -2] = 1
+K = n
+L[-1, -1] = n
+
+# block_size=36 同样可以找到正确解
+for ans in L.BKZ(block_size=36):
+    if abs(ans[-1]) == K:
+        if ans[-1] == K:
+            kh0 = ans[-2]
+        if ans[-1] == -K:
+            kh0 = -ans[-2]
+        k0 = kh0 * 8 + l0
+        d = (s0 * k0 - h0) * pow(r0, -1, n) % n
+        print(d)
+```
+
+最后，两种构造都可以解决这个题。观察他们的形式
+
+- $k_{hi} \equiv A_id +B_i \pmod n$
+- $k_{hi}\equiv A_ik_{h0}+B_i \pmod n$
+
+本质上好像又都是一样的，第二种用未知量 $k_{h0}$ 代替了 d。这么来看的话第一种利用了61组数据，第二种利用了60组数据，或许可以这样粗略地理解
+
+总之，这个题只泄露了3bit，构造的格的行列式大小和目标向量的大小关系有点极限，得不断增大 BKZ 的 block_size 才能整出来
+
+## 参考 
 
 1. [| 独奏の小屋](https://hasegawaazusa.github.io/hidden-number-problem.html)
