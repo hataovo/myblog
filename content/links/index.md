@@ -1,10 +1,10 @@
 ---
 title: Links
 links:
-  - title: GitHub
-    description: GitHub is the world's largest software development platform.
-    website: https://github.com
-    image: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+  - title: CopperKoi
+    description: Web 领域大神
+    website: https://copperkoi.cn/
+    image: 1.jpg
 
 menu:
     main: 

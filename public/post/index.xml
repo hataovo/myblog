@@ -1205,6 +1205,7 @@ $$&lt;h2 id=&#34;lets-prove-it-again&#34;&gt;Let&amp;rsquo;s Prove It Again
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;$r_1-r_2 = (c_2-c_1)\cdot flag + p_1 - p_2$ 即可求出 flag&lt;/p&gt;
+&lt;p&gt;补充：实际上设置一样的 seed 取两组一样的 p 也可以，此时的 p, y, t 一样，但是 c, r 不一样&lt;/p&gt;
 </description>
         </item>
         <item>
