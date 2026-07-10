@@ -10,7 +10,7 @@
 <meta property='og:description' content="HNP\r前言\n本文记录hnp有关内容以及一些例题，前面的内容和代码主要参考了 | 独奏の小屋\n以及一些收录的例题，后续慢慢补充中\n基本概念\rHNP 即 the Hidden Number Problem，隐藏数问题，种类比较多，主要参考 | 独奏の小屋 的分类进行整理\nLHNP(线性隐藏数问题)\r给出了如下的方程组，e较小，目标是恢复出x $$\r\\left\\{\\begin{array}{l}\rc_{0}=r_{0} \\cdot x+e_{0} \\\\\rc_{1}=r_{1} \\cdot x+e_{1} \\\\\r\\ \\ \\ \\ \\ \\ \\vdots \\\\\rc_{n-1}=r_{n-1} \\cdot x+e_{n-1}\r\\end{array} \\pmod p \\right.\r$$ 先去掉模p，得到$e_i = c_i -r_i x +k_ip$，然后利用线性关系构造格 $$\r(k_0,k_1,...,k_{n-1},x,1)\r\\left[\\begin{array}{cccccc}\rp & & & & & \\\\\r& p & & & & \\\\\r& & \\ddots & & & \\\\\r& & & p & & \\\\\r-r_{0} & -r_{1} & \\cdots & -r_{n-1} & K/p & \\\\\rc_{0} & c_{1} & \\cdots & c_{n-1} & & K\r\\end{array}\\right] = (e_0,e_1,...,e_{n-1},Kx/p,K)\r$$ 这是一个(n+2)*(n+2)的格子，前(n+2)列就是利用方程组构造的，为了凑成方阵，又在后面添了两列，一方面要配平，另一方面也要让使得左边向量最后两个分量x和1出现在目标向量时，和e的数量级差不多大，更好规约\n">
 <meta property='og:url' content='http://localhost:1313/p/%E6%A0%BC%E5%AF%86%E7%A0%81-hnp/'>
 <meta property='og:site_name' content='Hata的小屋'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2026-04-16T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-04-16T00:00:00&#43;00:00'/>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2026-07-10T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-07-10T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="格密码-HNP">
 <meta name="twitter:description" content="HNP\r前言\n本文记录hnp有关内容以及一些例题，前面的内容和代码主要参考了 | 独奏の小屋\n以及一些收录的例题，后续慢慢补充中\n基本概念\rHNP 即 the Hidden Number Problem，隐藏数问题，种类比较多，主要参考 | 独奏の小屋 的分类进行整理\nLHNP(线性隐藏数问题)\r给出了如下的方程组，e较小，目标是恢复出x $$\r\\left\\{\\begin{array}{l}\rc_{0}=r_{0} \\cdot x+e_{0} \\\\\rc_{1}=r_{1} \\cdot x+e_{1} \\\\\r\\ \\ \\ \\ \\ \\ \\vdots \\\\\rc_{n-1}=r_{n-1} \\cdot x+e_{n-1}\r\\end{array} \\pmod p \\right.\r$$ 先去掉模p，得到$e_i = c_i -r_i x +k_ip$，然后利用线性关系构造格 $$\r(k_0,k_1,...,k_{n-1},x,1)\r\\left[\\begin{array}{cccccc}\rp & & & & & \\\\\r& p & & & & \\\\\r& & \\ddots & & & \\\\\r& & & p & & \\\\\r-r_{0} & -r_{1} & \\cdots & -r_{n-1} & K/p & \\\\\rc_{0} & c_{1} & \\cdots & c_{n-1} & & K\r\\end{array}\\right] = (e_0,e_1,...,e_{n-1},Kx/p,K)\r$$ 这是一个(n+2)*(n+2)的格子，前(n+2)列就是利用方程组构造的，为了凑成方阵，又在后面添了两列，一方面要配平，另一方面也要让使得左边向量最后两个分量x和1出现在目标向量时，和e的数量级差不多大，更好规约\n">
     </head>
@@ -298,6 +298,7 @@
     <li><a href="#例题">例题</a>
       <ol>
         <li><a href="#desctf-2026-low-bits-high-risk">[DesCTF 2026] Low Bits, High Risk</a></li>
+        <li><a href="#未知-truncated-lcg">[未知] truncated lcg</a></li>
       </ol>
     </li>
     <li><a href="#参考">参考</a></li>
@@ -350,7 +351,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published" datetime='2026-04-16T00:00:00Z'>Apr 16, 2026</time>
+                <time class="article-time--published" datetime='2026-07-10T00:00:00Z'>Jul 10, 2026</time>
             </div>
         
 
@@ -365,7 +366,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 9 分钟
+                    阅读时长: 11 分钟
                 </time>
             </div>
         
@@ -931,10 +932,176 @@ $$<p>
 </ul>
 <p>本质上好像又都是一样的，第二种用未知量 $k_{h0}$ 代替了 d。这么来看的话第一种利用了61组数据，第二种利用了60组数据，或许可以这样粗略地理解</p>
 <p>总之，这个题只泄露了3bit，构造的格的行列式大小和目标向量的大小关系有点极限，得不断增大 BKZ 的 block_size 才能整出来</p>
-<h2 id="参考">参考
+<h3 id="未知-truncated-lcg">[未知] truncated lcg
+</h3><p>三个参数均已知的情况下的截断 LCG 求解，下面讨论高位已知的情况</p>
+<p>题目取自 [参考链接2] 先上代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">flag</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;Spirit{*****************}&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">plaintext</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">length</span> <span class="o">=</span> <span class="n">plaintext</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span> <span class="n">getPrime</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="n">getPrime</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="n">getPrime</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">seed</span> <span class="o">=</span> <span class="n">plaintext</span>
+</span></span><span class="line"><span class="cl"><span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">seed</span> <span class="o">=</span> <span class="p">(</span><span class="n">seed</span><span class="o">*</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span><span class="o">%</span><span class="n">n</span>
+</span></span><span class="line"><span class="cl">    <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seed</span><span class="o">&gt;&gt;</span><span class="mi">64</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;a = &#34;</span><span class="p">,</span><span class="n">a</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;b = &#34;</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;n = &#34;</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;output = &#34;</span><span class="p">,</span><span class="n">output</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>万物起源
+</p>
+$$
+s_{i+1} \equiv as_i + b \pmod n
+$$<p>
+改写成高低位的形式 (对应代码，h 代表 output 左移64位之后的结果)
+</p>
+$$
+h_{i+1} + l_{i+1} \equiv a(h_{i} + l_{i}) + b \pmod n
+$$<p>
+简单移项
+</p>
+$$
+l_{i+1}\equiv al_i + ah_i + b -h_{i+1} \pmod n
+$$<p>
+已知部分记为 $t_i \equiv ah_i + b -h_{i+1} \pmod n$，则现在的形式为
+</p>
+$$
+l_{i+1} \equiv al_i + t_i \pmod n
+$$<blockquote>
+<p>HNP 的目标形式是</p>
+<p>$r_i = A_i u + B_i \pmod n$</p>
+<p>其中，$A_i$ 和 $B_i$ 均已知，n 也已知，u 未知但是定值，$r_i$ 也未知</p>
+</blockquote>
+<p>现在很接近了，但是 $l_i$ 不是定值，故还需进一步变形，考虑都往 $l_0$ 上统一，写几项观察一下
+</p>
+$$
+l_1 \equiv al_0+ t_0 \pmod n \\
+l_2 \equiv al_1+ t_1 \equiv a^2l_0+ at_0+t_1 \pmod n\\
+l_3 \equiv al_2+ t_2 \equiv a^3l_0+ a^2t_0+at_1+t_2 \pmod n\\
+$$<p>
+故 $l_{i} \equiv A_il_0 + B_i \pmod n \ \ (i \ge 1)$，(i=0 没意义)，其中
+</p>
+$$
+A_i \equiv a^i \pmod n \\
+B_i \equiv aB_{i-1}+t_{i-1} \pmod n \ \ (i\ge2) \\
+B_1 = t_0
+$$<p>
+OK，现在就可构造标准的 HNP 格了
+</p>
+$$
+(k_1,k_2,...,k_v,l_0,1) \begin{pmatrix}
+n & &  & & &    \\
+ & n & & & &     \\
+& & \ddots & & &\\
+& &  &n & &\\
+A_1&A_2 &\cdots & A_v & 1 & \\
+B_1&B_2 &\cdots & B_v & & K
+\end{pmatrix} = (l_1,l_2,...,l_v,l_0,K)
+$$<p>
+exp，K 取1即可</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">long_to_bytes</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span>  <span class="mi">731111971045863129770849213414583830513204814328949766909151</span>
+</span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span>  <span class="mi">456671883153709362919394459405008275757410555181682705944711</span>
+</span></span><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span>  <span class="mi">666147691257100304060287710111266554526660232037647662561651</span>
+</span></span><span class="line"><span class="cl"><span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="mi">16985619148410545083429542035273917746612</span><span class="p">,</span> <span class="mi">32633736473029292963326093326932585135645</span><span class="p">,</span> <span class="mi">20531875000321097472853248514822638673918</span><span class="p">,</span> <span class="mi">37524613187648387324374487657224279011</span><span class="p">,</span> <span class="mi">21531154020699900519763323600774720747179</span><span class="p">,</span> <span class="mi">1785016578450326289280053428455439687732</span><span class="p">,</span> <span class="mi">15859114177482712954359285501450873939895</span><span class="p">,</span> <span class="mi">10077571899928395052806024133320973530689</span><span class="p">,</span> <span class="mi">30199391683019296398254401666338410561714</span><span class="p">,</span> <span class="mi">21303634014034358798100587236618579995634</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">h</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">output</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">t</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tmp</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span> <span class="o">-</span> <span class="n">h</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">A</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">B</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">B</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">a</span> <span class="o">*</span> <span class="n">B</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">L</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">(</span><span class="n">ZZ</span><span class="p">,</span> <span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+</span></span><span class="line"><span class="cl">    <span class="n">L</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">L</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">L</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="n">L</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">tmp</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">LLL</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">seed</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="n">seed</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># b&#39;Spirit{King__of__LCG_qWq}&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="参考">参考
 </h2><ol>
 <li><a class="link" href="https://hasegawaazusa.github.io/hidden-number-problem.html"  target="_blank" rel="noopener"
     >| 独奏の小屋</a></li>
+<li><a class="link" href="https://xz.aliyun.com/news/15672"  target="_blank" rel="noopener"
+    >crypto之线性同余生成器（lcg)-先知社区</a></li>
 </ol>
 
 </section>
@@ -1008,13 +1175,13 @@ $$<p>
         
         
             <div class="article-image">
-                <img src="/p/%E9%A2%98%E7%9B%AE%E5%88%87%E7%89%87-%E4%B8%80/111.297c53e5f06792c9c9e79d1d3178d79a_hu_b64951ac79210309.png" 
+                <img src="/p/%E9%A2%98%E7%9B%AE%E5%88%87%E7%89%87-%E4%B8%80/111.02b6ea075f2ce475cd31640dc1a71ff7_hu_835091a2f2dc11ec.png" 
                         width="250" 
                         height="150" 
                         loading="lazy"
                         alt="Featured image of post 题目切片-(一)"
                         
-                        data-hash="md5-KXxT5fBnksnJ550dMXjXmg==">
+                        data-hash="md5-ArbqB18s5HXNMWQNwacf9w==">
                 
             </div>
         

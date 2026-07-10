@@ -1,6 +1,6 @@
 +++
 title = "格密码-HNP"
-date = "2026-04-16"
+date = "2026-07-10"
 categories = ["密码学习"]
 
 +++
@@ -438,6 +438,116 @@ for ans in L.BKZ(block_size=36):
 
 总之，这个题只泄露了3bit，构造的格的行列式大小和目标向量的大小关系有点极限，得不断增大 BKZ 的 block_size 才能整出来
 
+### [未知] truncated lcg
+
+三个参数均已知的情况下的截断 LCG 求解，下面讨论高位已知的情况
+
+题目取自 [参考链接2] 先上代码
+
+```python
+from Crypto.Util.number import *
+
+flag = b'Spirit{*****************}'
+plaintext = bytes_to_long(flag)
+length = plaintext.bit_length()
+
+a = getPrime(length)
+b = getPrime(length)
+n = getPrime(length)
+seed = plaintext
+output = []
+for i in range(10):
+    seed = (seed*a+b)%n
+    output.append(seed>>64)
+    
+print("a = ",a)
+print("b = ",b)
+print("n = ",n)
+print("output = ",output)
+```
+
+万物起源
+$$
+s_{i+1} \equiv as_i + b \pmod n
+$$
+改写成高低位的形式 (对应代码，h 代表 output 左移64位之后的结果)
+$$
+h_{i+1} + l_{i+1} \equiv a(h_{i} + l_{i}) + b \pmod n
+$$
+简单移项
+$$
+l_{i+1}\equiv al_i + ah_i + b -h_{i+1} \pmod n
+$$
+已知部分记为 $t_i \equiv ah_i + b -h_{i+1} \pmod n$，则现在的形式为
+$$
+l_{i+1} \equiv al_i + t_i \pmod n
+$$
+
+> HNP 的目标形式是
+> 
+> $r_i = A_i u + B_i \pmod n$
+> 
+> 其中，$A_i$ 和 $B_i$ 均已知，n 也已知，u 未知但是定值，$r_i$ 也未知
+
+现在很接近了，但是 $l_i$ 不是定值，故还需进一步变形，考虑都往 $l_0$ 上统一，写几项观察一下
+$$
+l_1 \equiv al_0+ t_0 \pmod n \\
+l_2 \equiv al_1+ t_1 \equiv a^2l_0+ at_0+t_1 \pmod n\\
+l_3 \equiv al_2+ t_2 \equiv a^3l_0+ a^2t_0+at_1+t_2 \pmod n\\
+$$
+故 $l_{i} \equiv A_il_0 + B_i \pmod n \ \ (i \ge 1)$，(i=0 没意义)，其中
+$$
+A_i \equiv a^i \pmod n \\
+B_i \equiv aB_{i-1}+t_{i-1} \pmod n \ \ (i\ge2) \\
+B_1 = t_0
+$$
+OK，现在就可构造标准的 HNP 格了
+$$
+(k_1,k_2,...,k_v,l_0,1) \begin{pmatrix}
+n & &  & & &    \\
+ & n & & & &     \\
+& & \ddots & & &\\
+& &  &n & &\\
+A_1&A_2 &\cdots & A_v & 1 & \\
+B_1&B_2 &\cdots & B_v & & K
+\end{pmatrix} = (l_1,l_2,...,l_v,l_0,K)
+$$
+exp，K 取1即可
+
+```python
+from Crypto.Util.number import long_to_bytes
+
+a =  731111971045863129770849213414583830513204814328949766909151
+b =  456671883153709362919394459405008275757410555181682705944711
+n =  666147691257100304060287710111266554526660232037647662561651
+output = [16985619148410545083429542035273917746612, 32633736473029292963326093326932585135645, 20531875000321097472853248514822638673918, 37524613187648387324374487657224279011, 21531154020699900519763323600774720747179, 1785016578450326289280053428455439687732, 15859114177482712954359285501450873939895, 10077571899928395052806024133320973530689, 30199391683019296398254401666338410561714, 21303634014034358798100587236618579995634]
+h = [i * pow(2, 64) for i in output]
+l = len(h)
+t, A, B = [], [], []
+for i in range(l - 1):
+    tmp = a * h[i] + b - h[i + 1]
+    t.append(tmp % n)
+for i in range(1, l):
+    A.append(pow(a, i, n))
+B.append(t[0])
+for i in range(1, l - 1):
+    B.append((a * B[-1] + t[i]) % n)
+
+L = matrix(ZZ, l + 1, l + 1)
+for i in range(l - 1):
+    L[i,i] = n
+    L[-2,i] = A[i]
+    L[-1,i] = B[i]
+L[-2,-2] = 1
+L[-1,-1] = 1
+
+tmp = L.LLL()[0][-2] + h[0]
+seed = (tmp - b) * pow(a, -1, n) % n
+print(long_to_bytes(seed))
+# b'Spirit{King__of__LCG_qWq}'
+```
+
 ## 参考 
 
 1. [| 独奏の小屋](https://hasegawaazusa.github.io/hidden-number-problem.html)
+1. [crypto之线性同余生成器（lcg)-先知社区](https://xz.aliyun.com/news/15672)

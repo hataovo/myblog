@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="[SekaiCTF 2026] orbital-strike\rAuthor: Water\nDescription:\nAn orbital strike is an attack directed at a planetary surface from a weapon system stationed in space (orbit).\n轨道打击是指从部署在太空（轨道）中的武器系统向行星表面发起的攻击\n由此题出发，补充一些知识，最后尝试理解该题目的解法\n结式 (resultant)\r结式是代数中用来判断两个多项式是否有公共根的一个量\n设有两个一元多项式 f(x), g(x)，它们的结式记作 Res(f, g)，核心性质是：Res(f, g) = 0 当且仅当 f 和 g 有公共根\n更一般地，如果 $$\rf(x) = a(x - \\alpha_1)(x - \\alpha_2) \\cdots (x - \\alpha_m) \\\\\rg(x) = b(x - \\beta_1)(x - \\beta_2) \\cdots (x - \\beta_n)\r$$ 则记 ">
+<title>orbital-strike</title>
+
+<link rel='canonical' href='http://localhost:1313/p/orbital-strike/'>
+
+<link rel="stylesheet" href="/scss/style.min.4d36f8dc1fd48129e1635deb4b8eb2870fa09474f7280c4cb606d40b2526994b.css"><meta property='og:title' content="orbital-strike">
+<meta property='og:description' content="[SekaiCTF 2026] orbital-strike\rAuthor: Water\nDescription:\nAn orbital strike is an attack directed at a planetary surface from a weapon system stationed in space (orbit).\n轨道打击是指从部署在太空（轨道）中的武器系统向行星表面发起的攻击\n由此题出发，补充一些知识，最后尝试理解该题目的解法\n结式 (resultant)\r结式是代数中用来判断两个多项式是否有公共根的一个量\n设有两个一元多项式 f(x), g(x)，它们的结式记作 Res(f, g)，核心性质是：Res(f, g) = 0 当且仅当 f 和 g 有公共根\n更一般地，如果 $$\rf(x) = a(x - \\alpha_1)(x - \\alpha_2) \\cdots (x - \\alpha_m) \\\\\rg(x) = b(x - \\beta_1)(x - \\beta_2) \\cdots (x - \\beta_n)\r$$ 则记 ">
+<meta property='og:url' content='http://localhost:1313/p/orbital-strike/'>
+<meta property='og:site_name' content='Hata的小屋'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2026-07-10T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-07-10T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:1313/p/orbital-strike/111.png' />
+<meta name="twitter:title" content="orbital-strike">
+<meta name="twitter:description" content="[SekaiCTF 2026] orbital-strike\rAuthor: Water\nDescription:\nAn orbital strike is an attack directed at a planetary surface from a weapon system stationed in space (orbit).\n轨道打击是指从部署在太空（轨道）中的武器系统向行星表面发起的攻击\n由此题出发，补充一些知识，最后尝试理解该题目的解法\n结式 (resultant)\r结式是代数中用来判断两个多项式是否有公共根的一个量\n设有两个一元多项式 f(x), g(x)，它们的结式记作 Res(f, g)，核心性质是：Res(f, g) = 0 当且仅当 f 和 g 有公共根\n更一般地，如果 $$\rf(x) = a(x - \\alpha_1)(x - \\alpha_2) \\cdots (x - \\alpha_m) \\\\\rg(x) = b(x - \\beta_1)(x - \\beta_2) \\cdots (x - \\beta_n)\r$$ 则记 "><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='http://localhost:1313/p/orbital-strike/111.png' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <figure class="site-avatar">
+            <a href="/">
+                
+                
+                
+                
+                <img src="/img/avatar_hu_1f41586fb0ce9a39.png" width="300"
+                    height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                
+            </a>
+            
+            <span class="emoji">🤔</span>
+            
+        </figure>
+        
+        
+
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Hata的小屋</a></h1>
+            <h2 class="site-description">刻舟求剑</h2>
+        </div>
+    </header>
+
+    
+    <ol class="menu-social">
+        
+        <li>
+            <a href="https://github.com/hataovo" target="_blank" title="GitHub" rel="me">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+            </a>
+        </li>
+        
+    </ol>
+    
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+        <li>
+            <a href="/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                <span>主页</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/archives/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                <span>归档</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/categories/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+                <span>分类</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/search/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                <span>搜索</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/links/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                <span>链接</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/about/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                <span>关于</span>
+            </a>
+            </li>
+            
+            
+
+            <li class="menu-bottom-section">
+                <ol class="menu">
+                    
+                    
+
+                    
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                    
+                </ol>
+            </li>
+    </ol>
+</aside>
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#结式-resultant">结式 (resultant)</a></li>
+    <li><a href="#gröbner-基">Gröbner 基</a></li>
+    <li><a href="#正交格">正交格</a></li>
+    <li><a href="#正题">正题</a></li>
+    <li><a href="#总结">总结</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/orbital-strike/">
+                <img src="/p/orbital-strike/111_hu_fe9c5191a45da28.png"
+                        srcset="/p/orbital-strike/111_hu_fe9c5191a45da28.png 800w, /p/orbital-strike/111_hu_b3573fc8351794ae.png 1600w"
+                        width="800" 
+                        height="340" 
+                        loading="lazy"
+                        alt="Featured image of post orbital-strike" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/wp/" style="background-color: #2a9d8f; color: #fff;">
+                WP
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/orbital-strike/">orbital-strike</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2026-07-10T00:00:00Z'>Jul 10, 2026</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="sekaictf-2026-orbital-strike">[SekaiCTF 2026] orbital-strike
+</h1><p>Author: Water</p>
+<p>Description:</p>
+<p>An orbital strike is an attack directed at a planetary surface from a weapon system stationed in space (orbit).</p>
+<blockquote>
+<p>轨道打击是指从部署在太空（轨道）中的武器系统向行星表面发起的攻击</p>
+</blockquote>
+<p>由此题出发，补充一些知识，最后尝试理解该题目的解法</p>
+<h2 id="结式-resultant">结式 (resultant)
+</h2><p>结式是代数中用来判断两个多项式是否有公共根的一个量</p>
+<p>设有两个<strong>一元多项式</strong> f(x), g(x)，它们的结式记作 Res(f, g)，核心性质是：Res(f, g) = 0 当且仅当 f 和 g 有公共根</p>
+<p>更一般地，如果
+</p>
+$$
+f(x) = a(x - \alpha_1)(x - \alpha_2) \cdots (x - \alpha_m) \\
+g(x) = b(x - \beta_1)(x - \beta_2) \cdots (x - \beta_n)
+$$<p>
+则记
+</p>
+$$
+\text{Res}(f, g) = a^n b^m \prod_{i=1}^m \prod_{j=1}^n (\alpha_i - \beta_j)\\
+$$<p>
+所以只要某个 $α_i = β_j$，乘积中就出现 0，结式也就为 0</p>
+<p><strong>二元/多元情况</strong>：最常见的用途是消元，如果有两个方程 f(x, y) = 0 和 g(x, y) = 0</p>
+<p>把它们看成关于 x 的多项式，则 Res_x(f, g) 会消去变量 x，得到只含 y 的式子</p>
+<blockquote>
+<p>例如</p>
+<p>$f(x, y) = x + y$</p>
+<p>$g(x, y) = x^2 - y$</p>
+<p>$Res_x(x + y, x^2 - y) = y^2 - y$</p>
+</blockquote>
+<p>此时 $Res_x(f, g) = 0$，表示存在某个 x，使得 f(x, y) = 0 且 g(x, y) = 0</p>
+<p>注：二元/多元情况其实和一元情况本质上是一样的。无论有多少个变量，选取 f 和 g 中的一个变量作为主元，其他所有变量都视作常数，那么对 f 和 g 做结式就消去了这个主元，只不过得到的结果中实际上仍有其他变量</p>
+<p>使用示例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">p0</span> <span class="o">=</span> <span class="mi">7</span>
+</span></span><span class="line"><span class="cl"><span class="n">q0</span> <span class="o">=</span> <span class="mi">13</span>
+</span></span><span class="line"><span class="cl"><span class="n">N</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">*</span> <span class="n">q0</span>
+</span></span><span class="line"><span class="cl"><span class="n">p_plus_q</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">+</span> <span class="n">q0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">ZZ</span><span class="p">[</span><span class="s1">&#39;x, y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gens</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">f</span> <span class="o">=</span> <span class="n">N</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+</span></span><span class="line"><span class="cl"><span class="n">g</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">-</span> <span class="n">p_plus_q</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">([</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">])</span> <span class="c1"># [-x*y + 91, x + y - 20]</span>
+</span></span><span class="line"><span class="cl"><span class="n">h</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">resultant</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">factor</span><span class="p">(</span><span class="n">h</span><span class="p">)])</span> <span class="c1"># [-x^2 + 20*x - 91, (-1) * (x - 13) * (x - 7)]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<p>计算上，结式通常定义为 Sylvester 矩阵的行列式，设：(x 为主元，其他变量都视作常数)</p>
+$$
+f(x) = a_m x^m + \cdots + a_0 \\ g(x) = b_n x^n + \cdots + b_0
+$$<p>
+其中各系数 $a_i, b_j$ 都取自域 $\mathbb{F}$，且 $a_m b_n \neq 0$</p>
+<p>则<br>
+$$
+\text{Res}(f, g) = \begin{vmatrix}
+a_m &amp; a_{m-1} &amp; \cdots &amp; a_0 &amp; &amp; \</p>
+<p>&amp;\ddots&amp;  &amp;&amp;\ddots&amp;  \
+&amp;&amp;a_m&amp;  a_{m-1}&amp; \cdots &amp; a_0 \
+b_n &amp; b_{n-1} &amp; \cdots &amp; b_0 &amp; &amp; \
+&amp;\ddots&amp;  &amp;&amp;\ddots&amp;  \
+&amp;&amp;b_n&amp;b_{n-1}  &amp; \cdots &amp; b_0
+\end{vmatrix}
+$$
+其中前 n 行都是 $a_i $，后 m 行都是 $b_j $；换言之，结式等于 Sylvester 矩阵的行列式</p>
+<p>例如 m=n=2，那就是
+</p>
+$$
+\begin{vmatrix}
+a_2 & a_1 &a_0 & 0 \\
+0 & a_2 & a_1 &a_0 \\
+b_2 & b_1 & b_0 & 0\\
+0 & b_2 & b_1 & b_0
+\end{vmatrix}
+$$<p>有时候 Sage 内置的 resultant 无法直接计算。这时可以计算 Sylvester 矩阵的行列式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sage.matrix.matrix2</span> <span class="kn">import</span> <span class="n">Matrix</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">resultant</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">Matrix</span><span class="o">.</span><span class="n">determinant</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">sylvester_matrix</span><span class="p">(</span><span class="n">f2</span><span class="p">,</span> <span class="n">var</span><span class="p">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<p>简单记录一点原理</p>
+<blockquote>
+<p>这部分可能不甚严谨，甚至有些问题，笔者并未深入研究学习&hellip;</p>
+</blockquote>
+<p>Sylvester 矩阵实现了这个线性映射：</p>
+<p>$(A,B)\longmapsto A(x)f(x)+B(x)g(x) $    $S\mathbf α = \mathbf β$</p>
+<p>把 (A,B) 的系数排成一个向量，把 (Af+Bg) 的系数也排成一个向量，其中 $\deg A<n,\deg B<m$</p>
+<p>之后，结式的定义就是 Sylvester 矩阵的行列式，Sylvester 矩阵形式如上，一般认为其行列式的值和这部分一开始的那个式子是一样的</p>
+<p>然后可以得出结式的一个基本性质：存在多项式 $A(x),B(x)\in \mathbb Z[x]$，使得 $ A(x)f(x)+B(x)g(x)=\operatorname{Res}(f,g)$</p>
+<p>设 $\deg f=m ,\deg g=n$，考虑所有形如 $A(x)f(x)+B(x)g(x)$ 的多项式，其中 $\deg A<n,\deg B<m$</p>
+<p>写成
+</p>
+$$
+A(x)=u_0+u_1x+\cdots+u_{n-1}x^{n-1}\\
+ B(x)=v_0+v_1x+\cdots+v_{m-1}x^{m-1} \\
+ Af+Bg = c_0+c_1x+\cdots +c_{m+n-1}x^{m+n-1}
+$$<p>
+那么 $A(x)f(x)+B(x)g(x)$ 的次数小于等于 m+n-1，所以它有 m+n 个系数，由上可写出
+$$
+S \begin{pmatrix}
+u_0\
+\vdots \
+u_{n-1} \
+v_0 \
+\vdots \
+v_{m-1}
+\end{pmatrix} =  \begin{pmatrix}
+c_0\
+c_1 \</p>
+<p>\vdots \
+c_{m+n-1}
+\end{pmatrix}
+$$
+现在用伴随矩阵公式 $S\operatorname{adj}(S)=\det(S)I$</p>
+<p>可得 $S\operatorname{adj}(S)=\operatorname{Res}(f,g)I$，进一步有：
+</p>
+$$
+S\cdot \bigl(\operatorname{adj}(S)\text{ 的第一列}\bigr)
+=\operatorname{Res}(f,g)
+\begin{pmatrix}
+1\\
+0\\
+\vdots \\
+0
+\end{pmatrix}
+$$<p>
+此时把 adj(S) 的第一列当作 ui,vj 系数向量 α，得到的结果就是
+</p>
+$$
+S\mathbf \alpha = \begin{pmatrix}
+\operatorname{Res}(f,g)\\
+0\\
+0\\
+\vdots \\
+0
+\end{pmatrix}
+$$<p>
+右边这个向量代表的是零次多项式 Res(f, g) (常数)</p>
+<p>换言之，找到了 u0,&hellip;,v0,&hellip; 使得 $ A(x)f(x)+B(x)g(x)=\operatorname{Res}(f,g)$</p>
+<hr>
+<p>上面讨提到的都是整数上的多项式，下面介绍一个结论：</p>
+<p>如果两个整数多项式在模 p 下有共同根，那么它们的 resultant 会被 p 整除</p>
+<p>即：设 $f(x),g(x)\in \mathbb{Z}[x]$，如果存在某个 $a\in \mathbb{F}_p$ 使得 $f(a)\equiv 0 \pmod p\ \text{and} \ g(a)\equiv 0 \pmod p $</p>
+<p>那么 $p\mid \operatorname{Res}(f,g)$，也就是说 $\operatorname{Res}(f,g)\equiv 0 \pmod p$</p>
+<p>**简单证明：**由上知：存在多项式 $A(x),B(x)\in \mathbb Z[x]$，使得 $ A(x)f(x)+B(x)g(x)=\operatorname{Res}(f,g)$</p>
+<p>代入 x=a，并且模 p 可得
+</p>
+$$
+A(a)f(a)+B(a)g(a)\equiv \operatorname{Res}(f,g) \pmod p
+$$<p>
+进而
+</p>
+$$
+\operatorname{Res}(f,g) \equiv  0\pmod p
+$$<h2 id="gröbner-基">Gröbner 基
+</h2><p>早期的时候经常会看到 Gröbner基 和 结式，但是分不清楚，故顺带学习一下</p>
+<p>给一组多项式 $f_1, f_2, ..., f_s$，它们生成一个理想 $I = \langle f_1, f_2, ..., f_s\rangle$</p>
+<p>Gröbner 基就是同一个理想 I 的另一组生成元 $G = \langle g_1, g_2, ..., g_t\rangle$，具有更好的性质</p>
+<p>同样的，其可以用于求解方程组</p>
+<p>一个简单的示例，取自 [参考链接2]：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">getPrime</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span> <span class="n">getPrime</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">N</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+</span></span><span class="line"><span class="cl"><span class="n">m1</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="sa">b</span><span class="s2">&#34;flag{12345678901234567890&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">m2</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="sa">b</span><span class="s2">&#34;1234567890123456789012345&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">m3</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="sa">b</span><span class="s2">&#34;6789012345678901234567890}&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">e</span> <span class="o">=</span> <span class="mi">17</span>
+</span></span><span class="line"><span class="cl"><span class="n">c1</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">c2</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">m2</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">c3</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">m3</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span> <span class="o">=</span> <span class="n">m1</span> <span class="o">+</span> <span class="n">m2</span> <span class="o">+</span> <span class="n">m3</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>相当于给了四个式子
+</p>
+$$
+x^{17} - c_1 = 0 \pmod n \\
+y^{17} - c_2 = 0 \pmod n \\
+z^{17} - c_3 = 0 \pmod n \\
+x+y+z-s = 0 \pmod n
+$$<p>
+使用 Gröbner 基可以方便地求解此方程组</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">PR</span><span class="o">.&lt;</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">PolynomialRing</span><span class="p">(</span><span class="n">Zmod</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">F</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">^</span><span class="n">e</span> <span class="o">-</span> <span class="n">c1</span><span class="p">,</span> <span class="n">y</span><span class="o">^</span><span class="n">e</span> <span class="o">-</span> <span class="n">c2</span><span class="p">,</span> <span class="n">z</span><span class="o">^</span><span class="n">e</span> <span class="o">-</span> <span class="n">c3</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span> <span class="o">-</span> <span class="n">s</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">ideal</span> <span class="o">=</span> <span class="n">Ideal</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">I</span> <span class="o">=</span> <span class="n">ideal</span><span class="o">.</span><span class="n">groebner_basis</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">I</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>输出是这样的，相当于已经给出了方程组的解</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[x + 7832285201038728889673203618495806191666048217814099430080392419727684801164668651566065865955482611011945758945490948806579242177121949932113062087139615,
+</span></span><span class="line"><span class="cl">y + 7832285201038728889673203618495806191666048217814099430080392419727684801164668651566065865955816723984891498394975865395498844303963237973082573844096538,
+</span></span><span class="line"><span class="cl">z + 7832285201038728889673203618495806191666048217814099430080392419727684801164668651566065865869004259291738399089780207942786853960904670546825494315641298]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>后续</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">x</span><span class="o">.</span><span class="n">constant_coefficient</span><span class="p">()</span> <span class="o">%</span> <span class="n">N</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">I</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">+</span> <span class="n">long_to_bytes</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">+</span> <span class="n">long_to_bytes</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<p>简单来说：结式通常处理两个多项式，消去一个变量</p>
+<p>而 Gröbner 基更通用，可以处理多个多项式，多个变量</p>
+<h2 id="正交格">正交格
+</h2><p>首先又需要提到矩阵的四个子空间，设 A 是 m*n 的矩阵，r(A) = r</p>
+<p>列空间：$b=Ax$ 即列向量的线性组合，秩为 r</p>
+<p>行空间：$b=xA$ 即行向量的线性组合，秩为 r</p>
+<p>零空间：$Ax=0$，秩为 n-r</p>
+<p>左零空间：$xA=0$，秩为 m-r</p>
+<p>零空间的向量是列向量，又其秩为 n-r，故应当是一个 n*(n-r) 的矩阵</p>
+<p>左零空间的向量是列向量，又其秩为 m-r，故应当是一个 (m-r)*m 的矩阵</p>
+<hr>
+<p>正交性：</p>
+<p>行空间的向量和零空间的向量正交</p>
+<p>列空间的向量和左零空间的向量正交</p>
+<p>简单证明一下：行空间的向量 x，形状 1*n；零空间的向量 y，形状 n*1</p>
+<p>$x\cdot y = c\cdot A \cdot y = c\cdot (A \cdot y) = c\cdot \vec{0} = 0$</p>
+<p>另一个类似</p>
+<hr>
+<p>正交格怎么用，以 [参考链接4] 中的一个题为例，这里截取核心部分</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">m</span> <span class="o">=</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="mi">16</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="n">random_prime</span><span class="p">(</span><span class="mi">2</span><span class="o">^</span><span class="mi">512</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">A</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">(</span><span class="n">ZZ</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="p">[</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="n">n</span><span class="p">)])</span>
+</span></span><span class="line"><span class="cl"><span class="n">alpha</span> <span class="o">=</span> <span class="n">vector</span><span class="p">(</span><span class="n">Zmod</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="p">[</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)])</span>
+</span></span><span class="line"><span class="cl"><span class="n">B</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">A</span>
+</span></span><span class="line"><span class="cl"><span class="n">key</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">LLL</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">c</span> <span class="o">=</span> <span class="o">...</span> <span class="c1"># AES key 加密 flag</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># p, B, c 已知</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个题构造的等式
+</p>
+$$
+B_{1\times 16} = a_{1\times 8}\cdot A_{8\times 16}
+$$<p>
+只有 B 是已知的，A 是一个小矩阵，要把 A.LLL()[0] 恢复出来</p>
+<p>若能找到矩阵 M 使得 $AM=0$，由最开始，M 应当是 n*(n-r)，即 16*8 (随机生成的 A 大概率满秩)
+</p>
+$$
+BM = aAM = \vec{0}
+$$<p>
+那大概思路就是：先求 M，然后求 M 的左零空间</p>
+<p><strong>第一步：求 M</strong></p>
+<p>可以用格来求 M，按照一般习惯，对行向量规约，故转置一下 $M^TB^T = \vec{0}$</p>
+<p>上面虽然写的都是等号，但实际上都是在模 p 下进行的，故
+</p>
+$$
+(m_0,m_1,...,m_{15},k)\begin{pmatrix}
+I_{16\times 16}& B^T \\
+0& p
+\end{pmatrix} = (m_0,m_1,...,m_{15},0)
+$$<p>
+对于 $M^T$ 的每一个行向量，都满足这个关系，故可在格内寻找目标向量，这里采用规约的方法找到</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">B</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">(</span><span class="n">ZZ</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">B</span><span class="o">.</span><span class="n">list</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl"><span class="n">L</span> <span class="o">=</span> <span class="n">block_matrix</span><span class="p">([[</span><span class="n">identity_matrix</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span> <span class="n">B</span><span class="o">.</span><span class="n">T</span><span class="p">],</span> <span class="p">[</span><span class="n">matrix</span><span class="o">.</span><span class="n">zero</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">p</span><span class="p">]])</span>
+</span></span><span class="line"><span class="cl"><span class="n">MT</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">L</span><span class="o">.</span><span class="n">LLL</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">MT</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">MT</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">(</span><span class="n">ZZ</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">MT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">A</span> <span class="o">*</span> <span class="n">MT</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="c1"># 验证</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">[0 0 0 0 0 0 0 0]
+</span></span></span><span class="line"><span class="cl"><span class="s1">[0 0 0 0 0 0 0 0]
+</span></span></span><span class="line"><span class="cl"><span class="s1">[0 0 0 0 0 0 0 0]
+</span></span></span><span class="line"><span class="cl"><span class="s1">[0 0 0 0 0 0 0 0]
+</span></span></span><span class="line"><span class="cl"><span class="s1">[0 0 0 0 0 0 0 0]
+</span></span></span><span class="line"><span class="cl"><span class="s1">[0 0 0 0 0 0 0 0]
+</span></span></span><span class="line"><span class="cl"><span class="s1">[0 0 0 0 0 0 0 0]
+</span></span></span><span class="line"><span class="cl"><span class="s1">[0 0 0 0 0 0 0 0]
+</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>第二步：求 M 的左零空间</strong></p>
+<p>直接调用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">M</span> <span class="o">=</span> <span class="n">MT</span><span class="o">.</span><span class="n">T</span>
+</span></span><span class="line"><span class="cl"><span class="n">A1</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">left_kernel_matrix</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但是这里求出的 A1 并非所有元素都在 [-8, 8] 之间，不过 A 和 A1 都是 M 的左零空间的一组基，而 A.LLL() 之后得到的还是一组基，故大概是可以在 A1 或者 A1.LLL() 中找到题目要求的那个 A.LLL()[0] 的，(需要在A1 或者 A1.LLL() 中遍历，并且考虑反向量，甚至一些小的线性组合) <del>虽然也有可能完全找不到</del></p>
+<p>(当然，也可再用格去求解，和第一步类似，[参考链接4] 中有，这里就不写了)</p>
+<hr>
+<p>再区分一下：(以零空间为例)</p>
+<p><code>M.right_kernel()</code> 返回的是零空间对象</p>
+<p><code>M.right_kernel().basis_matrix()</code> 把这个零空间对象的基取出来，变成一个矩阵</p>
+<p><code>M.right_kernel_matrix()</code> 直接返回一个矩阵，矩阵的每一行是一组零空间基向量</p>
+<p>后面两个的效果基本上是一样的。值得注意的是：零空间的向量一般理解就是列向量，但是两种写法得到的结果均是把零空间的基向量当作行向量存进去的，后面乘的时候需要转置一下</p>
+<hr>
+<p>总之，目前粗浅地理解正交格似乎就是在零空间/左零空间上做文章</p>
+<h2 id="正题">正题
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">getPrime</span><span class="p">,</span> <span class="n">getRandomRange</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">AES</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.Padding</span> <span class="kn">import</span> <span class="n">pad</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">FLAG</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;flag.txt&#39;</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">lcg</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span> <span class="k">yield</span> <span class="p">(</span><span class="n">x</span> <span class="o">:=</span> <span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="nb">next</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">P</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">getPrime</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span> <span class="n">getPrime</span><span class="p">(</span><span class="mh">0x137</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">X</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="n">getRandomRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">P</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">p</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># what&#39;s better than one lcg? TWO lcgs!</span>
+</span></span><span class="line"><span class="cl"><span class="n">moons</span> <span class="o">=</span> <span class="n">lcg</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="nb">iter</span><span class="p">([</span><span class="n">b</span><span class="p">]</span><span class="o">*</span><span class="mi">14</span><span class="p">),</span><span class="n">p</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">planets</span> <span class="o">=</span> <span class="n">lcg</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">moons</span><span class="p">,</span><span class="n">P</span><span class="p">,</span><span class="n">X</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">orbit</span> <span class="o">=</span> <span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="n">planets</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl"><span class="n">star</span> <span class="o">=</span> <span class="n">AES</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span><span class="n">AES</span><span class="o">.</span><span class="n">MODE_ECB</span><span class="p">)</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pad</span><span class="p">(</span><span class="n">FLAG</span><span class="p">,</span><span class="mi">16</span><span class="p">))</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">orbit</span> <span class="si">= }</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">star</span> <span class="si">= }</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>构造了一个嵌套 lcg</p>
+<p>moons：内层，参数：a, b, p, init=B；都是311bit数量级</p>
+<p>planets/orbit：外层，参数：A, moons, P, init=X；A, P, X 都是256bit数量级</p>
+<p>特点是外层的模数更小，而且 lcg 参数 &lsquo;b&rsquo; 是变化的，是内层 lcg 的输出；两个 lcg 所有参数均未知，只有外层 lcg 的14个输出，任务是恢复外层初始状态 X</p>
+<hr>
+<p>**第一步：**先进行一些简单的推导与变形</p>
+<p>记外层输出为 y，内层输出为 s
+</p>
+$$
+y_i = Ay_{i-1} + s_i \pmod P \\
+s_i = as_{i-1} + b \pmod p
+$$<p>
+内层差分
+</p>
+$$
+s_i - s_{i-1} = a(s_{i-1}-s_{i-2}) \pmod p \\
+t_i = at_{i-1} \pmod p
+$$<p>
+外层差分
+</p>
+$$
+y_i - y_{i-1} = A(y_{i-1}-y_{i-2}) + (s_i - s_{i-1}) \pmod P \\
+r_i = Ar_{i-1} + t_i \pmod P
+$$<p>
+有
+</p>
+$$
+t_i = r_i -Ar_{i-1} + k_i P
+$$<p>
+**第二步：**恢复内层的 a 和 p</p>
+<p>假设我们得到了若干个与 t 正交的向量 v，有
+</p>
+$$
+\mathbf{v} \cdot \mathbf{t} = 0 \\
+\sum_i v_it_i=0 \\
+\sum_i v_ia^it_c\equiv 0 \pmod p \\
+\sum_i v_ia^i \equiv 0 \pmod p \ (t_c \not\equiv 0 \pmod p)
+$$<p>
+知道 $\mathbf{v}$ 之后可以得到一个多项式，并且这个多项式在模 p 意义下以 a 为根；因此，我们可以取3个这样的多项式，计算两组不同的结式 resultant。它们都会是 p 的倍数，之后对这些结式做 gcd，可以恢复 p，进而恢复 a</p>
+<p>但是现在 t 是未知的，能用的只有外层的差分 r
+</p>
+$$
+t_i= r_i - Ar_{i-1} \pmod P
+$$<p>
+如果 $\mathbf v$ 同时正交于两个相邻的 r 的切片，那么其就会和 t 也正交，比如后面用的
+</p>
+$$
+v\cdot(r_0,\dots,r_{10})=0\\
+v\cdot(r_1,\dots,r_{11})=0\\
+v\cdot(r_2,\dots,r_{12})=0\\
+$$<p>
+这时需要用到 <strong>Stern&rsquo;s Attack</strong>，其意思大概是</p>
+<p>这些对<strong>截断序列</strong>成立的正交关系，很可能也对完整隐藏序列 t 在模 p 下成立，也就是 $\mathbf{v} \cdot \mathbf{t} = 0$</p>
+<p>故可以找
+</p>
+$$
+Y = \begin{pmatrix}
+r_0 & r_1 & \cdots & r_{10}\\
+r_1 & r_2 & \cdots & r_{11}\\
+r_2 & r_3 & \cdots & r_{12}
+\end{pmatrix}
+$$<p>
+的零空间 <code>rkm</code>，然后 LLL 一下，(用 LLL 从已知部分的正交关系里找出同时也正交于完整 t 的短向量)</p>
+<p>虽然这里实测 <code>Y.right_kernel_matrix().LLL() == Y.right_kernel_matrix()</code></p>
+<p>注：Y.right_kernel_matrix() 会给出 8 个基向量，但这 8 个向量只是满足和3个 r 的切片正交，我们真正想要的是同时也正交于隐藏的 t 切片的向量，其有两个对应切片，所以额外多了两个隐藏约束
+</p>
+$$
+v\cdot (t_1,\dots,t_{11})=0 \\
+v\cdot (t_2,\dots,t_{12})=0
+$$<p>
+因此真正有用的 Stern 子格维度大约是：8-2=6</p>
+<p>所以：<code>rkm = Y.right_kernel_matrix().LLL()[:-2]</code></p>
+<p>**第三步：**恢复内层差分序列 t</p>
+<p>直白的想法是，有 $\mathbf{v} \cdot \mathbf{t} = 0$ 之后，再找 v 的零空间恢复出 t，但是由于 t 太大，这里行不通</p>
+<p>前面得到的 <code>rkm</code> 每一行是长度 11 的向量 $ v=(v_0,\dots,v_{10})$</p>
+<p>因为 Y 取了三段 r，而如果 v 同时正交于相邻两段 r，就能推出它正交于一段 t，故现在有
+</p>
+$$
+v\cdot(t_1,\dots,t_{11})=0 \\
+v\cdot(t_2,\dots,t_{12})=0
+$$<p>
+所以 <code>rkm</code> 的每一行其实给了两个滑动窗口约束，为了把这两条约束写成对同一个向量的方程，就要补 0：
+</p>
+$$
+(v_0,\dots,v_{10},0)\cdot(t_1,\dots,t_{11},t_{12})=0 \\
+(0,v_0,\dots,v_{10})\cdot(t_1,t_2,\dots,t_{12})=0
+$$<p>
+如果不补0，直接把 <code>rkm</code> 拿过来的话，相当于对同一个 <strong>v</strong> 只进行了一条约束，最后大概率找不到结果 (也就是第三步一开始说的情况)</p>
+<p>把所有的 <strong>v</strong> 按上面所说排成矩阵 M，找其零空间的基 B，代码中为 <code>rkm2</code>
+</p>
+$$
+M =\begin{bmatrix}
+0 & v_{00} & v_{01} & \cdots & v_{0n} \\
+v_{00} & v_{01} & v_{02} & \cdots & 0 \\
+0 & v_{10} & v_{11} & \cdots & v_{1n} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+v_{m0} & v_{m1} & v_{m2} & \cdots & 0
+\end{bmatrix}
+$$<p>
+rkm2 中有3个向量，每一行都是一个长度12的向量，张成候选空间 $\langle \text{rkm2}_0,\text{rkm2}_1,\text{rkm2}_2\rangle$</p>
+<p>这个空间里包含：$(r_0,r_1,...,r_{11}),\ (r_1,r_2,...,r_{12}),\ (t_1,t_2,...,t_{12})$</p>
+<p>则真实的 $(t_1,t_2,\dots,t_{12})$ 可表示为 $\mathbf t = uB$，但此时还不能唯一确定 t，因为零空间里可能有很多候选向量，于是要利用：内层差分 t 是模 p 下的等比数列
+</p>
+$$
+\mathbf t \equiv c\cdot(1,a,a^2,\dots,a^{11}) \equiv cw \pmod p
+$$<p>
+因为 $t=uB$，并且 $t\equiv c w\pmod p $，所以存在某个 (u,c)，使得 $uB - cw \equiv 0\pmod p $
+</p>
+$$
+M = \begin{pmatrix}
+B\\
+\mathbf w
+\end{pmatrix}
+$$<p>
+也就是要找他的左零空间，然后找到 u，计算 uB 就恢复了 t</p>
+<p>**注：**代码中求出 rkm2 之后还做了一步缩放，(虽然实际上缩放系数 k=1)</p>
+<p><code>rkm2.solve_left(r[1:])</code> 是在求 $c \cdot rkm2 = (r_1,r_2,...,r_{12})$</p>
+<p>满足 $(r_1,r_2,...,r_{12}) = c_0B_0+c_1B_1+c_2B_2$</p>
+<p>进行 <code>k = ZZ(rkm2.solve_left(r[1:])[2]); rkm2 *= k</code>，使得 $(r_1,r_2,...,r_{12}) = c_0'B_0'+c_1'B_1'+1\cdot B_2'$</p>
+<p>后续 <code>M = rkm2[::-1]</code> 将 $B_2'$ 放到了最前面，然后 <code>left_kernel_matrix()</code> 通常会把第一个非零系数归一成1，所以如果坐标已经是 1，就更容易直接得到正确比例的左核向量</p>
+<p>总之，这一步是为了确保已知参考向量 $(r_1,r_2,...,r_{12})$ 在 <code>rkm2</code> 基下的最后一个坐标被归一化为 1</p>
+<blockquote>
+<p>摘自 author wp</p>
+<p>One more thing to note is that because we find orthogonal vectors with LLL, <code>B.solve_left(y)[-1] == B.solve_left(x)[-1] == +- 1</code>. Additionally, when we find the last orthogonal basis (i.e. when finding <strong>u</strong>), the <strong>first</strong> entry is always equal to 1 (never −1). I&rsquo;m not sure why LLL does this, but we can just accept it as a fact and manage our indices/polarity properly.</p>
+</blockquote>
+<p><code>B.solve_left(y)[-1] == B.solve_left(x)[-1] == +- 1</code> (这里的 r 就是 y，t 就是 x)，也就是说二者对应的最后一个基分量的系数都是 1 或 -1 (x应当是作者本地验证的)；并且一个经验/事实是，求出左零空间后第一个分量总会是 1，结合这两条性质，调整顺序后恢复出来的直接就是 t</p>
+<p>我也试了下别的顺序确实没法直接弄出来，感觉这里应当是一些技巧罢，有点玄学</p>
+<p>**第四步：**恢复外层的 A 和 P</p>
+<p>到这里就简单了
+</p>
+$$
+r_i = Ar_{i-1} + t_i \pmod P \\
+r_{i+1} = Ar_{i} + t_{i+1} \pmod P\\
+(r_i - t_i)r_{i-1}^{-1} \equiv (r_{i+1} - t_{i+1})r_{i}^{-1} \pmod P \\
+(r_i - t_i)r_i \equiv (r_{i+1} - t_{i+1})r_{i-1} \pmod P
+$$<p> {(r_i - t_i)}
+取两组数据 gcd 一下恢复 P，最后代回去恢复 A (<strong>注意公式下标和实际索引略有差异</strong>)</p>
+<p>最后倒恢复 X
+</p>
+$$
+r_0 \equiv y_0 - y_{-1} \pmod P \\
+X \equiv y_{-1} \equiv y_0 - r_0 \pmod P
+$$<p>
+另一方面
+</p>
+$$
+y_1 - y_{0} = A(y_{0}-y_{-1}) + (s_1 - s_{0}) \mod P \\
+$$<p>
+<code>t[0]</code> 放的是 s[2]-s[1]，故 <code>t[-1]</code> 应当是 s[1]-s[0]，而 $t[0] \equiv at[-1] \pmod p$，代码中兼顾了 t[-1] 为正和为负的两种情况 (例如是 p-7，当正数处理就直接算；当 -7 处理，需要减去 p；最终结果是前者)</p>
+<p>代入即可求得 $y_{-1}$</p>
+<hr>
+<p>完整 exp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">AES</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">orbit</span> <span class="o">=</span> <span class="p">[</span><span class="mi">46157012221654917396851254347154820393060391878580715960476654689260395468184</span><span class="p">,</span> <span class="mi">36926194633341127588542680684095293820802193681748458943524916140809713523560</span><span class="p">,</span> <span class="mi">16005201943847263206512436577001283414470030273089746675203830598137794555134</span><span class="p">,</span> <span class="mi">28937919714389596084610407023450127584695575606301484773390370819366639643218</span><span class="p">,</span> <span class="mi">11459012353705334109041842799942754581703065868230253271729711591416155557180</span><span class="p">,</span> <span class="mi">31030059279554219046464541926833857543445131889728181065565033726460506326840</span><span class="p">,</span> <span class="mi">20987315604501021667042879662101693092441980938033961081037347214532349371248</span><span class="p">,</span> <span class="mi">76741461130245451493723909055453557280102065396647043801270629949855565452326</span><span class="p">,</span> <span class="mi">84258885183671683674472390974667571532577240974449641001706593550302243268268</span><span class="p">,</span> <span class="mi">59535034089467707172052245359810812420431903279354584714432674122159502991956</span><span class="p">,</span> <span class="mi">7115679899033391144975170596669540596311296590450661546000723388170577963715</span><span class="p">,</span> <span class="mi">35572951991838484594163260879328705523576344587262461128887804475450813563036</span><span class="p">,</span> <span class="mi">85569022704397114858282741078883377190544624744955636482627379979792474136036</span><span class="p">,</span> <span class="mi">5047270986830280372910174287287823507537624765267582560460157826800286170460</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">star</span> <span class="o">=</span> <span class="s1">&#39;1664ff83cbca2643b357bcdc8c3d6e1548615a18cec73e734a82e163b32a9b0c367c61bab01140a04ac8eda8b007d1d6&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">r</span> <span class="o">=</span> <span class="n">vector</span><span class="p">(</span><span class="n">orbit</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span> <span class="n">vector</span><span class="p">(</span><span class="n">orbit</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Y</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">(</span><span class="n">ZZ</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">vector</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">11</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">rkm</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">right_kernel_matrix</span><span class="p">()</span><span class="o">.</span><span class="n">LLL</span><span class="p">()[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">R</span><span class="o">.&lt;</span><span class="n">x</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">PolynomialRing</span><span class="p">(</span><span class="n">ZZ</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">poly0</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">rkm</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">11</span><span class="p">)])</span>
+</span></span><span class="line"><span class="cl"><span class="n">poly1</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">rkm</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">11</span><span class="p">)])</span>
+</span></span><span class="line"><span class="cl"><span class="n">poly2</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">rkm</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">11</span><span class="p">)])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">res0</span> <span class="o">=</span> <span class="n">poly0</span><span class="o">.</span><span class="n">resultant</span><span class="p">(</span><span class="n">poly1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">res1</span> <span class="o">=</span> <span class="n">poly1</span><span class="o">.</span><span class="n">resultant</span><span class="p">(</span><span class="n">poly2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="n">gcd</span><span class="p">(</span><span class="n">res0</span><span class="p">,</span><span class="n">res1</span><span class="p">)</span><span class="o">.</span><span class="n">factor</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">poly0</span> <span class="o">=</span> <span class="n">poly0</span><span class="o">.</span><span class="n">change_ring</span><span class="p">(</span><span class="n">GF</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">poly1</span> <span class="o">=</span> <span class="n">poly1</span><span class="o">.</span><span class="n">change_ring</span><span class="p">(</span><span class="n">GF</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span> <span class="n">gcd</span><span class="p">(</span><span class="n">poly0</span><span class="p">,</span><span class="n">poly1</span><span class="p">)</span><span class="o">.</span><span class="n">roots</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">M</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rkm</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">M</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">matrix</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="n">row</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">M</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">matrix</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">+</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl"><span class="n">rkm2</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">right_kernel_matrix</span><span class="p">()</span><span class="o">.</span><span class="n">LLL</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">k</span> <span class="o">=</span> <span class="n">ZZ</span><span class="p">(</span><span class="n">rkm2</span><span class="o">.</span><span class="n">solve_left</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">:])[</span><span class="mi">2</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">rkm2</span> <span class="o">*=</span> <span class="n">k</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">M</span> <span class="o">=</span> <span class="n">rkm2</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">vector</span><span class="p">(</span><span class="n">a</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl"><span class="n">t</span> <span class="o">=</span> <span class="n">vector</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">left_kernel_matrix</span><span class="p">()[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">lift_centered</span><span class="p">()</span><span class="o">*</span><span class="n">rkm2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">gcd_a</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">-</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">gcd_b</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">-</span><span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">-</span><span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">P</span> <span class="o">=</span> <span class="n">gcd</span><span class="p">(</span><span class="n">gcd_a</span><span class="p">,</span><span class="n">gcd_b</span><span class="p">)</span><span class="o">.</span><span class="n">factor</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">A</span> <span class="o">=</span> <span class="n">mod</span><span class="p">((</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">P</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">X</span> <span class="o">=</span> <span class="n">orbit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">mod</span><span class="p">(</span><span class="n">ZZ</span><span class="p">(</span><span class="n">mod</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">a</span><span class="p">,</span><span class="n">p</span><span class="p">))</span><span class="o">-</span><span class="n">p</span><span class="p">,</span><span class="n">P</span><span class="p">))</span><span class="o">/</span><span class="n">A</span>
+</span></span><span class="line"><span class="cl"><span class="n">flag</span> <span class="o">=</span> <span class="n">AES</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(),</span><span class="n">AES</span><span class="o">.</span><span class="n">MODE_ECB</span><span class="p">)</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span><span class="n">star</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="o">.</span><span class="n">isascii</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">X</span> <span class="o">=</span> <span class="n">orbit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">mod</span><span class="p">(</span><span class="n">mod</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">a</span><span class="p">,</span><span class="n">p</span><span class="p">),</span><span class="n">P</span><span class="p">))</span><span class="o">/</span><span class="n">A</span>
+</span></span><span class="line"><span class="cl">    <span class="n">flag</span> <span class="o">=</span> <span class="n">AES</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(),</span><span class="n">AES</span><span class="o">.</span><span class="n">MODE_ECB</span><span class="p">)</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span><span class="n">star</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">flag</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># SEKAI{orbital_strike_like_miku_miku_beam!!!}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="总结">总结
+</h2><p>这个题以我的水平来说还是太难了，感觉需要正交格这块玩的很6才行，虽然目前也没有完全理解掌握吧，还有一些地方比较模糊，但还是学到不少东西。未来仍需继续努力，夯实基本功 :smirk_cat:</p>
+<h2 id="参考">参考
+</h2><ol>
+<li><a class="link" href="https://zhuanlan.zhihu.com/p/674151864"  target="_blank" rel="noopener"
+    >入门向]结式在CTF Crypto中的应用 - 知乎</a></li>
+<li><a class="link" href="https://xz.aliyun.com/news/17347"  target="_blank" rel="noopener"
+    >Gröbner 基学习与CTF题目实践应用-先知社区</a></li>
+<li><a class="link" href="https://tover.xyz/p/HSSP-note/"  target="_blank" rel="noopener"
+    >HSSP与正交格学习笔记 | Tover&rsquo;s Blog</a></li>
+<li><a class="link" href="https://suhanhan-cpu.github.io/2024/12/25/%e6%ad%a3%e4%ba%a4%e6%a0%bc/"  target="_blank" rel="noopener"
+    >正交格 - suhanhan的博客</a></li>
+<li><a class="link" href="https://shuizhuimiaoman.github.io/#/sekaictf-2026-author-writeup"  target="_blank" rel="noopener"
+    >Water&rsquo;s Blog official writeup</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2025 - 
+        
+        2026 hata
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.884460734613d5e85247b63e1915405c54071b98eccd53eda431ec100faee589.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
