@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Something about Security Proofs\rPreface\nThese days, I&rsquo;m reading the classic book Introduction to Modern Cryptography for some reasons. I have learned a lot of concepts that I didn&rsquo;t know before. What&rsquo;s more, it&rsquo;s my first time to try to read an English book(not English textbook), as a result, maybe my English standard will be better. This is also my first time to try to write a EN blog, as you can see, my word levels are very low, like a primary school student.(huh, I will try my best to avoid spelling and grammatical mistakes.)\n">
+<title>Something about Security Proofs</title>
+
+<link rel='canonical' href='http://localhost:1313/p/something-about-security-proofs/'>
+
+<link rel="stylesheet" href="/scss/style.min.4d36f8dc1fd48129e1635deb4b8eb2870fa09474f7280c4cb606d40b2526994b.css"><meta property='og:title' content="Something about Security Proofs">
+<meta property='og:description' content="Something about Security Proofs\rPreface\nThese days, I&rsquo;m reading the classic book Introduction to Modern Cryptography for some reasons. I have learned a lot of concepts that I didn&rsquo;t know before. What&rsquo;s more, it&rsquo;s my first time to try to read an English book(not English textbook), as a result, maybe my English standard will be better. This is also my first time to try to write a EN blog, as you can see, my word levels are very low, like a primary school student.(huh, I will try my best to avoid spelling and grammatical mistakes.)\n">
+<meta property='og:url' content='http://localhost:1313/p/something-about-security-proofs/'>
+<meta property='og:site_name' content='Hata的小屋'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2026-08-02T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-08-02T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="Something about Security Proofs">
+<meta name="twitter:description" content="Something about Security Proofs\rPreface\nThese days, I&rsquo;m reading the classic book Introduction to Modern Cryptography for some reasons. I have learned a lot of concepts that I didn&rsquo;t know before. What&rsquo;s more, it&rsquo;s my first time to try to read an English book(not English textbook), as a result, maybe my English standard will be better. This is also my first time to try to write a EN blog, as you can see, my word levels are very low, like a primary school student.(huh, I will try my best to avoid spelling and grammatical mistakes.)\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <figure class="site-avatar">
+            <a href="/">
+                
+                
+                
+                
+                <img src="/img/avatar_hu_1f41586fb0ce9a39.png" width="300"
+                    height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                
+            </a>
+            
+            <span class="emoji">🤔</span>
+            
+        </figure>
+        
+        
+
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Hata的小屋</a></h1>
+            <h2 class="site-description">刻舟求剑</h2>
+        </div>
+    </header>
+
+    
+    <ol class="menu-social">
+        
+        <li>
+            <a href="https://github.com/hataovo" target="_blank" title="GitHub" rel="me">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+            </a>
+        </li>
+        
+    </ol>
+    
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+            
+        
+        
+        <li>
+            <a href="/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                <span>主页</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/archives/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                <span>归档</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/categories/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+                <span>分类</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/search/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                <span>搜索</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/links/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                <span>链接</span>
+            </a>
+            </li>
+            
+            
+        
+        
+        <li>
+            <a href="/about/">
+                
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                <span>关于</span>
+            </a>
+            </li>
+            
+            
+
+            <li class="menu-bottom-section">
+                <ol class="menu">
+                    
+                    
+
+                    
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                    
+                </ol>
+            </li>
+    </ol>
+</aside>
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#motivation">Motivation</a></li>
+    <li><a href="#proofs-by-reduction">Proofs by Reduction</a></li>
+    <li><a href="#example-1">Example 1</a></li>
+    <li><a href="#example-2">Example 2</a></li>
+    <li><a href="#example-3">Example 3</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AF%86%E7%A0%81%E5%AD%A6%E4%B9%A0/" style="background-color: #2a9d8f; color: #fff;">
+                密码学习
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/something-about-security-proofs/">Something about Security Proofs</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2026-08-02T00:00:00Z'>Aug 02, 2026</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 10 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="something-about-security-proofs">Something about Security Proofs
+</h1><p><strong>Preface</strong></p>
+<p>These days, I&rsquo;m reading the classic book <em>Introduction to Modern Cryptography</em> for some reasons. I have learned a lot of concepts that I didn&rsquo;t know before. What&rsquo;s more, it&rsquo;s my first time to try to read an English book(not English textbook), as a result, maybe my English standard will be better. This is also my first time to try to write a EN blog, as you can see, my word levels are very low, like a primary school student.(huh, I will try my best to avoid spelling and grammatical mistakes.)</p>
+<h2 id="motivation">Motivation
+</h2><p>There are three important principles of modern cryptography, namely: <strong>formal definitions</strong>, <strong>precise assumptions</strong>, and <strong>proofs of security</strong>. This article focuses on the third principle: proofs of security.</p>
+<p>A proof of security is always relative to the definition being considered and the assumptions being used. (But I will not talk detailed things about the first two principles here.) Proofs of security give a guarantee that no attacker will succeed. Obviously, proofs need to be rigorous, I will show some examples to demonstrate this.</p>
+<p>Talk about to proof, we may not be strange. In junior/senior math studies, we are always asked to prove some theorem. But proofs in cryptography, give me a feeling like some proofs in discrete math, like, the theorem looks right intuitively, however, the formal proofs takes a significant amount of space.</p>
+<p>Besides proving directly, a general method is <strong>proofs by reduction</strong> (which is famous). I will give the concept of it and some proof examples as the remaining content of this article.</p>
+<h2 id="proofs-by-reduction">Proofs by Reduction
+</h2><p>If we want to prove a given construction is computationally secure, (unless the scheme is information-theoretically secure), we must rely on unproven assumptions. The main idea is to prove that the given construction based on the problem/primitive is secure as long as our initial assumption is correct, since the problem is hard or the low-level cryptographic primitive is secure.</p>
+<p>A proof that some cryptographic construction $\Pi$ is secure as long as some underlying problem $X$ is hard. We need present a explicit <strong>reduction</strong> showing that how to transform any efficient adversary $A$ that succeeds in breaking $\Pi$ into an efficient algorithm $A'$ that solves $X$.</p>
+<p>A proof by reduction usually has 4 steps:</p>
+<ol>
+<li>
+<p>Fix some efficient adversary A attacking $\Pi$. Denote this adversary&rsquo;s success probability by $\varepsilon(n)$.</p>
+</li>
+<li>
+<p>Construct an efficient algorithm $A'$ that attempts to solve problem $X$ by using $A$ as a subroutine. An important point here is that $A'$ knows nothing about how $A$ works, the only thing $A'$ knows is that $A$ is expecting to attack $\Pi$. So, given some input instance x of problem $X$, our algorithm $A'$ will simulate for $A$ an instance of $\Pi$ such that:</p>
+<p>(a) As far as $A$ can tell, it is interacting with $\Pi$.</p>
+<p>(b) When $A$ succeeds in breaking the instance of $\Pi$ that is being simulated by $A'$, this should allow $A'$ to solve the instance x it was given, at least with inverse polynomial probability $1/p(n)$.</p>
+</li>
+<li>
+<p>Taken together, the above imply that $A'$ solves $X$ with probability $\varepsilon(n)/p(n)$. Now, if $\varepsilon(n)$ isn&rsquo;t negligible then neither is $\varepsilon(n)/p(n)$. Moreover, if $A$ is efficient then we obtain an efficient algorithm $A'$ solving $X$ with non-negligible probability, contradicting our initial assumption.</p>
+</li>
+<li>
+<p>Given our assumption regarding $X$, we conclude that no efficient adversary $A$ can succeed in breaking $\Pi$ with non-negligible probability. Stated differently, $\Pi$ is computationally secure.</p>
+</li>
+</ol>
+<p><img src="/p/something-about-security-proofs/1.png"
+	width="767"
+	height="452"
+	srcset="/p/something-about-security-proofs/1_hu_93e5c5c73b412aa3.png 480w, /p/something-about-security-proofs/1_hu_d4a62effe074a457.png 1024w"
+	loading="lazy"
+	
+		alt="1"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="169"
+		data-flex-basis="407px"
+	
+></p>
+<p>This figure shows the idea: Construct an efficient algorithm $A'$ that attempts to solve problem $X$ by using $A$ as a <strong>subroutine</strong>.</p>
+<h2 id="example-1">Example 1
+</h2><p><strong>Theorem</strong></p>
+<p>Let $\Pi=(\text{Enc},\text{Dec})$ be a fixed-length private-key encryption scheme for messages of length l that is EAV-secure. Then for all PPT adversaries A and $i \in \{1,...,l\}$, there is a negligible function negl such that
+</p>
+$$
+\Pr\left[
+\mathcal{A}\left(1^n,\operatorname{Enc}_k(m)\right)=m^i
+\right]
+\leq
+\frac{1}{2}+\operatorname{negl}(n)
+$$<p>
+where the probability is taken over uniform $m \in \{0,1\}^l$ and $k \in \{0,1\}^n$, the randomness of A, and the randomness of Enc.</p>
+<p><strong>Proof</strong></p>
+<p>The theorem above means that if A can determine the i-th bit of m from Enc(m) (namely, A violates the equation above), then we can use A to construct A‘ that can break scheme $\Pi$.</p>
+<p>Let $I_0 \subset \{0,1\}^l$ be the set of all strings whose i-th bit is 0, and $I_1 \subset \{0,1\}^l$ be the set of all strings whose i-th bit is 1.</p>
+<p>Then, we can construct <strong>Adversary</strong> $A'(1^n)$:</p>
+<ol>
+<li>Choose uniform $m_0 \in I_0$ and $m_1\in I_1$. Output $m_0, m_1$.</li>
+<li>Upon observing a ciphertext c, invoke $A(1^n, c)$. If A outputs 0, output b&rsquo;=0; otherwise, output b&rsquo;=1.</li>
+</ol>
+<p>So, we can compute
+</p>
+$$
+\begin{aligned}
+&\Pr[\text{PrivK}_{A',\Pi}^{\text{eav}}(n)=1] \\
+&= \Pr[\mathcal{A}\left(1^n,\text{Enc}_k(m_b)\right)=b] \\
+&= \frac{1}{2}\Pr\nolimits_{m_0\leftarrow I_0}[\mathcal{A}\left(1^n,\text{Enc}_k(m_0)\right)=0]+ \frac{1}{2}\Pr\nolimits_{m_1\leftarrow I_1}[\mathcal{A}\left(1^n,\text{Enc}_k(m_1)\right)=1]\\
+&= \Pr[\mathcal{A}\left(1^n,\text{Enc}_k(m)\right)=m^i]
+\end{aligned}
+$$<p>
+Since $\Pi$ is EAV-secure, thus
+</p>
+$$
+\Pr[\text{PrivK}_{A',\Pi}^{\text{eav}}(n)=1] \leq \frac{1}{2} + \text{negl}(n)
+$$<p>
+then can conclude
+</p>
+$$
+\Pr[\mathcal{A}\left(1^n,\operatorname{Enc}_k(m)\right)=m^i]\leq \frac{1}{2} + \text{negl}(n)
+$$<p>
+Now, we reach our target.</p>
+<h2 id="example-2">Example 2
+</h2><p><strong>Theorem</strong></p>
+<p>If G is a pseudorandom generator, then construction below is an EAV-secure, fixed-length private-key encryption scheme for messages of length $l(n)$.</p>
+<p><strong>Construction</strong></p>
+<p>Let G be a pseudorandom generator with expansion factor $l(n)$. Define a fixed-length private-key encryption scheme for messages of length $l(n)$ as follows:</p>
+<ul>
+<li>Gen: on input $1^n$, choose uniform $k \in \{0,1\}^n$ and output it as the key.</li>
+<li>Enc: on input a key $k \in \{0,1\}^n$ and a message $m \in \{0,1\}^{l(n)}$, output the ciphertext</li>
+</ul>
+$$
+c :=  G(k) \oplus m
+$$<ul>
+<li>Dec: on input a key $k \in \{0,1\}^n$ and a ciphertext $c \in \{0,1\}^{l(n)}$, output the message</li>
+</ul>
+$$
+m := G(k) \oplus c
+$$<p><strong>Proof</strong></p>
+<p>First, recall the definition of EAV-secure, which is also our final target here. Namely:</p>
+<p>For any probabilistic polynomial-time adversary A there is a negligible function negl such that
+</p>
+$$
+\text{Pr}[\text{PrivK}_{A,\Pi}^\text{eav}(n)=1] \leq \frac{1}{2} + \text{negl}(n)
+$$<p>
+The main idea is that: if a uniform pad replaces the pseudorandom pad G(k), then the scheme will be identical to the one-time pad encryption scheme and the probability A guesses correctly will be 1/2.</p>
+<p>Then, we need to do reduction. The method is use A to construct a distinguisher D, then D can distinguish the output of G from a uniform string because of the ability of A (here, D is the role A&rsquo; we talked above). D outputs 1 means A succeeds and D guesses that w comes from G. In detail:</p>
+<p><strong>Distinguisher D:</strong> D is given as input a string $w \in \{0,1\}^{l(n)}$</p>
+<ol>
+<li>Run $A(1^n)$ to obtain a pair of messages $m_0,m_1 \in \{0,1\}^{l(n)}$</li>
+<li>Choose a uniform bit $b \in {0,1}$. Set $c :=  w \oplus m_b$</li>
+<li>Give c to A and obtain output b&rsquo;. Output 1 if b&rsquo;=b, and output 0 otherwise.</li>
+</ol>
+<p>Then, we define a modified encryption scheme $\widetilde{\Pi}=(\widetilde{\mathsf{Gen}},\widetilde{\mathsf{Enc}},\widetilde{\mathsf{Dec}})$ that is exactly one-time pad encryption scheme (except append a security parameter). That is $\widetilde{\mathsf{Gen}}$ outputs a uniform key k of length $l(n)$, then $\widetilde{\mathsf{Enc}}$ and $\widetilde{\mathsf{Dec}}$ use the k. Perfect secrecy of the one-time pad implies
+</p>
+$$
+\text{Pr}[\text{PrivK}_{A,\widetilde{\Pi}}^\text{eav}(n)=1] = \frac{1}{2}
+$$<p>
+Then, there are two cases:</p>
+<ol>
+<li>If w is chosen uniformly from $\{0,1\}^{l(n)}$, then A is given a ciphertext $c :=  w \oplus m_b$ where w is uniform. Since D outputs 1 exactly when A succeeds in its eav-experiment, we therefore have</li>
+</ol>
+$$
+\Pr\nolimits_{w\leftarrow\{0,1\}^{\ell(n)}}
+\left[D(w)=1\right]= \Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{eav}}(n)=1
+\right]
+=\frac{1}{2}
+$$<ol start="2">
+<li>if w is generated by choosing uniform $k \in \{0,1\}^n$ and then w=G(k), then A is given a ciphertext $c :=  w \oplus m_b$ where w=G(k), we therefore have</li>
+</ol>
+$$
+\Pr\nolimits_{k\leftarrow\{0,1\}^{n}}
+\left[D(G(k))=1\right]=
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{eav}}(n)=1
+\right]
+$$<p>Since G is a pseudorandom generator, there is a negligible function negl such that
+</p>
+$$
+\left | \Pr\nolimits_{k\leftarrow\{0,1\}^{n}}
+\left[D(G(k))=1\right]- \Pr\nolimits_{w\leftarrow\{0,1\}^{\ell(n)}} \left[D(w)=1\right]\right | \leq \operatorname{negl}(n)
+$$<p>
+then, we have
+</p>
+$$
+\left | \Pr\left[\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{eav}}(n)=1\right] - \frac{1}{2} \right |
+\leq \operatorname{negl}(n)
+$$<p>
+this implies
+</p>
+$$
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{eav}}(n)=1
+\right] \leq
+\frac{1}{2}+\operatorname{negl}(n)
+$$<p>
+Since A was an arbitrary PPT adversary, this completes the proof that $\Pi$ is EAV-secure.</p>
+<blockquote>
+<p>Note that, although it feels like we should use proof by contradiction, but in fact, we just use A to construct A&rsquo;, and find some equations (the relation between A and A&rsquo;), then use the assumption, finally we complete the proof.</p>
+<p>I mean that we don&rsquo;t need to truly suppose A can break $\Pi$, namely, don&rsquo;t need to violate the target equation. At least that&rsquo;s the case in these two examples. Nevertheless, proof by contradiction is also feasible just with some difference in the final section.</p>
+</blockquote>
+<h2 id="example-3">Example 3
+</h2><p><strong>Theorem</strong></p>
+<p>If F is a pseudorandom function, then construction below is a CPA-secure, fixed-length private-key encryption scheme for messages of length $n$.</p>
+<p><strong>Construction</strong></p>
+<p>Let F be a pseudorandom function. Define a fixed-length private-key encryption scheme for messages of length n as follows:</p>
+<ul>
+<li>Gen: on input $1^n$, choose uniform $k \in \{0,1\}^n$ and output it.</li>
+<li>Enc: on input a key $k \in \{0,1\}^n$ and a message $m \in \{0,1\}^{n}$, choose uniform $r\in\{0,1\}^n$ and output the ciphertext</li>
+</ul>
+$$
+c :=\langle r, F_k(r)\oplus m \rangle
+$$<ul>
+<li>Dec: on input a key $k \in \{0,1\}^n$ and a ciphertext $c =\langle r, s \rangle$, output the message</li>
+</ul>
+$$
+m := F_k(r)\oplus s
+$$<p><strong>Proof</strong></p>
+<p>Similar to example 2, we define a modified encryption scheme $\widetilde{\Pi}=(\widetilde{\mathsf{Gen}},\widetilde{\mathsf{Enc}},\widetilde{\mathsf{Dec}})$ that a random function f takes the place of $F_k$.</p>
+<p>Fix an arbitrary PPT adversary A, and let q(n) be an upper bound on the number of queries that $A(1^n)$ makes to its encryption oracle. (q is upper-bounded by some polynomial)</p>
+<p>We use A to construct a distinguisher D. D is given oracle access to a function O, its goal is to determine whether O is pseudorandom or random. D simulates experiment $\text{PrivK}^\text{cpa}$ for A, and observes A succeeds or not. If A succeeds then D guesses O must be a pseudorandom function, whereas A doesn&rsquo;t succeed then D guesses O must be a random function.</p>
+<p><strong>Distinguisher D</strong>: D is given input $1^n$ and access to an oracle O: $\{0,1\}^n \rightarrow \{0,1\}^n$</p>
+<ol>
+<li>Run $A(1^n)$. Whenever A queries its encryption oracle on a message $m \in \{0,1\}^n$, answer this query in the following way:
+<ol>
+<li>Choose uniform $r\in \{0,1\}^n$</li>
+<li>Query O(r) and obtain response y</li>
+<li>Return the ciphertext $\langle r, y\oplus m \rangle$ to A</li>
+</ol>
+</li>
+<li>When A outputs messages $m_0,m_1 \in \{0,1\}^n$, choose a uniform bit $b \in \{0,1\}$ and then:
+<ol>
+<li>Choose uniform $r \in \{0,1\}^n$</li>
+<li>Query O(r) and obtain response y</li>
+<li>Return the ciphertext $\langle r, y\oplus m_b \rangle$ to A</li>
+</ol>
+</li>
+<li>Continue answering encryption-oracle queries of A as before until A outputs a bit b&rsquo;. Output 1 if b&rsquo;=b, and 0 otherwise.</li>
+</ol>
+<p>Then, we need to find relations between the two as follows:</p>
+<ol>
+<li>If D&rsquo;s oracle is a pseudorandom function, we have</li>
+</ol>
+$$
+\Pr\nolimits_{k\leftarrow\{0,1\}^{n}}
+\left[
+D^{F_k(\mathord{\cdot})}(1^n)=1
+\right]
+= \Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{cpa}}(n)=1
+\right]
+$$<ol start="2">
+<li>If D&rsquo;s oracle is a random function, we have</li>
+</ol>
+$$
+\Pr\nolimits_{f\leftarrow\mathrm{Func}_n}
+\left[
+D^{f(\mathord{\cdot})}(1^n)=1
+\right]
+= \Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)=1
+\right]
+$$<p>Since the assumption that F is a pseudorandom function, we have
+</p>
+$$
+\left | \Pr\left[ D^{F_k(\mathord{\cdot})}(1^n)=1 \right]- 
+\Pr\left[D^{f(\mathord{\cdot})}(1^n)=1 \right] 
+\right | \leq \operatorname{negl}(n)
+$$<p>
+Combining the above equations, we have
+</p>
+$$
+\left |
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{cpa}}(n)=1
+\right] -
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)=1
+\right]
+\right |
+\leq
+\operatorname{negl}(n)
+$$<p>
+Our goal is something about the left Pr, so next thing we need to do is compute the right one.</p>
+<p>Every time a message m is encrypted in $\text{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)$ (either by the encryption oracle $\langle r, f(r)\oplus m \rangle$ or when the challenge ciphertext is computed $\langle r^*, f(r^*)\oplus m_b \rangle$), due to the r is chosen uniformly, there are 2 possibilities:</p>
+<ol>
+<li>The value $r^*$ is never appeared in queries. In this case, the probability A outputs b&rsquo;=b is exactly 1/2</li>
+<li>The value $r^*$ is used when answering at least one of A&rsquo;s queries. In this case, A can easily determine which message is encrypted. However, since A makes at most q(n) queries to its encryption oracle. The probability of this case is at most $q(n)/2^n$</li>
+</ol>
+<p>Let <strong>repeat</strong> denote the event that $r^*$ is used by the encryption oracle when answering at least one of A&rsquo;s queries. Therefore:
+</p>
+$$
+\begin{aligned}
+&\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)=1
+\right]
+\\
+&=
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)=1
+\land \mathsf{repeat}
+\right]
++
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)=1
+\land \overline{\mathsf{repeat}}
+\right]
+\\
+&\leq
+\Pr\left[\mathsf{repeat}\right]
++
+\Pr\left[
+\left.
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)=1
+\,\right|\,
+\overline{\mathsf{repeat}}
+\right]
+\\
+&\leq
+\frac{q(n)}{2^n}+\frac{1}{2}
+\end{aligned}
+$$<p>
+Finally, we conclude that
+</p>
+$$
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{cpa}}(n)=1
+\right] \leq \frac{1}{2} + \frac{q(n)}{2^n}+ \text{negl}(n)
+$$<p>
+Since q(n) is polynomial, $q(n)/2^n$ is negligible, and the sum of 2 negligible functions is negligible, namely
+</p>
+$$
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{cpa}}(n)=1
+\right] \leq \frac{1}{2}+ \text{negl}'(n)
+$$<blockquote>
+<p>I think the core and difficult part of proof is to construct the distinguisher D and find the probability equations.</p>
+</blockquote>
+<h2 id="conclusion">Conclusion
+</h2><p>I introduce the concept of proofs by reduction and give 3 examples to show the detail construct. These three are classic examples. Maybe I will append more interesting proof examples in the future.</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/%E6%A0%BC%E5%AF%86%E7%A0%81-hnp/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">格密码-HNP</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E9%A2%98%E7%9B%AE%E5%88%87%E7%89%87-%E4%B8%80/">
+        
+        
+            <div class="article-image">
+                <img src="/p/%E9%A2%98%E7%9B%AE%E5%88%87%E7%89%87-%E4%B8%80/111.02b6ea075f2ce475cd31640dc1a71ff7_hu_835091a2f2dc11ec.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 题目切片-(一)"
+                        
+                        data-hash="md5-ArbqB18s5HXNMWQNwacf9w==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">题目切片-(一)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/zkps-%E4%BA%8C/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">ZKPS-(二)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/zkps-%E4%B8%80/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">ZKPS-(一)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/%E6%A0%BC%E5%AF%86%E7%A0%81-lwe/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">格密码-LWE</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2025 - 
+        
+        2026 hata
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.884460734613d5e85247b63e1915405c54071b98eccd53eda431ec100faee589.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

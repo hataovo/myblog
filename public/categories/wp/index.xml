@@ -126,11 +126,10 @@ $$&lt;p&gt;有时候 Sage 内置的 resultant 无法直接计算。这时可以�
 &lt;/blockquote&gt;
 &lt;p&gt;Sylvester 矩阵实现了这个线性映射：&lt;/p&gt;
 &lt;p&gt;$(A,B)\longmapsto A(x)f(x)+B(x)g(x) $    $S\mathbf α = \mathbf β$&lt;/p&gt;
-&lt;p&gt;把 (A,B) 的系数排成一个向量，把 (Af+Bg) 的系数也排成一个向量，其中&lt;/p&gt;
-&lt;p&gt;$\deg A&lt;n,\deg B&lt;m$&lt;/p&gt;
+&lt;p&gt;把 (A,B) 的系数排成一个向量，把 (Af+Bg) 的系数也排成一个向量，其中 deg(A)&amp;lt;n, deg(B)&amp;lt;m&lt;/p&gt;
 &lt;p&gt;之后，结式的定义就是 Sylvester 矩阵的行列式，Sylvester 矩阵形式如上，一般认为其行列式的值和这部分一开始的那个式子是一样的&lt;/p&gt;
 &lt;p&gt;然后可以得出结式的一个基本性质：存在多项式 $A(x),B(x)\in \mathbb Z[x]$，使得 $ A(x)f(x)+B(x)g(x)=\operatorname{Res}(f,g)$&lt;/p&gt;
-&lt;p&gt;设 $\deg f=m ,\deg g=n$，考虑所有形如 $A(x)f(x)+B(x)g(x)$ 的多项式，其中 $\deg A&lt;n,\deg B&lt;m$&lt;/p&gt;
+&lt;p&gt;设 $\deg f=m ,\deg g=n$，考虑所有形如 $A(x)f(x)+B(x)g(x)$ 的多项式，其中 deg(A)&amp;lt;n, deg(B)&amp;lt;m&lt;/p&gt;
 &lt;p&gt;写成
 &lt;/p&gt;
 $$

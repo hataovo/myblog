@@ -7,7 +7,333 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>hata</copyright>
-        <lastBuildDate>Fri, 10 Jul 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sun, 02 Aug 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Something about Security Proofs</title>
+        <link>http://localhost:1313/p/something-about-security-proofs/</link>
+        <pubDate>Sun, 02 Aug 2026 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/p/something-about-security-proofs/</guid>
+        <description>&lt;h1 id=&#34;something-about-security-proofs&#34;&gt;Something about Security Proofs
+&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;Preface&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;These days, I&amp;rsquo;m reading the classic book &lt;em&gt;Introduction to Modern Cryptography&lt;/em&gt; for some reasons. I have learned a lot of concepts that I didn&amp;rsquo;t know before. What&amp;rsquo;s more, it&amp;rsquo;s my first time to try to read an English book(not English textbook), as a result, maybe my English standard will be better. This is also my first time to try to write a EN blog, as you can see, my word levels are very low, like a primary school student.(huh, I will try my best to avoid spelling and grammatical mistakes.)&lt;/p&gt;
+&lt;h2 id=&#34;motivation&#34;&gt;Motivation
+&lt;/h2&gt;&lt;p&gt;There are three important principles of modern cryptography, namely: &lt;strong&gt;formal definitions&lt;/strong&gt;, &lt;strong&gt;precise assumptions&lt;/strong&gt;, and &lt;strong&gt;proofs of security&lt;/strong&gt;. This article focuses on the third principle: proofs of security.&lt;/p&gt;
+&lt;p&gt;A proof of security is always relative to the definition being considered and the assumptions being used. (But I will not talk detailed things about the first two principles here.) Proofs of security give a guarantee that no attacker will succeed. Obviously, proofs need to be rigorous, I will show some examples to demonstrate this.&lt;/p&gt;
+&lt;p&gt;Talk about to proof, we may not be strange. In junior/senior math studies, we are always asked to prove some theorem. But proofs in cryptography, give me a feeling like some proofs in discrete math, like, the theorem looks right intuitively, however, the formal proofs takes a significant amount of space.&lt;/p&gt;
+&lt;p&gt;Besides proving directly, a general method is &lt;strong&gt;proofs by reduction&lt;/strong&gt; (which is famous). I will give the concept of it and some proof examples as the remaining content of this article.&lt;/p&gt;
+&lt;h2 id=&#34;proofs-by-reduction&#34;&gt;Proofs by Reduction
+&lt;/h2&gt;&lt;p&gt;If we want to prove a given construction is computationally secure, (unless the scheme is information-theoretically secure), we must rely on unproven assumptions. The main idea is to prove that the given construction based on the problem/primitive is secure as long as our initial assumption is correct, since the problem is hard or the low-level cryptographic primitive is secure.&lt;/p&gt;
+&lt;p&gt;A proof that some cryptographic construction $\Pi$ is secure as long as some underlying problem $X$ is hard. We need present a explicit &lt;strong&gt;reduction&lt;/strong&gt; showing that how to transform any efficient adversary $A$ that succeeds in breaking $\Pi$ into an efficient algorithm $A&#39;$ that solves $X$.&lt;/p&gt;
+&lt;p&gt;A proof by reduction usually has 4 steps:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Fix some efficient adversary A attacking $\Pi$. Denote this adversary&amp;rsquo;s success probability by $\varepsilon(n)$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Construct an efficient algorithm $A&#39;$ that attempts to solve problem $X$ by using $A$ as a subroutine. An important point here is that $A&#39;$ knows nothing about how $A$ works, the only thing $A&#39;$ knows is that $A$ is expecting to attack $\Pi$. So, given some input instance x of problem $X$, our algorithm $A&#39;$ will simulate for $A$ an instance of $\Pi$ such that:&lt;/p&gt;
+&lt;p&gt;(a) As far as $A$ can tell, it is interacting with $\Pi$.&lt;/p&gt;
+&lt;p&gt;(b) When $A$ succeeds in breaking the instance of $\Pi$ that is being simulated by $A&#39;$, this should allow $A&#39;$ to solve the instance x it was given, at least with inverse polynomial probability $1/p(n)$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Taken together, the above imply that $A&#39;$ solves $X$ with probability $\varepsilon(n)/p(n)$. Now, if $\varepsilon(n)$ isn&amp;rsquo;t negligible then neither is $\varepsilon(n)/p(n)$. Moreover, if $A$ is efficient then we obtain an efficient algorithm $A&#39;$ solving $X$ with non-negligible probability, contradicting our initial assumption.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Given our assumption regarding $X$, we conclude that no efficient adversary $A$ can succeed in breaking $\Pi$ with non-negligible probability. Stated differently, $\Pi$ is computationally secure.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/1.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;This figure shows the idea: Construct an efficient algorithm $A&#39;$ that attempts to solve problem $X$ by using $A$ as a &lt;strong&gt;subroutine&lt;/strong&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;example-1&#34;&gt;Example 1
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Theorem&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Let $\Pi=(\text{Enc},\text{Dec})$ be a fixed-length private-key encryption scheme for messages of length l that is EAV-secure. Then for all PPT adversaries A and $i \in {1,...,l}$, there is a negligible function negl such that
+&lt;/p&gt;
+$$
+\Pr\left[
+\mathcal{A}\left(1^n,\operatorname{Enc}_k(m)\right)=m^i
+\right]
+\leq
+\frac{1}{2}+\operatorname{negl}(n)
+$$&lt;p&gt;
+where the probability is taken over uniform $m \in \{0,1\}^l$ and $k \in \{0,1\}^n$, the randomness of A, and the randomness of Enc.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Proof&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The theorem above means that if A can determine the i-th bit of m from Enc(m) (namely, A violates the equation above), then we can use A to construct A‘ that can break scheme $\Pi$.&lt;/p&gt;
+&lt;p&gt;Let $I_0 \subset \{0,1\}^l$ be the set of all strings whose i-th bit is 0, and $I_1 \subset \{0,1\}^l$ be the set of all strings whose i-th bit is 1.&lt;/p&gt;
+&lt;p&gt;Then, we can construct &lt;strong&gt;Adversary&lt;/strong&gt; $A&#39;(1^n)$:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Choose uniform $m_0 \in I_0$ and $m_1\in I_1$. Output $m_0, m_1$.&lt;/li&gt;
+&lt;li&gt;Upon observing a ciphertext c, invoke $A(1^n, c)$. If A outputs 0, output b&amp;rsquo;=0; otherwise, output b&amp;rsquo;=1.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So, we can compute
+$$
+\begin{aligned}
+&amp;amp;\Pr[\text{PrivK}_{A&amp;rsquo;,\Pi}^{\text{eav}}(n)=1] \
+&amp;amp;= \Pr[\mathcal{A}\left(1^n,\operatorname{Enc}&lt;em&gt;k(m_b)\right)=b] \
+&amp;amp;= \frac{1}{2}\Pr\nolimits&lt;/em&gt;{m_0\leftarrow I_0}[\mathcal{A}\left(1^n,\operatorname{Enc}_k(m_0)\right)=0]&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;\frac{1}{2}\Pr\nolimits_{m_1\leftarrow I_1}[\mathcal{A}\left(1^n,\operatorname{Enc}_k(m_1)\right)=1]\
+&amp;amp;= \Pr[\mathcal{A}\left(1^n,\operatorname{Enc}&lt;em&gt;k(m)\right)=m^i]
+\end{aligned}
+$$
+Since $\Pi$ is EAV-secure, thus
+$$
+\Pr[\text{PrivK}&lt;/em&gt;{A&amp;rsquo;,\Pi}^{\text{eav}}(n)=1] \leq \frac{1}{2} + \text{negl}(n)
+$$
+then can conclude
+$$
+\Pr[\mathcal{A}\left(1^n,\operatorname{Enc}_k(m)\right)=m^i]\leq \frac{1}{2} + \text{negl}(n)
+$$
+Now, we reach our target.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;example-2&#34;&gt;Example 2
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Theorem&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;If G is a pseudorandom generator, then construction below is an EAV-secure, fixed-length private-key encryption scheme for messages of length $l(n)$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Construction&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Let G be a pseudorandom generator with expansion factor $l(n)$. Define a fixed-length private-key encryption scheme for messages of length $l(n)$ as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Gen: on input $1^n$, choose uniform $k \in \{0,1\}^n$ and output it as the key.&lt;/li&gt;
+&lt;li&gt;Enc: on input a key $k \in \{0,1\}^n$ and a message $m \in \{0,1\}^{l(n)}$, output the ciphertext&lt;/li&gt;
+&lt;/ul&gt;
+$$
+c :=  G(k) \oplus m
+$$&lt;ul&gt;
+&lt;li&gt;Dec: on input a key $k \in \{0,1\}^n$ and a ciphertext $c \in \{0,1\}^{l(n)}$, output the message&lt;/li&gt;
+&lt;/ul&gt;
+$$
+m := G(k) \oplus c
+$$&lt;p&gt;&lt;strong&gt;Proof&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;First, recall the definition of EAV-secure, which is also our final target here. Namely:&lt;/p&gt;
+&lt;p&gt;For any probabilistic polynomial-time adversary A there is a negligible function negl such that
+&lt;/p&gt;
+$$
+\text{Pr}[\text{PrivK}_{A,\Pi}^\text{eav}(n)=1] \leq \frac{1}{2} + \text{negl}(n)
+$$&lt;p&gt;
+The main idea is that: if a uniform pad replaces the pseudorandom pad G(k), then the scheme will be identical to the one-time pad encryption scheme and the probability A guesses correctly will be 1/2.&lt;/p&gt;
+&lt;p&gt;Then, we need to do reduction. The method is use A to construct a distinguisher D, then D can distinguish the output of G from a uniform string because of the ability of A (here, D is the role A&amp;rsquo; we talked above). D outputs 1 means A succeeds and D guesses that w comes from G. In detail:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Distinguisher D:&lt;/strong&gt; D is given as input a string $w \in \{0,1\}^{l(n)}$&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Run $A(1^n)$ to obtain a pair of messages $m_0,m_1 \in \{0,1\}^{l(n)}$&lt;/li&gt;
+&lt;li&gt;Choose a uniform bit $b \in {0,1}$. Set $c :=  w \oplus m_b$&lt;/li&gt;
+&lt;li&gt;Give c to A and obtain output b&amp;rsquo;. Output 1 if b&amp;rsquo;=b, and output 0 otherwise.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Then, we define a modified encryption scheme $\widetilde{\Pi}=(\widetilde{\mathsf{Gen}},\widetilde{\mathsf{Enc}},\widetilde{\mathsf{Dec}})$ that is exactly one-time pad encryption scheme (except append a security parameter). That is $\widetilde{\mathsf{Gen}}$ outputs a uniform key k of length $l(n)$, then $\widetilde{\mathsf{Enc}}$ and $\widetilde{\mathsf{Dec}}$ use the k. Perfect secrecy of the one-time pad implies
+&lt;/p&gt;
+$$
+\text{Pr}[\text{PrivK}_{A,\widetilde{\Pi}}^\text{eav}(n)=1] = \frac{1}{2}
+$$&lt;p&gt;
+Then, there are two cases:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;If w is chosen uniformly from $\{0,1\}^{l(n)}$, then A is given a ciphertext $c :=  w \oplus m_b$ where w is uniform. Since D outputs 1 exactly when A succeeds in its eav-experiment, we therefore have&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;right&#34;&gt;$$
+\Pr\nolimits_{w\leftarrow{0,1}^{\ell(n)}}
+\left[D(w)=1\right]=
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{eav}}(n)=1
+\right]
+&lt;/h1&gt;&lt;p&gt;\frac{1}{2}
+$$&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;if w is generated by choosing uniform $k \in \{0,1\}^n$ and then w=G(k), then A is given a ciphertext $c :=  w \oplus m_b$ where w=G(k), we therefore have&lt;/li&gt;
+&lt;/ol&gt;
+$$
+\Pr\nolimits_{k\leftarrow\{0,1\}^{n}}
+\left[D(G(k))=1\right]=
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{eav}}(n)=1
+\right]
+$$&lt;h2 id=&#34;leftdgk1right&#34;&gt;Since G is a pseudorandom generator, there is a negligible function negl such that
+$$
+\left|
+\Pr\nolimits_{k\leftarrow{0,1}^{n}}
+\left[D(G(k))=1\right]
+&lt;/h2&gt;&lt;h2 id=&#34;right-1&#34;&gt;\Pr\nolimits_{w\leftarrow{0,1}^{\ell(n)}}
+\left[D(w)=1\right]
+\right|
+\leq
+\operatorname{negl}(n)
+$$
+then, we have
+$$
+\left|
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{eav}}(n)=1
+\right]
+&lt;/h2&gt;&lt;p&gt;\frac{1}{2}
+\right|
+\leq
+\operatorname{negl}(n)
+&lt;/p&gt;
+$$
+this implies 
+$$&lt;p&gt;
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{eav}}(n)=1
+\right] \leq
+\frac{1}{2}+\operatorname{negl}(n)
+$$
+Since A was an arbitrary PPT adversary, this completes the proof that $\Pi$ is EAV-secure.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Note that, although it feels like we should use proof by contradiction, but in fact, we just use A to construct A&amp;rsquo;, and find some equations (the relation between A and A&amp;rsquo;), then use the assumption, finally we complete the proof.&lt;/p&gt;
+&lt;p&gt;I mean that we don&amp;rsquo;t need to truly suppose A can break $\Pi$, namely, don&amp;rsquo;t need to violate the target equation. At least that&amp;rsquo;s the case in these two examples. Nevertheless, proof by contradiction is also feasible just with some difference in the final section.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;example-3&#34;&gt;Example 3
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Theorem&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;If F is a pseudorandom function, then construction below is a CPA-secure, fixed-length private-key encryption scheme for messages of length $n$.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Construction&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Let F be a pseudorandom function. Define a fixed-length private-key encryption scheme for messages of length n as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Gen: on input $1^n$, choose uniform $k \in \{0,1\}^n$ and output it.&lt;/li&gt;
+&lt;li&gt;Enc: on input a key $k \in \{0,1\}^n$ and a message $m \in \{0,1\}^{n}$, choose uniform $r\in\{0,1\}^n$ and output the ciphertext&lt;/li&gt;
+&lt;/ul&gt;
+$$
+c :=\langle r, F_k(r)\oplus m \rangle
+$$&lt;ul&gt;
+&lt;li&gt;Dec: on input a key $k \in \{0,1\}^n$ and a ciphertext $c =\langle r, s \rangle$, output the message&lt;/li&gt;
+&lt;/ul&gt;
+$$
+m := F_k(r)\oplus s
+$$&lt;p&gt;&lt;strong&gt;Proof&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Similar to example 2, we define a modified encryption scheme $\widetilde{\Pi}=(\widetilde{\mathsf{Gen}},\widetilde{\mathsf{Enc}},\widetilde{\mathsf{Dec}})$ that a random function f takes the place of $F_k$.&lt;/p&gt;
+&lt;p&gt;Fix an arbitrary PPT adversary A, and let q(n) be an upper bound on the number of queries that $A(1^n)$ makes to its encryption oracle. (q is upper-bounded by some polynomial)&lt;/p&gt;
+&lt;p&gt;We use A to construct a distinguisher D. D is given oracle access to a function O, its goal is to determine whether O is pseudorandom or random. D simulates experiment $\text{PrivK}^\text{cpa}$ for A, and observes A succeeds or not. If A succeeds then D guesses O must be a pseudorandom function, whereas A doesn&amp;rsquo;t succeed then D guesses O must be a random function.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Distinguisher D&lt;/strong&gt;: D is given input $1^n$ and access to an oracle O: $\{0,1\}^n \rightarrow \{0,1\}^n$&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Run $A(1^n)$. Whenever A queries its encryption oracle on a message $m \in \{0,1\}^n$, answer this query in the following way:
+&lt;ol&gt;
+&lt;li&gt;Choose uniform $r\in \{0,1\}^n$&lt;/li&gt;
+&lt;li&gt;Query O(r) and obtain response y&lt;/li&gt;
+&lt;li&gt;Return the ciphertext $\langle r, y\oplus m \rangle$ to A&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;When A outputs messages $m_0,m_1 \in \{0,1\}^n$, choose a uniform bit $b \in \{0,1\}$ and then:
+&lt;ol&gt;
+&lt;li&gt;Choose uniform $r \in \{0,1\}^n$&lt;/li&gt;
+&lt;li&gt;Query O(r) and obtain response y&lt;/li&gt;
+&lt;li&gt;Return the ciphertext $\langle r, y\oplus m_b \rangle$ to A&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Continue answering encryption-oracle queries of A as before until A outputs a bit b&amp;rsquo;. Output 1 if b&amp;rsquo;=b, and 0 otherwise.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Then, we need to find relations between the two as follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;If D&amp;rsquo;s oracle is a pseudorandom function, we have&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;right-2&#34;&gt;$$
+\Pr\nolimits_{k\leftarrow{0,1}^{n}}
+\left[
+D^{F_k(\mathord{\cdot})}(1^n)=1
+\right]
+&lt;/h1&gt;&lt;p&gt;\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{cpa}}(n)=1
+\right]
+$$&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;If D&amp;rsquo;s oracle is a random function, we have&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;right-3&#34;&gt;$$
+\Pr\nolimits_{f\leftarrow\mathrm{Func}_n}
+\left[
+D^{f(\mathord{\cdot})}(1^n)=1
+\right]
+&lt;/h1&gt;&lt;p&gt;\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)=1
+\right]
+$$&lt;/p&gt;
+&lt;h2 id=&#34;right-4&#34;&gt;Since the assumption that F is a pseudorandom function, we have
+$$
+\left|
+\Pr\left[
+D^{F_k(\mathord{\cdot})}(1^n)=1
+\right]
+&lt;/h2&gt;&lt;h2 id=&#34;right-5&#34;&gt;\Pr\left[
+D^{f(\mathord{\cdot})}(1^n)=1
+\right]
+\right|
+\leq
+\operatorname{negl}(n)
+$$
+Combining the above equations, we have
+$$
+\left|
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{cpa}}(n)=1
+\right]
+&lt;/h2&gt;&lt;p&gt;\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)=1
+\right]
+\right|
+\leq
+\operatorname{negl}(n)
+$$
+Our goal is something about the left Pr, so next thing we need to do is compute the right one.&lt;/p&gt;
+&lt;p&gt;Every time a message m is encrypted in $\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)$ (either by the encryption oracle $\langle r, f(r)\oplus m \rangle$ or when the challenge ciphertext is computed $\langle r^*, f(r^*)\oplus m_b \rangle$), due to the r is chosen uniformly, there are 2 possibilities:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The value $r^*$ is never appeared in queries. In this case, the probability A outputs b&amp;rsquo;=b is exactly 1/2&lt;/li&gt;
+&lt;li&gt;The value $r^*$ is used when answering at least one of A&amp;rsquo;s queries. In this case, A can easily determine which message is encrypted. However, since A makes at most q(n) queries to its encryption oracle. The probability of this case is at most $q(n)/2^n$&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Let &lt;strong&gt;repeat&lt;/strong&gt; denote the event that $r^*$ is used by the encryption oracle when answering at least one of A&amp;rsquo;s queries. Therefore:
+&lt;/p&gt;
+$$
+\begin{aligned}
+&amp;\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)=1
+\right]
+\\
+&amp;=
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)=1
+\land \mathsf{repeat}
+\right]
++
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)=1
+\land \overline{\mathsf{repeat}}
+\right]
+\\
+&amp;\leq
+\Pr\left[\mathsf{repeat}\right]
++
+\Pr\left[
+\left.
+\operatorname{PrivK}_{\mathcal{A},\widetilde{\Pi}}^{\mathrm{cpa}}(n)=1
+\,\right|\,
+\overline{\mathsf{repeat}}
+\right]
+\\
+&amp;\leq
+\frac{q(n)}{2^n}+\frac{1}{2}
+\end{aligned}
+$$&lt;p&gt;
+Finally, we conclude that
+&lt;/p&gt;
+$$
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{cpa}}(n)=1
+\right] \leq \frac{1}{2} + \frac{q(n)}{2^n}+ \text{negl}(n)
+$$&lt;p&gt;
+Since q(n) is polynomial, $q(n)/2^n$ is negligible, and the sum of 2 negligible functions is negligible, namely
+&lt;/p&gt;
+$$
+\Pr\left[
+\operatorname{PrivK}_{\mathcal{A},\Pi}^{\mathrm{cpa}}(n)=1
+\right] \leq \frac{1}{2}+ \text{negl}&#39;(n)
+$$&lt;blockquote&gt;
+&lt;p&gt;I think the core and difficult part of proof is to construct the distinguisher D and find the probability equations.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion
+&lt;/h2&gt;&lt;p&gt;I introduce the concept of proofs by reduction and give 3 examples to show the detail construct. These three are classic examples. Maybe I will append more interesting proof examples in the future.&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>[SekaiCTF 2026] orbital-strike</title>
         <link>http://localhost:1313/p/sekaictf-2026-orbital-strike/</link>
         <pubDate>Fri, 10 Jul 2026 00:00:00 +0000</pubDate>
@@ -126,11 +452,10 @@ $$&lt;p&gt;有时候 Sage 内置的 resultant 无法直接计算。这时可以�
 &lt;/blockquote&gt;
 &lt;p&gt;Sylvester 矩阵实现了这个线性映射：&lt;/p&gt;
 &lt;p&gt;$(A,B)\longmapsto A(x)f(x)+B(x)g(x) $    $S\mathbf α = \mathbf β$&lt;/p&gt;
-&lt;p&gt;把 (A,B) 的系数排成一个向量，把 (Af+Bg) 的系数也排成一个向量，其中&lt;/p&gt;
-&lt;p&gt;$\deg A&lt;n,\deg B&lt;m$&lt;/p&gt;
+&lt;p&gt;把 (A,B) 的系数排成一个向量，把 (Af+Bg) 的系数也排成一个向量，其中 deg(A)&amp;lt;n, deg(B)&amp;lt;m&lt;/p&gt;
 &lt;p&gt;之后，结式的定义就是 Sylvester 矩阵的行列式，Sylvester 矩阵形式如上，一般认为其行列式的值和这部分一开始的那个式子是一样的&lt;/p&gt;
 &lt;p&gt;然后可以得出结式的一个基本性质：存在多项式 $A(x),B(x)\in \mathbb Z[x]$，使得 $ A(x)f(x)+B(x)g(x)=\operatorname{Res}(f,g)$&lt;/p&gt;
-&lt;p&gt;设 $\deg f=m ,\deg g=n$，考虑所有形如 $A(x)f(x)+B(x)g(x)$ 的多项式，其中 $\deg A&lt;n,\deg B&lt;m$&lt;/p&gt;
+&lt;p&gt;设 $\deg f=m ,\deg g=n$，考虑所有形如 $A(x)f(x)+B(x)g(x)$ 的多项式，其中 deg(A)&amp;lt;n, deg(B)&amp;lt;m&lt;/p&gt;
 &lt;p&gt;写成
 &lt;/p&gt;
 $$
