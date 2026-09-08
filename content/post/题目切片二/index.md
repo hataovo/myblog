@@ -133,7 +133,7 @@ $$
 $$
 那么就可以对 u 向量组成的矩阵求零空间恢复出 a
 
-> 这时关于求 u，就可能会想到 "把 c 向量当作矩阵，然后求其零空间得到 u " 的做法。但是这么做是有问题的，因为如果直接把 c 看成整数矩阵，求出来的是 $\sum_i u_i c_i = 0$，并非上述分析的 $\sum_i u_i c_i\equiv0\pmod n$，事实上普通零空间只取到了目标格里的一个很小的子集
+---
 
 故下一个任务是考虑如何求出 u
 
@@ -156,6 +156,16 @@ $$
 B= \begin{pmatrix} n&0&0&\cdots&0\\ r_1&1&0&\cdots&0\\ r_2&0&1&\cdots&0\\ \vdots&&&\ddots&\\ r_{19}&0&0&\cdots&1 \end{pmatrix}
 $$
 对 B 做 LLL 可以求出短向量 u
+
+> 更直白的想法可能是 "把 c 向量当作矩阵，然后求其零空间得到 u " 的做法，实际上也能求出 u 和 a；但是有一些细节上的差异，这里就不写了
+
+```python
+L = matrix(ZZ, 1, 20)
+for i in range(20):
+    L[0,i] = c[i] 
+u = L.right_kernel_matrix().LLL()[:-2] 
+a = u.right_kernel_matrix()[0]
+```
 
 ---
 
