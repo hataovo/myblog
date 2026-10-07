@@ -560,9 +560,7 @@ $$
 \sum_i u_i a_i=0
 $$<p>
 那么就可以对 u 向量组成的矩阵求零空间恢复出 a</p>
-<blockquote>
-<p>这时关于求 u，就可能会想到 &ldquo;把 c 向量当作矩阵，然后求其零空间得到 u &quot; 的做法。但是这么做是有问题的，因为如果直接把 c 看成整数矩阵，求出来的是 $\sum_i u_i c_i = 0$，并非上述分析的 $\sum_i u_i c_i\equiv0\pmod n$，事实上普通零空间只取到了目标格里的一个很小的子集</p>
-</blockquote>
+<hr>
 <p>故下一个任务是考虑如何求出 u</p>
 <p>假设 c0 在模 n 下可逆，则
 </p>
@@ -586,7 +584,26 @@ $$
 B= \begin{pmatrix} n&0&0&\cdots&0\\ r_1&1&0&\cdots&0\\ r_2&0&1&\cdots&0\\ \vdots&&&\ddots&\\ r_{19}&0&0&\cdots&1 \end{pmatrix}
 $$<p>
 对 B 做 LLL 可以求出短向量 u</p>
-<hr>
+<blockquote>
+<p>更直白的想法可能是 &ldquo;把 c 向量当作矩阵，然后求其零空间得到 u &quot; 的做法，实际上也能求出 u 和 a；但是有一些细节上的差异，这里就不写了</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">L</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">(</span><span class="n">ZZ</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">L</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> 
+</span></span><span class="line"><span class="cl"><span class="n">u</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">right_kernel_matrix</span><span class="p">()</span><span class="o">.</span><span class="n">LLL</span><span class="p">()[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> 
+</span></span><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">right_kernel_matrix</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
 <p>求出 a，即 $(m_i+k_{0,i}M)$ 之后，剩下的就是一个标准的 ACD 问题了，可以用典型的丢番图近似 SDA 格攻击，也可以继续正交格来做</p>
 <blockquote>
 <p>Approximate Common Divisor Problem     $a_i = pq_i + r_i$</p>
