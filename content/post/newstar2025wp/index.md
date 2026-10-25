@@ -9,10 +9,10 @@ image="fengmian.jpg"
 继moectf之后打的第二场ctf比赛，前两周主要做了cry和逆向，后面就只做了cry了，其他方向都做不动了...<br >
 这次的crypto一共24道题，大部分难度适中，相比moe，难度相差不大，或者说稍微难一点，考的东西涉及的更广，另外重要的一点就是不只有附件题，还有远程题目，趣味性相较moe确实更高，总之还是挺好玩的<br >
 
-
 ## Week 1
 
 ### 唯一表示
+
 这道题是一个中国剩余定理的应用，由若干连续的素数恢复n，而题目中remainders给了，就是c<br >
 由c的长度等于used_primes的长度，可以恢复出used_primes，那么就能用中国剩余定理求出n，即message_int<br >
 
@@ -310,7 +310,9 @@ print(long_to_bytes(m1) + long_to_bytes(m2) + long_to_bytes(m3))
 ```
 
 ## Week3
+
 ### 欧皇的生日
+
 题目
 ```python
 import random
@@ -762,6 +764,7 @@ print(long_to_bytes(int(m)))
 ## Week4
 
 ### 随机数之旅4
+
 题目
 ```python
 from Crypto.Util.number import getPrime

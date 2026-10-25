@@ -11,6 +11,7 @@ image="fengmian.png"
 总之，这次的crypto一共19道题，大部分难度适中，多花花时间，或是借助ai，都能应付得来，有几道分组密码比较繁琐，个人不是很喜欢 : (<br >
 
 ### Crypto入门指北
+
 题目
 ```python
 from Crypto.PublicKey import ElGamal
@@ -1513,6 +1514,7 @@ print(flag)
 # 没有用到p
 ```
 ### Prime_in_prime
+
 题目(输出没有贴出来)
 ```python
 from Crypto.Util.number import long_to_bytes, bytes_to_long, getPrime
@@ -1674,6 +1676,7 @@ print(long_to_bytes(int(m)))
 # moectf{Ez_W1NNer_@AtT@CK!||}
 ```
 ### wiener++
+
 题目
 ```python
 from Crypto.Util.number import *

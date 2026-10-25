@@ -3,18 +3,21 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2026-10-16T00:00:00+00:00</lastmod>
+    <lastmod>2026-10-25T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/p/0xgame-2026/</loc>
+    <lastmod>2026-10-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/categories/</loc>
-    <lastmod>2026-10-16T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/p/moectf-2026/</loc>
-    <lastmod>2026-10-16T00:00:00+00:00</lastmod>
+    <lastmod>2026-10-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/post/</loc>
-    <lastmod>2026-10-16T00:00:00+00:00</lastmod>
+    <lastmod>2026-10-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/categories/wp/</loc>
+    <lastmod>2026-10-25T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/p/moectf-2026/</loc>
     <lastmod>2026-10-16T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/p/%E6%8E%A8%E5%85%8D%E5%9B%9E%E5%BF%86%E5%BD%95/</loc>
